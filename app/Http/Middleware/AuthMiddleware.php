@@ -19,24 +19,21 @@ class AuthMiddleware
      */
     public function handle($request, Closure $next)
     {
-        // Check if the request contains a valid token
         $token = $request->bearerToken();
         $current_route = \join('::', \explode('@', Route::currentRouteAction()));
         $current_route_node = Cache::get('routes')
             ->where('properties.value.route_function', $current_route)->first();
         if (\in_array($current_route_node->authentication_level['value'], [0, 2])) {
-            return $next($request); // Continue to the
+            return $next($request);
         } else {
             if ($token) {
                 $personalAccessToken = PersonalAccessToken::findToken($token);
                 if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
-                    // Set the authenticated user
+
                     Auth::setUser($personalAccessToken->tokenable);
                     return $next($request);
                 }
-
             }
-            // If no valid token or not authenticated, return unauthorized response
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
