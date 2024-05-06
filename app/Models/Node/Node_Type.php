@@ -9,25 +9,61 @@ class Node_Type extends Model
 {
     use HasFactory;
 
-    public function NODE_TYPES($filler=null)
+    public function NODE_TYPES($filler = null)
     {
         $methods = \collect((new Node())->getControllerMethods());
         $options = '';
-        $methods->each(function ($controller, $location) use (&$options ,$filler) {
-            collect($controller)->each(function ($method) use ($location, &$options,$filler) {
-                $selected = !empty($filler) &&optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ?"selected":'';
+        $methods->each(function ($controller, $location) use (&$options, $filler) {
+            collect($controller)->each(function ($method) use ($location, &$options, $filler) {
+                $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
                 $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $location . "::" . $method . "</option>";
             });
         });
-
-        $route_method_options ='';
-        collect(['put','post','get','delete'])->each(function($route_method) use(&$route_method_options,$filler){
-            $selected =!empty($filler) && \optional(\optional($filler)->properties['value'])->route_method==$route_method? 'selected' :'';
-            $route_method_options.= "<option value='$route_method' $selected>$route_method</option>";
+        $node_pages_options = '';
+        Node::where('node_type', 3)->get()->each(function ($page) use (&$node_pages_options, $filler) {
+            $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->node_page == $page->id ? "selected" : '';
+            $node_pages_options .= "<option value='" . $page->id . "'$selected>" . $page->name . "</option>";
         });
-        $node_route = empty($filler)?'':\optional(\optional($filler)->properties['value'])->node_route;
+
+        $route_method_options = '';
+        collect(['put', 'post', 'get', 'delete'])->each(function ($route_method) use (&$route_method_options, $filler) {
+            $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
+            $route_method_options .= "<option value='$route_method' $selected>$route_method</option>";
+        });
+        $node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
+        $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
+        $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
+
         return collect([
-            'link' => ['id' => 2, 'rules' => ['route' => 'required'], 'handle' => []],
+            'link' => [
+                'id' => 2,
+                'rules' => ['node_route' => 'required', 'node_page' => 'required'],
+                'handle' => [
+                    'node_route' => ['location' => 'properties'],
+                    'node_page' => ['location' => 'properties'],
+                    'node_page_name' => ['location' => 'properties'],
+                ],
+                'extra_html' => "<div>
+                 <input
+                    type='hidden' name='node_page_name'
+                    id='node_page_name'
+                     value='" . $node_page_name . "'>
+
+                  <div class='mb-3'>
+                    <label for='route ' class='form-label'>Node route</label>
+                    <input
+                    type='text' class='form-control'
+                     id='node_route' aria-describedby='node_name' name='node_route'
+                     value='" . $node_route . "' required>
+                </div>
+                 <div class='mb-3'>
+                      <label for='node_page' class='form-label'>Node Page</label>
+                      <select id='node_page' class='form-select' name='node_page' required>
+                       $node_pages_options
+                      </select>
+                  </div>
+                </div>",
+            ],
             'route' => [
                 'id' => 1,
                 // storage handler
@@ -36,14 +72,14 @@ class Node_Type extends Model
                     'route_function' => ['location' => 'properties'],
                     'route_method' => ['location' => 'properties'],
                 ],
-                'rules' => ['node_route' => 'required', 'route_function' => 'required','route_method' => 'required'],
+                'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required'],
                 'extra_html' => "<div>
                  <div class='mb-3'>
                     <label for='route ' class='form-label'>Node route</label>
                     <input
                     type='text' class='form-control'
                      id='node_route' aria-describedby='node_name' name='node_route'
-                     value='".$node_route."' required>
+                     value='" . $node_route . "' required>
                 </div>
                   <div class='mb-3'>
                       <label for='route_function' class='form-label'>Route Function</label>
@@ -59,7 +95,15 @@ class Node_Type extends Model
                   </div>
                   </div>",
             ],
-            'page' => ['id' => 3, 'rules' => [], 'handle' => []],
+            'page' => [
+                'id' => 3,
+                'rules' => [],
+                'handle' => ['page_link' => ['location' => 'properties']],
+                'extra_html' => "<input
+                    type='hidden' name='page_link'
+                    id='page_link'
+                     value='" . $page_link . "'>",
+            ],
             'component' => ['id' => 4, 'rules' => [], 'handle' => []],
         ]);
     }
@@ -71,5 +115,25 @@ class Node_Type extends Model
             $storage->put($key, $data[$key]);
         });
         return \json_encode($storage->toArray());
+    }
+
+    public function extraScripts()
+    {
+        return \collect([
+            "<script>
+          document.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+          const node_page_name = document.querySelector('#node_page_name');
+          const node_page = document.querySelector('#node_page');
+          const selectedOption = node_page.options[node_page.selectedIndex];
+          node_page_name.value = selectedOption.innerHTML;
+          node_page.addEventListener('change',(event)=>{
+            const selectedOption = node_page.options[node_page.selectedIndex];
+            node_page_name.value = selectedOption.innerHTML;
+          })
+       }, 1000);
+            });
+       </script>",
+        ]);
     }
 }

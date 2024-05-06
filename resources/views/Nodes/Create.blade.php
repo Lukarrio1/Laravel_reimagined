@@ -63,7 +63,6 @@
 
                 <div id="extra_fields"></div>
 
-
                 <div class="col-sm-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
@@ -74,6 +73,7 @@
 </div>
 
 @section('scripts')
+{!!$extra_scripts!!}
 <script>
     const types = @json($types)
 

@@ -19,12 +19,14 @@ class NodeController extends Controller
             'nodes' => Node::query()->latest()->get()
             // ->filter(fn($node)=>$node->node_type['value']==1)
             ,
-            'node'=>$node
+            'node'=>$node,
+            'extra_scripts'=>(new Node_Type())->extraScripts()->join('')
         ]);
     }
 
     public function save(Request $request)
     {
+        // dd($request->all());
         $main_rules = [
             'name' => 'required',
             'small_description' => 'required',
@@ -42,7 +44,8 @@ class NodeController extends Controller
             isset($current_node_type['rules']) ?
             \collect($current_node_type['rules'])->keys()->toArray()
             : []) + ['properties' => (new Node_Type())
-            ->handler($current_node_type['handle'], $request->all())]);
+            ->handler($current_node_type['handle'], $request->all())])
+            ->updatePageLink();
 
         return \redirect()->route('viewNodes');
     }

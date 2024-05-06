@@ -19,9 +19,9 @@ class Node extends Model
         0 => 'Un Authenticated',
         2 => 'Public',
     ];
-    public const NODE_STATUS =[1=>'Active',0=>'In Active'];
+    public const NODE_STATUS = [1 => 'Active', 0 => 'In Active'];
 
-     public  const NODE_TYPE =[1=>'Route',2=>'Link',3=>'Page',4=>'Component'];
+    public const NODE_TYPE = [1 => 'Route', 2 => 'Link', 3 => 'Page', 4 => 'Component'];
 
     public function getAllControllerClasses()
     {
@@ -79,24 +79,36 @@ class Node extends Model
         return $controllerMethods;
     }
 
-
-    public function getAuthenticationLevelAttribute($value){
-        return ['value'=>$value,'human_value'=>self::Authentication_Levels[$value]];
+    public function getAuthenticationLevelAttribute($value)
+    {
+        return ['value' => $value, 'human_value' => self::Authentication_Levels[$value]];
     }
 
-     public function getNodeTypeAttribute($value){
-        return ['value'=>$value,'human_value'=>self::NODE_TYPE[$value]];
+    public function getNodeTypeAttribute($value)
+    {
+        return ['value' => $value, 'human_value' => self::NODE_TYPE[$value]];
     }
 
-
-    public function getPropertiesAttribute($value){
-        return ['value'=>\json_decode($value),'html_value'=>"<small>".\collect(json_decode($value))->map(function($value,$key){
-            return collect(\explode('_',$key))->map(fn($word)=>\ucfirst($word))->join(' ')."<strong>:</strong> $value";
-        })->join('<br>')."</small>"];
+    public function getPropertiesAttribute($value)
+    {
+        return ['value' => \json_decode($value), 'html_value' => "<small>" . \collect(json_decode($value))->map(function ($value, $key) {
+            return collect(\explode('_', $key))->map(fn($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value";
+        })->join('<br>') . "</small>"];
     }
 
-    public function getNodeStatusAttribute($value){
-        return ['value'=>$value,'human_value'=>self::NODE_STATUS[$value]];
+    public function getNodeStatusAttribute($value)
+    {
+        return ['value' => $value, 'human_value' => self::NODE_STATUS[$value]];
+    }
+
+    public function updatePageLink()
+    {
+        if (\optional($this->node_type)['value'] == 2 && !empty(\optional(optional($this->properties)['value'])->node_page)) {
+            Node::find((int) $this->properties['value']->node_page)
+                ->update(['properties' => \json_encode(['page_link' => $this->name])]);
+        }
+        return $this;
+
     }
 
 }
