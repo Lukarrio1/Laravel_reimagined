@@ -11,6 +11,17 @@
                     @enderror
 
                 </div>
+                <div class="mb-3">
+                    <label for="role_name" class="form-label">Permissions</label>
+                    <select class="form-select" multiple aria-label="Multiple select example" name="permissions[]">
+                        <option selected>Open this select menu</option>
+                        @foreach ($permissions as $permission )
+                        <option value="{{$permission->id}}" {{in_array($permission->id,empty(optional(optional($role)->permissions)->pluck('id'))?[]:
+                        optional(optional($role)->permissions)->pluck('id')->toArray()) ? 'selected' : '' }}>
+                            {{$permission->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <input type="hidden" value="{{optional($role)->id}}" name="id">
                 <div class="mb-3 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>

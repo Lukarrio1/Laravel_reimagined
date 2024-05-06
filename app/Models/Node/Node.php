@@ -6,6 +6,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Node extends Model
@@ -105,10 +106,18 @@ class Node extends Model
     {
         if (\optional($this->node_type)['value'] == 2 && !empty(\optional(optional($this->properties)['value'])->node_page)) {
             Node::find((int) $this->properties['value']->node_page)
-                ->update(['properties' => \json_encode(['page_link' => $this->name])]);
+                ->update([
+                    'properties' => \json_encode(['page_link' => $this->name]),
+                    'permission_id' => $this->permission_id,
+                ]);
         }
         return $this;
 
+    }
+
+    public function permission()
+    {
+        return $this->hasOne(Permission::class, 'id', 'permission_id');
     }
 
 }

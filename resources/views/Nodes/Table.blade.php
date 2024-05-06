@@ -9,6 +9,7 @@
                         <th scope="col">Node Authentication Level</th>
                         <th scope="col">Node Type</th>
                         <th scope="col">Node Status</th>
+                        <th scope="col">Node Permission</th>
                         <th scope="col">Node Properties</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -21,6 +22,7 @@
                         <td>{{$node->authentication_level['human_value']}}</td>
                         <td>{{$node->node_type['human_value']}}</td>
                         <td>{{$node->node_status['human_value']}}</td>
+                        <td>{{optional(optional($node)->permission)->name}}</td>
                         <td>{!!$node->properties['html_value']!!}</td>
                         <td>
                         <a href="{{route('viewNode',['node'=>$node])}}" class="btn btn-warning btn-sm">Edit</a>

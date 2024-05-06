@@ -6,6 +6,7 @@ use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use App\Models\Node\Node_Type;
 use App\Http\Controllers\Controller;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
 
 class NodeController extends Controller
@@ -20,7 +21,8 @@ class NodeController extends Controller
             // ->filter(fn($node)=>$node->node_type['value']==1)
             ,
             'node'=>$node,
-            'extra_scripts'=>(new Node_Type())->extraScripts()->join('')
+            'extra_scripts'=>(new Node_Type())->extraScripts()->join(''),
+            'permissions'=>Permission::all()
         ]);
     }
 
@@ -64,7 +66,7 @@ class NodeController extends Controller
 
     public function testerFunction(Node $param){
 
-        dd($param->toArray());
-        return Node::query()->when($param,fn($q)=>$q->where('id',$param->id))->get();
+
+        return Node::query()->get();
     }
 }
