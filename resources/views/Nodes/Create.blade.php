@@ -62,19 +62,19 @@
                  </div>
 
                 <div id="extra_fields"></div>
-    <div class="mb-3">
-     <label for="permission" class="form-label">Node Permission</label>
-     <select id="permission" class="form-select" name="permission_id">
-     <option value=''> Select Permission</option>
-         @foreach($permissions as $permission)
-         <option value="{{$permission->id}}" {{optional($permission)->id==optional($node)->permission_id?"selected":''}}>{{$permission->name}}</option>
-         @endforeach
-     </select>
-     @error('node_status')
-     <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
-     @enderror
+                            <div class="mb-3">
+                            <label for="permission" class="form-label">Node Permission</label>
+                            <select id="permission" class="form-select" name="permission_id">
+                            <option value=''> Select Permission</option>
+                                @foreach($permissions as $permission)
+                                <option value="{{$permission->id}}" {{optional($permission)->id==optional($node)->permission_id?"selected":''}}>{{$permission->name}}</option>
+                                @endforeach
+                            </select>
+                            @error('node_status')
+                            <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
+                            @enderror
 
- </div>
+                        </div>
 
                 <div class="col-sm-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>

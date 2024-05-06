@@ -1,5 +1,14 @@
-<div class="col-sm-8 offset-sm-2 mt-4">
+<div class="col-sm-12 mt-4">
     <div class="card">
+    <div class="card-header">
+        <form action="{{route('viewNodes')}}" action="get">
+        <div class="mb-3">
+            <label for="search" class="form-label">Node Name ({{count($nodes)}})</label>
+            <input type="text" class="form-control" id="search" name="search" value="{{request('search')}}">
+            Search format: {{$search_placeholder}}
+        </div>
+        </form>
+    </div>
         <div class="card-body">
             <table class="table">
                 <thead>
