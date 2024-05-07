@@ -14,7 +14,7 @@ class NodeController extends Controller
     public function index($node = null)
     {
         $translate = ['name' => 'name', 'description' => 'small_description', 'type' => 'node_type'];
-        $translate_eg = ['name' => 'Link 1', 'description' => 'link to the home page', 'type' => '2'];
+        $translate_eg = ['name' => 'Link 1', 'description' => 'link to the home page', 'type' => 'Link'];
 
         $search_placeholder = \collect($translate)->keys()->map(function ($key, $idx) use ($translate, $translate_eg) {
             if ($idx == 0) {

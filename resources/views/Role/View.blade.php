@@ -1,4 +1,4 @@
-@extends('Layouts.layout')
+@extends('Layouts.app')
 @section('content')
 <div class="row">
     @include('Role.Create')

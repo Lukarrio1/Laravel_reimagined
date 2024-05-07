@@ -3,9 +3,10 @@
     <div class="card-header">
         <form action="{{route('viewNodes')}}" action="get">
         <div class="mb-3">
-            <label for="search" class="form-label">Node Name ({{count($nodes)}})</label>
+            <label for="search" class="form-label">Nodes({{count($nodes)}})</label>
             <input type="text" class="form-control" id="search" name="search" value="{{request('search')}}">
-            Search format: {{$search_placeholder}}
+            <span class="mt-2 text-info">Example Search Format: {{$search_placeholder}}</span>
+
         </div>
         </form>
     </div>

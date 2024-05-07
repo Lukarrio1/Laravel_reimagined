@@ -29,9 +29,14 @@ class AuthMiddleware
             if ($token) {
                 $personalAccessToken = PersonalAccessToken::findToken($token);
                 if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
-
                     Auth::setUser($personalAccessToken->tokenable);
-                    return $next($request);
+                    if (\request()->user()->hasPermissionTo(\optional($current_route_node->permission)->name)) { // Adjust the permission name
+                        return $next($request);
+                    } else if (empty($current_route_node->permission)) {
+                        return $next($request);
+                    }
+                    return response()->json(['error' => 'Forbidden'], 403);
+
                 }
             }
             return response()->json(['error' => 'Unauthorized'], 401);

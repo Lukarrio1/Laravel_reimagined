@@ -9,10 +9,15 @@ class Node_Type extends Model
 {
     use HasFactory;
 
+
+    public const ControllerExceptionList=[];
+
     public function NODE_TYPES($filler = null)
     {
+        // gets the controller methods
         $methods = \collect((new Node())->getControllerMethods());
         $options = '';
+        // creates a string that has the controller name and method as options
         $methods->each(function ($controller, $location) use (&$options, $filler) {
             collect($controller)->each(function ($method) use ($location, &$options, $filler) {
                 $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
@@ -20,11 +25,12 @@ class Node_Type extends Model
             });
         });
         $node_pages_options = '';
+       // creates a string that has node pages as option
         Node::where('node_type', 3)->get()->each(function ($page) use (&$node_pages_options, $filler) {
             $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->node_page == $page->id ? "selected" : '';
             $node_pages_options .= "<option value='" . $page->id . "'$selected>" . $page->name . "</option>";
         });
-
+       // creates a string that has route method as option
         $route_method_options = '';
         collect(['put', 'post', 'get', 'delete'])->each(function ($route_method) use (&$route_method_options, $filler) {
             $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
@@ -119,6 +125,7 @@ class Node_Type extends Model
 
     public function extraScripts()
     {
+        // this handles the setting of the selected node page as????
         return \collect([
             "<script>
           document.addEventListener('DOMContentLoaded', () => {
