@@ -14,53 +14,96 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthMiddleware
 {
-    /**
+
+  /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
+     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        $token = $request->bearerToken();
+        // Force response content to be JSON
         $request->headers->set('Accept', 'application/json');
-        $current_route = \join('::', \explode('@', Route::currentRouteAction()));
-        $current_route_node = Cache::get('routes')
-            ->where('properties.value.route_function', $current_route)->first();
-        if (empty($current_route_node)) {
+
+        // Extract the token from the request
+        $token = $request->bearerToken();
+
+        // Determine the current route's function name
+        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
+
+        // Retrieve the route node from the cache
+        $currentRouteNode = Cache::get('routes')
+            ->where('properties.value.route_function', $currentRoute)
+            ->first();
+
+        if (empty($currentRouteNode)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        if (\in_array($current_route_node->authentication_level['value'], [0, 2])) {
-            $personalAccessToken = PersonalAccessToken::findToken($token);
-            if ($current_route_node->authentication_level['value'] == 0 && $personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
-                Auth::setUser($personalAccessToken->tokenable);
-                if (!empty(request()->user())) {
-                    return response()->json(['error' => 'Unauthorized'], 401);
-                }
-            } else {
+
+        // Check the required authentication level
+        $authLevel = $currentRouteNode->authentication_level['value'];
+        if (in_array($authLevel, [0, 2])) {
+            return $this->handleAuthLevelZeroOrTwo($request, $next, $token, $authLevel);
+        } else {
+            return $this->handleAuthLevelOne($request, $next, $token, $currentRouteNode);
+        }
+    }
+
+    /**
+     * Handle routes with authentication level 0 or 2.
+     */
+    protected function handleAuthLevelZeroOrTwo(Request $request, Closure $next, $token, $authLevel)
+    {
+        $personalAccessToken = PersonalAccessToken::findToken($token);
+
+        if ($authLevel == 0 && $personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
+            Auth::setUser($personalAccessToken->tokenable);
+            if (request()->user()) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        }
+
+        return $next($request);
+    }
+
+    /**
+     * Handle routes with authentication level 1.
+     */
+    protected function handleAuthLevelOne(Request $request, Closure $next, $token, $currentRouteNode)
+    {
+        if (!$token) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $personalAccessToken = PersonalAccessToken::findToken($token);
+
+        if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
+            Auth::setUser($personalAccessToken->tokenable);
+
+            // Check admin role
+            $adminRoleId = optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
+            $adminRole = $adminRoleId ? Role::find($adminRoleId) : null;
+
+            if ($adminRole && request()->user()->hasRole(optional($adminRole)->name)) {
                 return $next($request);
             }
-        } else {
-            if ($token) {
-                $personalAccessToken = PersonalAccessToken::findToken($token);
-                $setting = \optional(Setting::where('key', 'admin_role')->first())
-                    ->getSettingValue();
-                $role = !empty($setting) ? Role::find($setting) : null;
-                if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
-                    Auth::setUser($personalAccessToken->tokenable);
-                    if (!empty($role) && request()->user()->hasRole(\optional($role)->name)) {
-                        return $next($request);
 
-                    }
-                    if (!empty(\optional($current_route_node)->permission) && \request()->user()->hasPermissionTo(\optional($current_route_node->permission)->name)) { // Adjust the permission name
-                        return $next($request);
-                    } elseif (empty($current_route_node->permission)) {
-                        return $next($request);
-                    }
-                    return response()->json(['error' => 'Forbidden'], 403);
-
-                }
+            // Check route-specific permissions
+            if (!empty($currentRouteNode->permission) &&
+                request()->user()->hasPermissionTo(optional($currentRouteNode->permission)->name)) {
+                return $next($request);
             }
-            return response()->json(['error' => 'Unauthorized'], 401);
+
+            // If no specific permissions are required, allow access
+            if (empty($currentRouteNode->permission)) {
+                return $next($request);
+            }
+
+            return response()->json(['error' => 'Forbidden'], 403);
         }
+
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 }
