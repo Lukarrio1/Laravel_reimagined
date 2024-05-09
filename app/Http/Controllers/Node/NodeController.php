@@ -8,11 +8,20 @@ use App\Models\Node\Node_Type;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Cache\CacheController;
 
 class NodeController extends Controller
 {
+
+    public $cache;
+
+    public function __construct(){
+
+        $this->cache = new CacheController();
+    }
     public function index($node = null)
     {
+
         $translate = ['name' => 'name', 'description' => 'small_description', 'type' => 'node_type'];
         $translate_eg = ['name' => 'Link 1', 'description' => 'link to the home page', 'type' => 'Link'];
 
@@ -52,6 +61,7 @@ class NodeController extends Controller
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
             'search_placeholder' => $search_placeholder,
+            // 'cache'=> $this->clearCache()
         ]);
     }
 

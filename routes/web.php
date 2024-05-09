@@ -3,16 +3,19 @@
 use App\Models\Node\Node;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\CheckSuperAdmin;
 use App\Http\Controllers\Node\NodeController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Cache\CacheController;
+use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Node\NodeTypeController;
+use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Permission\PermissionController;
 
 Auth::routes();
 
-Route::middleware(['auth'])->group(function(){
+Route::middleware(['auth',CheckSuperAdmin::class])->group(function(){
 
 Route::get('/nodes', [NodeController::class,'index'])->name('viewNodes');
 Route::post('/node', [NodeController::class,'save'])->name('saveNode');
@@ -36,8 +39,14 @@ Route::delete('/permission/{permission}', [PermissionController::class, 'delete'
 Route::get('/caches', [CacheController::class,'index'])->name('viewCache');
 Route::get('/clear/caches', [CacheController::class, 'clearCache'])->name('clearCache');
 
+Route::post('/update/user/{user}', [ProfileController::class, 'update'])->name('updateUser');
 Route::get('/users',[UserController::class,'index'])->name('viewUsers');
 Route::post('/assign/role/{user}', [UserController::class, 'assignRole'])->name('assignRole');
+
+
+Route::get('/settings',[SettingController::class,'index'])->name('viewSettings');
+Route::post('/save/setting',[SettingController::class,'save'])->name('saveSetting');
+
 
 
 
