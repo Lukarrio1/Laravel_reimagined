@@ -20,7 +20,9 @@ class RoleController extends Controller
 
     public function save(RoleSaveRequest $request)
     {
-        Role::updateOrCreate(['id' => $request->id], $request->all())->syncPermissions(Permission::whereIn('id', $request->permissions)->pluck('name')->toArray());
+        Role::updateOrCreate(['id' => $request->id], $request->all())
+        ->syncPermissions(Permission::whereIn('id', $request->permissions)
+        ->pluck('name')->toArray());
         return \redirect()->route('viewRoles');
     }
 

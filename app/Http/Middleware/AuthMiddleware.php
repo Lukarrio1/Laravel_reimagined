@@ -22,6 +22,7 @@ class AuthMiddleware
     public function handle($request, Closure $next)
     {
         $token = $request->bearerToken();
+        $request->headers->set('Accept', 'application/json');
         $current_route = \join('::', \explode('@', Route::currentRouteAction()));
         $current_route_node = Cache::get('routes')
             ->where('properties.value.route_function', $current_route)->first();
@@ -29,7 +30,15 @@ class AuthMiddleware
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         if (\in_array($current_route_node->authentication_level['value'], [0, 2])) {
-            return $next($request);
+            $personalAccessToken = PersonalAccessToken::findToken($token);
+            if ($current_route_node->authentication_level['value'] == 0 && $personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
+                Auth::setUser($personalAccessToken->tokenable);
+                if (!empty(request()->user())) {
+                    return response()->json(['error' => 'Unauthorized'], 401);
+                }
+            } else {
+                return $next($request);
+            }
         } else {
             if ($token) {
                 $personalAccessToken = PersonalAccessToken::findToken($token);
@@ -42,7 +51,7 @@ class AuthMiddleware
                         return $next($request);
 
                     }
-                    if (\request()->user()->hasPermissionTo(\optional($current_route_node->permission)->name)) { // Adjust the permission name
+                    if (!empty(\optional($current_route_node)->permission) && \request()->user()->hasPermissionTo(\optional($current_route_node->permission)->name)) { // Adjust the permission name
                         return $next($request);
                     } elseif (empty($current_route_node->permission)) {
                         return $next($request);

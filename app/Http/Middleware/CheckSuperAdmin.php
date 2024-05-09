@@ -21,7 +21,7 @@ class CheckSuperAdmin
     {
         $user = Auth::user();
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
-        $role = !empty($setting) ? Role::find($setting) : null;
+        $role = !empty($setting) ? Role::find((int)$setting) : null;
         // Check if the user is authenticated and has the "Super Admin" role
         if (!empty($role)&&$user && $user->hasRole($role)) {
             return $next($request);

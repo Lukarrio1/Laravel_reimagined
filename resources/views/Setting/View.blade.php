@@ -5,10 +5,10 @@
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="key" class="form-label">Setting Key</label>
+                    <label for="key" class="form-label">Setting Key (<small>Please request the setting value by pressing the blue button.</small>)</label>
                     <select id="key" class="form-select" name="setting_key">
                         @foreach($keys as $key=>$value)
-                        <option value="{{$key}}">{{$value}}</option>
+                        <option value="{{$key}}" {{request()->get('setting_key')==$key?"selected":''}}>{{$value}}</option>
                         @endforeach
                     </select>
                     @error('value')
@@ -50,7 +50,8 @@
                     @foreach ($settings as $setting )
                     <tr>
                         <td>{{$setting->getAllSettingKeys($setting->key)}}</td>
-                        <td>{{$setting->properties}}</td>
+                        <td>{{$setting->getSettingValue('first')}}</td>
+
                     </tr>
                     @endforeach
                 </tbody>
