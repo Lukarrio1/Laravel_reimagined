@@ -1,5 +1,5 @@
 @extends('Layouts.app')
 @section('content')
-@include('User.Search')
-@include('User.Table')
+@include('Export.Filter')
+@include('Export.Table')
 @endsection

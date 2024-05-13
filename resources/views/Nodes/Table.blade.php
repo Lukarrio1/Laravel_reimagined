@@ -1,11 +1,12 @@
 <div class="col-sm-12 mt-4">
-    <div class="card">
-    <div class="card-header">
+    <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+
+    <div class="card-header bg-white">
         <form action="{{route('viewNodes')}}" action="get">
         <div class="mb-3">
             <label for="search" class="form-label">Nodes({{count($nodes)}})</label>
             <input type="text" class="form-control" id="search" name="search" value="{{request('search')}}">
-            <span class="mt-2 text-info">Example Search Format: {{$search_placeholder}}</span>
+            <div class="mt-2 text-danger">Example Search Format: {{$search_placeholder}}</div>
 
         </div>
         </form>
@@ -35,7 +36,7 @@
                         <td>{{optional(optional($node)->permission)->name}}</td>
                         <td>{!!$node->properties['html_value']!!}</td>
                         <td>
-                        <a href="{{route('viewNode',['node'=>$node])}}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{route('viewNode',['node'=>$node])}}" class="btn btn-warning btn-sm m-2">Edit</a>
                      <form action="{{route('deleteNode',['node'=>$node])}}" method="post">
                      @method('delete')
                      @csrf
@@ -48,5 +49,12 @@
 
 
         </div>
+        <div class="card-footer bg-white">
+            <div class="text-center">
+                <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?load_more='.request()->get('load_more')+10}}">load more</a>
+
+            </div>
+        </div>
+
     </div>
 </div>

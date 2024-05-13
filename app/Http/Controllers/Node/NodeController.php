@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Node;
 
+use App\Models\Audit;
 use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use App\Models\Node\Node_Type;
@@ -15,59 +16,77 @@ class NodeController extends Controller
 
     public $cache;
 
-    public function __construct(){
+    public function __construct()
+    {
 
         $this->cache = new CacheController();
     }
     public function index($node = null)
     {
 
-        $translate = ['name' => 'name', 'description' => 'small_description', 'type' => 'node_type'];
-        $translate_eg = ['name' => 'Link 1', 'description' => 'link to the home page', 'type' => 'Link'];
+        $translate = [
+            'name' => 'name',
+            'description' => 'small_description',
+            'type' => 'node_type',
+        ];
 
-        $search_placeholder = \collect($translate)->keys()->map(function ($key, $idx) use ($translate, $translate_eg) {
+        $translateExamples = [
+            'name' => 'Link 1',
+            'description' => 'link to the home page',
+            'type' => 'Link',
+        ];
+
+        // Build the search placeholder
+        $searchPlaceholder = \collect($translate)->keys()->map(function ($key, $idx) use ($translate, $translateExamples) {
             if ($idx == 0) {
-                return '|' . $key . ":$translate_eg[$key]";
+                return '|' . $key . ":$translateExamples[$key]";
             }
             if ($idx + 1 == count($translate)) {
-                return $key . ":$translate_eg[$key]|";
+                return $key . ":$translateExamples[$key]|";
             }
-            return $key . ":$translate_eg[$key]";
+            return $key . ":$translateExamples[$key]";
         })->join('|');
 
-        $search_params = collect(explode('|', \request()->get('search')))
-            ->filter(fn($sec) => !empty($sec))
-            ->map(function ($sec) {
-                return \explode(':', $sec);
+        // Parse the search parameter from the request and create key-value pairs
+        $searchParams = collect(explode('|', request()->get('search')))
+            ->filter(fn($section) => !empty($section)) // Filter out empty sections
+            ->map(function ($section) {
+                return explode(':', $section);
             });
 
-        $nodes = Node::query()
-        // ->when($search, fn($q) => $q->where('name', 'LIKE', '%' . $search . '%'))
-        ;
-        collect($search_params)->each(function ($sec) use ($nodes, $translate) {
-            $sec = \collect($sec);
-            $convert_value = $translate[$sec->first()] == "node_type"?\array_search(\ucfirst($sec->last()), Node::NODE_TYPE) : $sec->last();
-            $nodes->where($translate[$sec->first()], 'LIKE', '%' . $convert_value . '%');
+        // Query for Nodes and apply filters based on search parameters
+        $nodes = Node::query();
+
+        $searchParams->each(function ($section) use ($nodes, $translate) {
+            list($key, $value) = $section;
+            // Check if the key is valid in the translation map
+            if (!isset($translate[$key])) {
+                return; // Skip invalid keys
+            }
+            // Convert 'type' value to its corresponding node type ID
+            if ($translate[$key] === 'node_type') {
+                $convertedValue = array_search(ucfirst($value), Node::NODE_TYPE);
+            } else {
+                $convertedValue = $value;
+            }
+
+            $nodes->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
         });
 
         return \view('Nodes.View', [
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
-            'nodes' => $nodes->latest()->get()
-            // ->filter(fn($node)=>$node->node_type['value']==1)
-            ,
+            'nodes' => $nodes->latest()->take(\request('load_more'))->get(),
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
-            'search_placeholder' => $search_placeholder,
-            // 'cache'=> $this->clearCache()
+            'search_placeholder' => $searchPlaceholder,
         ]);
     }
 
     public function save(Request $request)
     {
-        // dd($request->all());
         $main_rules = [
             'name' => 'required',
             'small_description' => 'required',
@@ -105,6 +124,6 @@ class NodeController extends Controller
     public function testerFunction(Node $param)
     {
 
-        return Node::query()->get();
+        return Audit::all();
     }
 }

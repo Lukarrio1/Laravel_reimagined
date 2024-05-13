@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use App\Models\Node\Node;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,10 @@ if (!Cache::has('routes')) {
     // Add routes to cache
     Cache::add('routes', $nodes, now()->addMinutes(30)); // Cache with expiration (optional)
 }
+if (!Cache::has('settings')) {
+    Cache::add('settings', Setting::all());
+}
+
 
 // Retrieve cached routes
 $routes = Cache::get('routes');

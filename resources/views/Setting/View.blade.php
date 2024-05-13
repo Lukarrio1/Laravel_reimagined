@@ -1,17 +1,17 @@
 @extends('Layouts.app')
 @section('content')
 <div class="col-sm-8 offset-sm-2">
-    <div class="card">
+    <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="key" class="form-label">Setting Key (<small>Please request the setting value by pressing the blue button.</small>)</label>
+                    <label for="key" class="form-label">Setting Key (<small class="text-danger">Please request the setting value by pressing the blue button.</small>)</label>
                     <select id="key" class="form-select" name="setting_key">
                         @foreach($keys as $key=>$value)
                         <option value="{{$key}}" {{request()->get('setting_key')==$key?"selected":''}}>{{$value}}</option>
                         @endforeach
                     </select>
-                    @error('value')
+                    @error('setting_key')
                     <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                     @enderror
                     <div class="mb-3 text-center mt-3">
@@ -37,7 +37,8 @@
     </div>
 </div>
 <div class="col-sm-8 offset-sm-2 mt-3">
-    <div class="card">
+    <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+
         <div class="card-body">
             <table class="table">
                 <thead>

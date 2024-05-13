@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Setting;
 
 use App\Models\Setting;
+use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -13,7 +14,6 @@ class SettingController extends Controller
     {
         $setting = new Setting();
         $setting_key = empty(\request()->get('setting_key')) ? $setting_key : \request()->get('setting_key');
-
         return view('Setting.View', [
             'keys' => $setting->getAllSettingKeys(),
             'key_value' => $setting->SETTING_KEYS($setting_key)['field'],
@@ -24,6 +24,7 @@ class SettingController extends Controller
 
     public function save(Request $request)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), ['value' => ['required'], 'setting_key' => ['required']]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();

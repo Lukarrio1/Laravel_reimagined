@@ -79,6 +79,17 @@ class Node extends Model
 
         return $controllerMethods;
     }
+    public function getAllModels()
+    {
+        $modelsPath = app_path('Models');
+        $modelFiles = File::allFiles($modelsPath);
+        $modelClasses = array_map(function ($file) {
+            $relativePath = str_replace(app_path(), '', $file->getRealPath());
+            $className = 'App' . str_replace(['/', '.php'], ['\\', ''], $relativePath);
+            return $className;
+        }, $modelFiles);
+        return $modelClasses;
+    }
 
     public function getAuthenticationLevelAttribute($value)
     {

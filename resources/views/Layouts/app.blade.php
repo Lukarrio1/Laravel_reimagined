@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -21,7 +22,10 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name') }}
+                @php
+                $app_name =optional(collect(Cache::get('settings'))->where('key','app_name')->first())->properties
+                @endphp
+                {{$app_name}}
                 </a>
                 @auth
                 <a class="navbar-brand" href="{{route('viewNodes')}}" aria-current="page">Nodes</a>
@@ -29,6 +33,7 @@
                 <a class="navbar-brand" href="{{route('viewPermissions')}}">Permissions</a>
                 <a class="navbar-brand" href="{{route('viewUsers')}}">Users</a>
                 <a class="navbar-brand" href="{{route('viewCache')}}">Cache</a>
+                <a class="navbar-brand" href="{{route('exportData')}}">Export</a>
                 <a class="navbar-brand" href="{{route('viewSettings')}}">Settings</a>
                 @endauth
 

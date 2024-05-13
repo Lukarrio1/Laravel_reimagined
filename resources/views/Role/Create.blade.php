@@ -1,5 +1,5 @@
 <div class="col-sm-8 offset-sm-2 mt-5">
-    <div class="card">
+    <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
             <form action="{{route('saveRole')}}" method='post'>
                 @csrf
@@ -12,7 +12,7 @@
 
                 </div>
                 <div class="mb-3">
-                    <label for="role_name" class="form-label">Permissions</label>
+                    <label for="role_name" class="form-label">Permissions (<small class="text-danger">Use shift to select more than 1 permission</small>)</label>
                     <select class="form-select" multiple aria-label="Multiple select example" name="permissions[]">
                         <option selected>Open this select menu</option>
                         @foreach ($permissions as $permission )

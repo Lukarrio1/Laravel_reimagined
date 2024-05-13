@@ -1,5 +1,9 @@
 <div class="col-sm-8 offset-sm-2 mt-2">
-    <div class="card">
+    <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+    <div class="card-header bg-white">
+        <div class="text-center h4">Manage Nodes</div>
+    </div>
+
         <div class="card-body">
             <form method="post" action="{{route('saveNode')}}">
                 @csrf
@@ -77,7 +81,7 @@
                         </div>
 
                 <div class="col-sm-12 text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Save</button>
                 </div>
 
             </form>

@@ -11,16 +11,21 @@ class Setting extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public function SETTING_OPTIONS($key, $value)
+    public function SETTING_OPTIONS($key, $value, $setting_key)
     {
         $html = '';
-        $value = collect($value);
+        $prev_val = '';
+        // \optional(self::where('key',$setting_key)->first())->getSettingValue();
+        $value = !empty($prev_val) ? $prev_val : collect($value);
         switch ($key) {
             case 'drop_down':
                 $value->each(function ($key, $val) use (&$html) {
                     $html .= "<option value='" . $val . "_" . $key . "'>$val</option>";
                 });
                 $html = "<select class='form-select' name='value'>$html</select>";
+                break;
+            case 'input':
+                $html = "<input class='form-control' name='value' value='" . $value->join('') . "'>";
                 break;
 
             default:
@@ -35,12 +40,48 @@ class Setting extends Model
     {
         $keys = collect([
             'admin_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name')),
+                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'registration_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name')),
+                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
                 'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
+            'app_name' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_MAILER') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_HOST') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_PORT') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_USERNAME') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_PASSWORD') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_ENCRYPTION') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_FROM_ADDRESS') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_FROM_NAME') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
             ],
         ]);
         return $keys->get($key);
@@ -56,7 +97,7 @@ class Setting extends Model
                 break;
 
             default:
-                # code...
+                $value = $this->properties;
                 break;
         }
         return $value;
@@ -64,7 +105,19 @@ class Setting extends Model
 
     public function getAllSettingKeys($key = "")
     {
-        $keys = ['admin_role' => "Admin Role", 'registration_role' => 'Registration Role'];
+        $keys = [
+            'admin_role' => "Admin Role",
+            'registration_role' => 'Registration Role',
+            'app_name' => 'Application Name',
+            \strtolower('MAIL_MAILER') => 'Mail Mailer',
+            \strtolower('MAIL_HOST') => 'Mail Host',
+            \strtolower('MAIL_PORT') => 'Mail Port',
+            \strtolower('MAIL_USERNAME') => 'Mail Username',
+            \strtolower('MAIL_PASSWORD') => 'Mail Password',
+            \strtolower('MAIL_ENCRYPTION') => 'Mail Encryption',
+            \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
+            \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
+        ];
         return $key ? $keys[$key] : $keys;
     }
 }

@@ -9,8 +9,7 @@ class Node_Type extends Model
 {
     use HasFactory;
 
-
-    public const ControllerExceptionList=[];
+    public const ControllerExceptionList = [];
 
     public function NODE_TYPES($filler = null)
     {
@@ -25,12 +24,12 @@ class Node_Type extends Model
             });
         });
         $node_pages_options = '';
-       // creates a string that has node pages as option
+        // creates a string that has node pages as option
         Node::where('node_type', 3)->get()->each(function ($page) use (&$node_pages_options, $filler) {
             $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->node_page == $page->id ? "selected" : '';
             $node_pages_options .= "<option value='" . $page->id . "'$selected>" . $page->name . "</option>";
         });
-       // creates a string that has route method as option
+        // creates a string that has route method as option
         $route_method_options = '';
         collect(['put', 'post', 'get', 'delete'])->each(function ($route_method) use (&$route_method_options, $filler) {
             $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
@@ -39,6 +38,7 @@ class Node_Type extends Model
         $node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
         $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
         $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
+        $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;
 
         return collect([
             'link' => [
@@ -77,8 +77,9 @@ class Node_Type extends Model
                     'node_route' => ['location' => 'properties'],
                     'route_function' => ['location' => 'properties'],
                     'route_method' => ['location' => 'properties'],
+                    'node_audit_message' => ['location' => 'properties'],
                 ],
-                'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required'],
+                'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required','node_audit_message'=>'required'],
                 'extra_html' => "<div>
                  <div class='mb-3'>
                     <label for='route ' class='form-label'>Node route</label>
@@ -86,6 +87,13 @@ class Node_Type extends Model
                     type='text' class='form-control'
                      id='node_route' aria-describedby='node_name' name='node_route'
                      value='" . $node_route . "' required>
+                </div>
+                   <div class='mb-3'>
+                    <label for='route ' class='form-label'>Node Audit Message <small>( use {name} for user name, {at} for the current time and date.)</small></label>
+                    <input
+                    type='text' class='form-control'
+                     id='node_audit_message' aria-describedby='node_audit_message' name='node_audit_message'
+                     value='" . $node_audit_message . "' required>
                 </div>
                   <div class='mb-3'>
                       <label for='route_function' class='form-label'>Route Function</label>

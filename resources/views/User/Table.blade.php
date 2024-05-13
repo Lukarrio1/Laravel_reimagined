@@ -1,5 +1,5 @@
 <div class="col-sm-8 offset-sm-2">
-    <div class="card">
+    <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
             <table class="table">
                 <thead>
@@ -19,13 +19,17 @@
                         <td>{{$user->email}}</td>
                         <td>{{$user->role_name}}</td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignRoleModal{{$user->id}}">
+                            <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#assignRoleModal{{$user->id}}">
                                 Assign Role
                             </button>
-                            <button type="button" class="btn btn-warning user_edit_button" data-bs-toggle="modal" data-bs-target="#editUserModal" data-user-id="{{$user->id}}">
+                            <button type="button" class="btn btn-warning m-1 user_edit_button" data-bs-toggle="modal" data-bs-target="#editUserModal" data-user-id="{{$user->id}}">
                                 Edit
                             </button>
-                            <a class="btn btn-sm btn-danger" href="">Delete</a>
+                            <form action="{{route('deleteUser',['user'=>$user])}}" method="post">
+                            @method('delete')
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-danger m-1">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     <div class="modal fade" id="assignRoleModal{{$user->id}}" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
@@ -70,6 +74,12 @@
                 </tbody>
             </table>
 
+        </div>
+        <div class="card-footer bg-white">
+            <div class="text-center">
+                <a class="btn btn-sm btn-primary" href="{{route('viewUsers').'?search='.request()->get('search').'?load_more='.request()->get('load_more')+10}}">load more</a>
+
+            </div>
         </div>
           <div class="modal fade " id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
 
