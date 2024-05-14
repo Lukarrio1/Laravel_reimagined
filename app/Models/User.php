@@ -3,10 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\TenantTrait;
+use App\Models\Tenant\Tenant;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Scopes\TenantScope;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -16,8 +18,13 @@ class User extends Authenticatable
     use Notifiable;
     use HasRoles;
     use HasApiTokens;
+    // use Encryptable;
     // use SoftDeletes;
-
+    use TenantTrait;
+    public function __construct()
+    {
+      $this->initialize();
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -28,11 +35,12 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    // protected $encryptable = ['name','email'];
 
     public function updateFieldTemplate()
     {
         return [
-            'id' => "<input type='hidden' value='".$this->id."' name='id'></input>",
+            'id' => "<input type='hidden' value='" . $this->id . "' name='id'></input>",
             'name' => "<div class='mb-3'>
                     <label for='name' class='form-label'>Name</label>
                     <input
@@ -101,7 +109,8 @@ class User extends Authenticatable
 
     public function updateUserHtml()
     {
-        $this->updateHtml =collect($this->updateFieldTemplate())->join(' ');
+        $this->updateHtml = collect($this->updateFieldTemplate())->join(' ');
         return $this;
     }
+
 }

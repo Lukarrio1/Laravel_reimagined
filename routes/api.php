@@ -4,6 +4,7 @@ use App\Models\Setting;
 use App\Models\Node\Node;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Config;
 use App\Http\Middleware\AuthMiddleware;
 
 // Ensure routes are cached
@@ -18,7 +19,6 @@ if (!Cache::has('routes')) {
 if (!Cache::has('settings')) {
     Cache::add('settings', Setting::all());
 }
-
 
 // Retrieve cached routes
 $routes = Cache::get('routes');

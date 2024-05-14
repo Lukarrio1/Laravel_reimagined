@@ -17,6 +17,7 @@ Auth::routes();
 if (!Cache::has('settings')) {
     Cache::add('settings', Setting::all());
 }
+
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::get('/nodes', [NodeController::class, 'index'])->name('viewNodes');

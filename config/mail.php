@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Cache;
+
+
+
 return [
 
     /*
@@ -12,9 +16,10 @@ return [
     | the message. All additional mailers can be configured within the
     | "mailers" array. Examples of each type of mailer are provided.
     |
-    */
+     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => 'smtp',
+    // optional(collect(Cache::get('settings'))->where('key', 'mail_mailer')->first(null,'log'))->properties,
 
     /*
     |--------------------------------------------------------------------------
@@ -32,11 +37,10 @@ return [
     | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
     |            "postmark", "log", "array", "failover", "roundrobin"
     |
-    */
+     */
 
     'mailers' => [
-
-        'smtp' => [
+         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
@@ -101,7 +105,7 @@ return [
     | the same address. Here you may specify a name and address that is
     | used globally for all emails that are sent by your application.
     |
-    */
+     */
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

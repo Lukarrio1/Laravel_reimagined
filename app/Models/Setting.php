@@ -83,6 +83,14 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input', '', $key),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'multi_tenancy' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key),
+                'handle' => ['action' => 'split', 'value' => 'first'],
+            ],
+             'mail_url'=> [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
         ]);
         return $keys->get($key);
     }
@@ -109,6 +117,7 @@ class Setting extends Model
             'admin_role' => "Admin Role",
             'registration_role' => 'Registration Role',
             'app_name' => 'Application Name',
+             'multi_tenancy' => 'Multi Tenancy',
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',
@@ -117,6 +126,8 @@ class Setting extends Model
             \strtolower('MAIL_ENCRYPTION') => 'Mail Encryption',
             \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
             \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
+            'mail_url' => "Mail Url",
+
         ];
         return $key ? $keys[$key] : $keys;
     }

@@ -21,7 +21,6 @@ class Export extends Model
 
     public function getAllTableColumns($table)
     {
-        // getColumnListing
         return Schema::getColumnListing($table);
     }
 
@@ -32,16 +31,12 @@ class Export extends Model
 
     public function export($table,$selected_columns)
     {
-
         $data = DB::table($table)->get($selected_columns);
-
-
         $csv = Writer::createFromString('');
         $csv->insertOne(array_keys((array) $data->first())); // Insert column headers
         foreach ($data as $row) {
             $csv->insertOne((array) $row);
         }
-
         return response()->streamDownload(function () use ($csv, $table) {
             echo $csv->getContent();
         }, $table . '.csv');

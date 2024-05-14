@@ -1,11 +1,17 @@
 <div class="col-sm-12">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+    <div class="card-header h4 text-left">
+    Current Table: {{strtoupper(request('table'))}}
+
+    </div>
         <div class="card-body">
             <table class="table">
                 <thead>
                     <tr>
                         @foreach ($selected_table_columns as $column )
-                        <th scope="col">{{$column}}</th>
+                        <th scope="col">{{collect(explode('_',$column))->map(fn($word)=>ucfirst($word))->join(' ')}}</th>
+
+
                         @endforeach
                     </tr>
                 </thead>

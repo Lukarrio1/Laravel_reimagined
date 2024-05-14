@@ -1,4 +1,4 @@
-<div class="col-sm-12 mt-4">
+<div class="col-lg-12 mt-4">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
 
     <div class="card-header bg-white">

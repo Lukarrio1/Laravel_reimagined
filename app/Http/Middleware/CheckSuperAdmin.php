@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -23,10 +24,9 @@ class CheckSuperAdmin
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
         $role = !empty($setting) ? Role::find((int)$setting) : null;
         // Check if the user is authenticated and has the "Super Admin" role
-        if (!empty($role)&&$user && $user->hasRole($role)) {
+        if (!empty($role)&&$user && $user->hasRole($role)||count(User::all())==1) {
             return $next($request);
         }
-
         Auth::logout();
         // Redirect to a specific route or return an unauthorized response
         return redirect()->route('login');
