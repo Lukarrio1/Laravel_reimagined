@@ -9,7 +9,7 @@ use App\Models\Scopes\TenantScope;
 
 trait TenantTrait
 {
-    public function initialize()
+    public function initializeTenancy()
     {
         static::addGlobalScope(new TenantScope);
     }

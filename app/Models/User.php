@@ -23,7 +23,7 @@ class User extends Authenticatable
     use TenantTrait;
     public function __construct()
     {
-      $this->initialize();
+      $this->initializeTenancy();
     }
     /**
      * The attributes that are mass assignable.
