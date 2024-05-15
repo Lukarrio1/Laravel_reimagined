@@ -1,7 +1,7 @@
 <div class="col-sm-8 offset-sm-2 mt-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
     <div class="card-header bg-white">
-        <div class="text-center h4">Manage Nodes</div>
+        <div class="text-center h4">Node Management</div>
     </div>
 
         <div class="card-body">

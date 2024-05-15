@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use App\Http\Requests\User\UserUpdateRequest;
 
 class UserController extends Controller
@@ -32,7 +33,7 @@ class UserController extends Controller
                 return explode(':', $section);
             });
         // Build the search placeholder
-        $searchPlaceholder =\collect($translate)->keys()->map(function ($key, $idx) use ($translate, $translateExamples) {
+        $searchPlaceholder = \collect($translate)->keys()->map(function ($key, $idx) use ($translate, $translateExamples) {
             if ($idx == 0) {
                 return '|' . $key . ":$translateExamples[$key]";
             }
@@ -72,19 +73,24 @@ class UserController extends Controller
             $user->role = $user->roles->first();
             $user = $user->updateUserHtml();
             return $user;
-        }), 'roles' => $roles,'search_placeholder'=>$searchPlaceholder]);
+        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder]);
     }
 
     public function assignRole(Request $request, User $user)
     {
         $role = Role::findById($request->role);
         $user->syncRoles([$role]);
+        Session::flash('message', 'The role was assigned successfully.');
+        Session::flash('alert-class', 'alert-success');
+
         return \redirect()->route('viewUsers');
     }
 
     public function update(UserUpdateRequest $request)
     {
         User::find((int) $request->id)->update($request->except(['password']) + ['password' => Hash::make($request->password)]);
+        Session::flash('message', 'The user was saved successfully.');
+        Session::flash('alert-class', 'alert-success');
 
         return \redirect()->route('viewUsers');
     }
@@ -92,6 +98,8 @@ class UserController extends Controller
     public function delete(User $user)
     {
         $user->delete();
+        Session::flash('message', 'The user was saved successfully.');
+        Session::flash('alert-class', 'alert-success');
         return \redirect()->back();
     }
 }

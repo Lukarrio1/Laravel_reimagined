@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Node;
 
-use App\Models\Audit;
 use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use App\Models\Node\Node_Type;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Cache\CacheController;
 
 class NodeController extends Controller
 {
-
     public $cache;
 
     public function __construct()
@@ -99,11 +98,12 @@ class NodeController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $request->merge(['permission_id'=>empty($request->permission_id)?0:$request->permission_id]);
+        $request->merge(['permission_id' => empty($request->permission_id) ? 0 : $request->permission_id]);
         Node::updateOrCreate(['id' => $request->id], $request->except(
             isset($current_node_type['rules']) ?
             \collect($current_node_type['rules'])->keys()->toArray()
-            : []) + ['properties' => (new Node_Type())
+            : []
+        ) + ['properties' => (new Node_Type())
                 ->handler($current_node_type['handle'], $request->all())])
             ->updatePageLink();
 
@@ -118,12 +118,9 @@ class NodeController extends Controller
     public function delete(Node $node)
     {
         $node->delete();
+        Session::flash('message', 'The node was deleted successfully.');
+        Session::flash('alert-class', 'alert-success');
         return \redirect()->route('viewNodes');
     }
 
-    public function testerFunction(Node $param)
-    {
-
-        return Audit::all();
-    }
 }

@@ -1,0 +1,2 @@
+id,name,email,email_verified_at,password_reset_token,password,remember_token,created_at,updated_at
+1,admin,admin@test.com,,,$2y$12$QG5jNRguq.9MnGY8i.GFAONRyCBYWMP4G1Qn3xxOm7Wr1Tapbr17q,,"2024-05-15 18:58:48","2024-05-15 18:58:48"

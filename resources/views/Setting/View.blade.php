@@ -2,6 +2,9 @@
 @section('content')
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+        <div class="card-header text-center bg-white h4">
+            Settings
+        </div>
         <div class="card-body">
             <form>
                 <div class="mb-3">

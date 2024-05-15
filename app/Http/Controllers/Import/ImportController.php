@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Import;
 use App\Models\Export;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
 use App\Http\Requests\Import\ImportRequest;
 
 class ImportController extends Controller
@@ -33,6 +34,9 @@ class ImportController extends Controller
             return $temp->toArray();
         })->toArray();
         DB::table($request->table_name)->insert($table_data);
+        Session::flash('message', 'The data was imported successfully.');
+        Session::flash('alert-class', 'alert-success');
+
         return \redirect()->route('importView');
     }
 }

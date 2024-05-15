@@ -87,7 +87,7 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key),
                 'handle' => ['action' => 'split', 'value' => 'first'],
             ],
-             'mail_url'=> [
+            'mail_url' => [
                 'field' => $this->SETTING_OPTIONS('input', '', $key),
                 'handle' => ['action' => '', 'value' => ''],
             ],
@@ -114,10 +114,10 @@ class Setting extends Model
     public function getAllSettingKeys($key = "")
     {
         $keys = [
-            'admin_role' => "Admin Role",
-            'registration_role' => 'Registration Role',
+            'admin_role' => "Super Admin Role",
+            'registration_role' => 'Api Registration Role',
             'app_name' => 'Application Name',
-             'multi_tenancy' => 'Multi Tenancy',
+            'multi_tenancy' => 'Api Multi Tenancy',
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',

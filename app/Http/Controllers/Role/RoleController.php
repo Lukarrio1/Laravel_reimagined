@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Role;
 
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Role\RoleSaveRequest;
 
@@ -21,8 +22,10 @@ class RoleController extends Controller
     public function save(RoleSaveRequest $request)
     {
         Role::updateOrCreate(['id' => $request->id], $request->all())
-        ->syncPermissions(Permission::whereIn('id', $request->permissions)
-        ->pluck('name')->toArray());
+            ->syncPermissions(Permission::whereIn('id', $request->permissions)
+                    ->pluck('name')->toArray());
+        Session::flash('message', 'The role was saved successfully.');
+        Session::flash('alert-class', 'alert-success');
         return \redirect()->route('viewRoles');
     }
 
@@ -34,6 +37,8 @@ class RoleController extends Controller
     public function delete(Role $role)
     {
         $role->delete();
+        Session::flash('message', 'The role was deleted successfully.');
+        Session::flash('alert-class', 'alert-success');
         return \redirect()->route('viewRoles');
     }
 }

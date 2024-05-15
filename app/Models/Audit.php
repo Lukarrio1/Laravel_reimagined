@@ -13,7 +13,7 @@ class Audit extends Model
 
     public function setUpMessage($message){
         $values =[
-            '{name}' =>\auth()->user()->name,
+            '{name}' =>\ucfirst(\request()->user()->name),
             '{at}'=>Carbon::now()->format('l, F jS Y, g:i A'),
         ];
         $message = collect( \explode(' ',$message))->map(fn($word)=>isset($values[$word])?$values[$word]:$word)->join(' ');

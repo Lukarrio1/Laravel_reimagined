@@ -1,4 +1,6 @@
+
    @php
+   use Illuminate\Support\Facades\Session;
    $app_name =optional(collect(Cache::get('settings'))->where('key','app_name')->first())->properties;
    $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_tenancy')->first())->getSettingValue('last');
    @endphp
@@ -17,6 +19,8 @@
        <!-- Fonts -->
        <link rel="dns-prefetch" href="//fonts.bunny.net">
        <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+       <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
 
        <!-- Scripts -->
        @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -90,8 +94,13 @@
                </div>
            </nav>
 
-           <main class="py-4 container">
-               @yield('content')
+           <main class="py-4 container ">
+               <div class="w3-animate-bottom">
+                   @if(Session::has('message'))
+                   <p class="alert text-center {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('message') }}</p>
+                   @endif
+                   @yield('content')
+               </div>
            </main>
            @yield('scripts')
        </div>

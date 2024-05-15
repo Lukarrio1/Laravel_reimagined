@@ -1,4 +1,4 @@
-<div class="col-sm-8 offset-sm-2 mt-5">
+<div class="col-sm-8 offset-sm-2 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
 
         <div class="card-body">
