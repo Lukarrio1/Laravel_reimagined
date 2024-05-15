@@ -51,7 +51,6 @@ class AuthMiddleware
         }
 
         if (empty($currentRouteNode)) {
-            (new Controller())->clearCache();
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
