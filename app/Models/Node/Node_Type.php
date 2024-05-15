@@ -17,8 +17,10 @@ class Node_Type extends Model
         $methods = \collect((new Node())->getControllerMethods());
         $options = '';
         // creates a string that has the controller name and method as options
-        $methods->each(function ($controller, $location) use (&$options, $filler) {
-            collect($controller)->each(function ($method) use ($location, &$options, $filler) {
+        $methods->filter(fn($con,$loc)=>\in_array('Api',\explode('\\',$loc)))
+        ->each(function ($controller, $location) use (&$options, $filler) {
+            collect($controller)
+            ->each(function ($method) use ($location, &$options, $filler) {
                 $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
                 $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $location . "::" . $method . "</option>";
             });
@@ -82,7 +84,7 @@ class Node_Type extends Model
                 'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required','node_audit_message'=>'required'],
                 'extra_html' => "<div>
                  <div class='mb-3'>
-                    <label for='route ' class='form-label'>Node route</label>
+                    <label for='route ' class='form-label'>Node route <small>(you can add parameters to the route eg. /test/{param}/{param1})</small></label>
                     <input
                     type='text' class='form-control'
                      id='node_route' aria-describedby='node_name' name='node_route'

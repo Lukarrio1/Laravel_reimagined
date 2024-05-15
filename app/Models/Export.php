@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Export extends Model
 {
     use HasFactory;
@@ -29,7 +30,7 @@ class Export extends Model
         return DB::table($table)->select($table_columns);
     }
 
-    public function export($table,$selected_columns)
+    public function export($table, $selected_columns)
     {
         $data = DB::table($table)->get($selected_columns);
         $csv = Writer::createFromString('');
@@ -41,5 +42,30 @@ class Export extends Model
             echo $csv->getContent();
         }, $table . '.csv');
 
+    }
+
+    public function readCSV($file)
+    {
+        if (!empty($file)) {
+            return $this->parseCSV($file);
+        } else {
+            return false;
+        }
+    }
+
+    private function parseCSV($file)
+    {
+        $csvData = [];
+
+        $handle = fopen($file->getPathname(), 'r');
+
+        if ($handle !== false) {
+            while (($data = fgetcsv($handle)) !== false) {
+                $csvData[] = $data;
+            }
+            fclose($handle);
+        }
+
+        return $csvData;
     }
 }

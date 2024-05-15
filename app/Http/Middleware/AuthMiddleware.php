@@ -7,6 +7,7 @@ use App\Models\Audit;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,8 @@ class AuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        // return $next($request);
+
         // Force response content to be JSON
         $request->headers->set('Accept', 'application/json');
 
@@ -34,12 +37,21 @@ class AuthMiddleware
         // Determine the current route's function name
         $currentRoute = join('::', explode('@', Route::currentRouteAction()));
 
+        $currentRouteNode = null;
         // Retrieve the route node from the cache
-        $currentRouteNode = Cache::get('routes')
-            ->where('properties.value.route_function', $currentRoute)
-            ->first();
+        if (Cache::has('routes')) {
+            $currentRouteNode = Cache::get('routes')
+                ->where('properties.value.route_function', $currentRoute)
+                ->first();
+        } else {
+            (new Controller())->clearCache();
+            $currentRouteNode = Cache::get('routes')
+                ->where('properties.value.route_function', $currentRoute)
+                ->first();
+        }
 
         if (empty($currentRouteNode)) {
+            (new Controller())->clearCache();
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -86,8 +98,8 @@ class AuthMiddleware
             Audit::create([
                 'user_id' => \request()->user()->id,
                 'node_id' => $currentRouteNode->id,
-                'message' => (new Audit())->setUpMessage($node_audit_message)
-                ]
+                'message' => (new Audit())->setUpMessage($node_audit_message),
+            ]
             );
             // Check admin role
             $adminRoleId = optional(Setting::where('key', 'admin_role')->first())->getSettingValue();

@@ -99,7 +99,7 @@ class NodeController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-
+        $request->merge(['permission_id'=>empty($request->permission_id)?0:$request->permission_id]);
         Node::updateOrCreate(['id' => $request->id], $request->except(
             isset($current_node_type['rules']) ?
             \collect($current_node_type['rules'])->keys()->toArray()

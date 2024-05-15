@@ -36,6 +36,7 @@
                    <a class="navbar-brand" href="{{route('viewUsers')}}">Users</a>
                    <a class="navbar-brand" href="{{route('viewCache')}}">Cache</a>
                    <a class="navbar-brand" href="{{route('exportData')}}">Export</a>
+                   <a class="navbar-brand" href="{{route('importView')}}">Import</a>
                    @if($multi_tenancy=='true')
                    <a class="navbar-brand" href="{{route('exportData')}}">Multi Tenancy</a>
                    @endif

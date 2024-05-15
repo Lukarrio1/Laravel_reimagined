@@ -10,6 +10,7 @@ use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Cache\CacheController;
 use App\Http\Controllers\Export\ExportController;
+use App\Http\Controllers\Import\ImportController;
 use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Permission\PermissionController;
 
@@ -47,9 +48,11 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::get('/settings', [SettingController::class, 'index'])->name('viewSettings');
     Route::post('/save/setting', [SettingController::class, 'save'])->name('saveSetting');
 
-    Route::get('/exports', [ExportController::class,'index'])->name('exportData');
+    Route::get('/exports', [ExportController::class, 'index'])->name('exportData');
     Route::get('/export/data', [ExportController::class, 'export'])->name('exportDataNow');
 
+    Route::get('/import', [ImportController::class, 'index'])->name('importView');
+    Route::post('/import/data', [ImportController::class, 'import'])->name('importData');
 
     Route::get('/', [NodeController::class, 'index'])->name('home');
 });

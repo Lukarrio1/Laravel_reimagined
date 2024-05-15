@@ -5,7 +5,8 @@
 
     </div>
         <div class="card-body">
-            <table class="table">
+            <table class="table table-responsive-xxl">
+
                 <thead>
                     <tr>
                         @foreach ($selected_table_columns as $column )

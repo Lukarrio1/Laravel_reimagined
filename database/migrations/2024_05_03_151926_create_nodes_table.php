@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('node_status');
             $table->longText('properties')->nullable();
             $table->integer('authentication_level');
-            $table->integer('permission_id')->nullable();
+            $table->integer('permission_id')->default(0);
             $table->timestamps();
         });
     }
