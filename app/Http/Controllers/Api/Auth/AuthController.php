@@ -69,4 +69,14 @@ class AuthController extends Controller
         return response()->json(['message' => 'Invalid Credentials'], 401);
     }
 
+    public function sendVerificationEmail()
+    {
+        $user = \request()->user();
+        if (!empty($user)) {
+            $route = "/per/";
+            $this->sendEmail($user->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>");
+        }
+        return \response()->json(['message' => "A mail was sent to the provided email address"]);
+    }
+
 }

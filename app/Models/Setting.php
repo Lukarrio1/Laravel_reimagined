@@ -117,7 +117,7 @@ class Setting extends Model
             'admin_role' => "Super Admin Role",
             'registration_role' => 'Api Registration Role',
             'app_name' => 'Application Name',
-            'multi_tenancy' => 'Api Multi Tenancy',
+            // 'multi_tenancy' => 'Api Multi Tenancy',
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',

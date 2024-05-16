@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Import;
 
 use App\Models\Export;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
-use App\Http\Requests\Import\ImportRequest;
+use Illuminate\Support\Facades\Validator;
 
 class ImportController extends Controller
 {
@@ -22,8 +23,25 @@ class ImportController extends Controller
         return view('Import.View', ['table_names' => $this->export->getAllTables()]);
     }
 
-    public function import(ImportRequest $request)
+    public function import(Request $request)
     {
+        $export = new Export();
+        $first_rules = [
+            'csv_file' => ['required',
+            // 'mimes:csv'
+        ],
+            'table_name' => ['required'],
+        ];
+        $validator = Validator::make($request->all(), $first_rules);
+        if ($validator->fails()) {
+            return \redirect()->back()->withErrors($validator);
+        }
+        $file_columns = \collect($export->readCSV($request->file('csv_file')))->first();
+        $table_columns = $export->getAllTableColumns($request->table_name);
+        if ($file_columns != $table_columns) {
+            return \redirect()->back()->withErrors(['csv_file' => 'The database table columns does not match the fields presented in the csv file.']);
+        }
+
         $csv_data = \collect($this->export->readCSV($request->file('csv_file')));
         $table_columns = \collect($csv_data->first());
         $table_data = $csv_data->filter(fn($_, $index) => $index > 0)->map(function ($data, $key) use ($table_columns) {

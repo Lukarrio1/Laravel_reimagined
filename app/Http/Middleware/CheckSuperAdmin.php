@@ -28,7 +28,7 @@ class CheckSuperAdmin
             return $next($request);
         }
         Auth::logout();
-        // Redirect to a specific route or return an unauthorized response
+        // Redirect to a specific\ route or return an unauthorized response
         return redirect()->route('login');
     }
 }

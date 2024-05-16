@@ -77,7 +77,7 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-                <a class="btn btn-sm btn-primary" href="{{route('viewUsers').'?search='.request()->get('search').'?load_more='.request()->get('load_more')+10}}">load more</a>
+                <a class="btn btn-sm btn-primary" href="{{route('viewUsers').'?load_more='.request()->get('load_more')+10}}">load more</a>
 
             </div>
         </div>

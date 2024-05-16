@@ -26,7 +26,7 @@ class UserController extends Controller
             'role' => 'admin',
         ];
 
-        $search = \request()->get('search');
+        $search = \request()->get('search','||');
         $searchParams = collect(explode('|', $search))
             ->filter(fn($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {

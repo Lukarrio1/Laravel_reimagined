@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('properties')->nullable();
             $table->integer('authentication_level');
             $table->integer('permission_id')->default(0);
+            $table->longText('uuid')->nullable();
             $table->timestamps();
         });
     }
