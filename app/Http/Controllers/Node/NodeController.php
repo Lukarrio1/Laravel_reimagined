@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Node;
 
 use App\Models\Node\Node;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Node\Node_Type;
 use App\Http\Controllers\Controller;
@@ -24,15 +25,15 @@ class NodeController extends Controller
     {
 
         $translate = [
-            'name' => 'name',
-            'description' => 'small_description',
-            'type' => 'node_type',
+         'name' => 'name',
+         'description' => 'small_description',
+         'type' => 'node_type',
         ];
 
         $translateExamples = [
-            'name' => 'Link 1',
-            'description' => 'link to the home page',
-            'type' => 'Link',
+         'name' => 'Link 1',
+         'description' => 'link to the home page',
+         'type' => 'Link',
         ];
 
         // Build the search placeholder
@@ -48,10 +49,10 @@ class NodeController extends Controller
 
         // Parse the search parameter from the request and create key-value pairs
         $searchParams = collect(explode('|', request()->get('search')))
-            ->filter(fn($section) => !empty($section)) // Filter out empty sections
-            ->map(function ($section) {
-                return explode(':', $section);
-            });
+         ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+         ->map(function ($section) {
+             return explode(':', $section);
+         });
 
         // Query for Nodes and apply filters based on search parameters
         $nodes = Node::query();
@@ -73,39 +74,43 @@ class NodeController extends Controller
         });
 
         return \view('Nodes.View', [
-            'types' => (new Node_Type())->NODE_TYPES($node),
-            'authentication_levels' => Node::Authentication_Levels,
-            'node_statuses' => Node::NODE_STATUS,
-            'nodes' => $nodes->latest()->take(\request('load_more'))->get(),
-            'node' => $node,
-            'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
-            'permissions' => Permission::all(),
-            'search_placeholder' => $searchPlaceholder,
+         'types' => (new Node_Type())->NODE_TYPES($node),
+         'authentication_levels' => Node::Authentication_Levels,
+         'node_statuses' => Node::NODE_STATUS,
+         'nodes' => $nodes->latest()->take(\request('load_more'))->get(),
+         'node' => $node,
+         'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
+         'permissions' => Permission::all(),
+         'search_placeholder' => $searchPlaceholder,
         ]);
     }
 
     public function save(Request $request)
     {
         $main_rules = [
-            'name' => 'required',
-            'small_description' => 'required',
-            'authentication_level' => 'required',
-            'node_type' => 'required',
-            'node_status' => 'required',
+         'name' => 'required',
+         'small_description' => 'required',
+         'authentication_level' => 'required',
+         'node_type' => 'required',
+         'node_status' => 'required',
         ];
         $current_node_type = (new Node_Type())->NODE_TYPES()->firstWhere('id', $request->node_type);
+        $current_node = !empty($request->id) ? Node::find((int) $request->id) : null;
         $validator = Validator::make($request->all(), isset($current_node_type['rules']) ? $current_node_type['rules'] + $main_rules : $main_rules);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $request->merge(['permission_id' => empty($request->permission_id) ? 0 : $request->permission_id]);
+        $request->merge([
+         'permission_id' => empty($request->permission_id) ? 0 : $request->permission_id,
+        ]);
         Node::updateOrCreate(['id' => $request->id], $request->except(
             isset($current_node_type['rules']) ?
-            \collect($current_node_type['rules'])->keys()->toArray()
-            : []
-        ) + ['properties' => (new Node_Type())
-                ->handler($current_node_type['handle'], $request->all())])
-            ->updatePageLink();
+   \collect($current_node_type['rules'])->keys()->toArray()
+   : []
+        ) + ['properties' => (new Node_Type())->handler($current_node_type['handle'], $request->all()),
+         'uuid' => !empty($current_node->uuid) ? $current_node->uuid : Str::random(50),
+        ])
+         ->updatePageLink();
 
         return \redirect()->route('viewNodes');
     }

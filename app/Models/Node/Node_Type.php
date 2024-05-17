@@ -37,7 +37,7 @@ class Node_Type extends Model
             $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
             $route_method_options .= "<option value='$route_method' $selected>$route_method</option>";
         });
-        $node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
+        $node_route = empty($filler) ? '' :\config('app.url')."/api". \optional(\optional($filler)->properties['value'])->node_route;
         $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
         $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
         $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;

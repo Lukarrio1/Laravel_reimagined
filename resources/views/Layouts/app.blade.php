@@ -95,7 +95,7 @@
            </nav>
 
            <main class="py-4 container ">
-               <div class="w3-animate-bottom">
+               <div class="w3-animate-zoom">
                    @if(Session::has('message'))
                    <p class="alert text-center {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('message') }}</p>
                    @endif
