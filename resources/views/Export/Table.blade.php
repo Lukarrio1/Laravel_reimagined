@@ -4,7 +4,7 @@
     Current Table: {{strtoupper(request('table'))}}
 
     </div>
-        <div class="card-body">
+        <div class="card-body scrollable-div">
             <table class="table table-responsive-xxl">
 
                 <thead>

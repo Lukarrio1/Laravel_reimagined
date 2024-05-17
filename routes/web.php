@@ -56,4 +56,3 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::get('/', [NodeController::class, 'index'])->name('home');
 });
-Route::view('/js/test','js_Library')->name('test_ground');
