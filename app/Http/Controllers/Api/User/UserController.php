@@ -9,6 +9,7 @@ class UserController extends Controller
 {
     public function profile()
     {
+
         $user = request()->user();
         return \response()->json(['user' => $user]);
     }

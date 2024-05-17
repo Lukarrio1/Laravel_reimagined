@@ -1,6 +1,5 @@
 <div class="col-lg-12 mt-4">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-
     <div class="card-header bg-white">
         <form action="{{route('viewNodes')}}" action="get">
         <div class="mb-3">
@@ -21,6 +20,7 @@
                         <th scope="col">Node Type</th>
                         <th scope="col">Node Status</th>
                         <th scope="col">Node Permission</th>
+                        <th scope="col">Node UUID</th>
                         <th scope="col">Node Properties</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -34,6 +34,7 @@
                         <td>{{$node->node_type['human_value']}}</td>
                         <td>{{$node->node_status['human_value']}}</td>
                         <td>{{optional(optional($node)->permission)->name}}</td>
+                        <td>{{$node->uuid}}</td>
                         <td>{!!$node->properties['html_value']!!}</td>
                         <td>
                         <a href="{{route('viewNode',['node'=>$node])}}" class="btn btn-warning btn-sm m-2">Edit</a>

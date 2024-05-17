@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 class NodeController extends Controller
 {
-    public function nodes(){
-        return ['nodes'=>Node::all()];
+    public function nodes($uuid){
+        return ['node'=>Node::whereUuid($uuid)->first()];
     }
 }

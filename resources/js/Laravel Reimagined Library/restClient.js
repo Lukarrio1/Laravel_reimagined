@@ -1,12 +1,9 @@
 import axios from "axios";
 
-export const resetClient = async (
-    Uuid,
-    nodes,
-    params = {},
-    data_to_send = null
-) => {
-    const node = nodes.filter(({ uuid }) => uuid == Uuid)[0];
+export const restClient = async (route_uuid='', route_params = {}, data_to_send = {}) => {
+    const {
+        data: { node },
+    } = await axios.get("http://localhost:8000/api/nodes/" + route_uuid);
     if (!node) {
         return -1;
     }
@@ -16,7 +13,7 @@ export const resetClient = async (
     } = node;
 
     return build_rest_client(
-        build_rest_url(value?.node_route, params),
+        build_rest_url(value?.node_route, route_params),
         value,
         data_to_send,
         node
@@ -26,7 +23,6 @@ export const resetClient = async (
 const setUpAuth = (node) => {
     // Get the Bearer token from Session Storage
     const token = sessionStorage.getItem("bearerToken");
-    console.log(token,"token")
     const authentication_level = node?.authentication_level["value"];
     return authentication_level == 1
         ? axios.create({
