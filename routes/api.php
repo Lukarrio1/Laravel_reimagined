@@ -22,7 +22,6 @@ if (!Cache::has('settings')) {
 
 // Retrieve cached routes
 $routes = Cache::get('routes');
-
 // Register each route with its corresponding method and function
 $routes->each(function ($route) {
     $properties = $route->properties['value'];
@@ -34,8 +33,13 @@ $routes->each(function ($route) {
 
     // Determine route method, path, and function
     $method = strtolower($properties->route_method); // Ensure method is lowercase
-    $node_route = $properties->node_route;
-
+    $node_route =\collect(\explode('/', $properties->node_route))
+        ->filter(function($dt,$key)use($properties){
+            if(array_search('api',\explode('/', $properties->node_route))<$key){
+               return true;
+            }
+            return false;
+        })->join('/');
     // Extract controller and method from the route function
     $routeFunctionParts = explode('::', $properties->route_function);
     if (count($routeFunctionParts) !== 2) {
