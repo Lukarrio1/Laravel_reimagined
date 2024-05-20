@@ -17,7 +17,7 @@ class PermissionController extends Controller
 
     public function save(PermissionSaveRequest $request)
     {
-        Permission::updateOrCreate(['id' => $request->id], $request->all());
+        Permission::updateOrCreate(['id' => $request->id], $request->all()+['guard'=>'api']);
         Session::flash('message', 'The permission was saved successfully.');
         Session::flash('alert-class', 'alert-success');
 

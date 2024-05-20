@@ -1,11 +1,17 @@
-import './bootstrap';
-import './Laravel Reimagined Library/index'
-import restClient from './Laravel Reimagined Library/index'
-
-//   sessionStorage.setItem(
-//       "bearerToken",
-//       "2|jAdtGx3kHvNiPsPeQ3W96kymTb2VCnryVfQYkTtv1a753bc6"
-//   );
+import "./bootstrap";
+import "./Laravel Reimagined Library/index";
+import restClient from "./Laravel Reimagined Library/index";
+import { handleNode } from "./Laravel Reimagined Library/nodeHandler";
 
 
- restClient("kZ5ZSVmv6BWUYWbPI0is2N3kiy6agWIm4fZw4LUBUbx2xi2Reo");
+const playground = async () => {
+    const {
+        data: { node },
+    } = await restClient("srnys1Mg1ovoMDbX3GCxQaY3UHuqiMBDkta8ZuUM9reYeh0YJM", {
+        uuid: "kmg9uKHV1VR9eoF1mdl3nahG8CCpSduNdL55C26uvwG6c9ldsH",
+    });
+    handleNode("");
+    console.log(node);
+};
+
+playground();

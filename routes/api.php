@@ -16,8 +16,15 @@ if (!Cache::has('routes')) {
     // Add routes to cache
     Cache::add('routes', $nodes, now()->addMinutes(30)); // Cache with expiration (optional)
 }
+
 if (!Cache::has('settings')) {
     Cache::add('settings', Setting::all());
+}
+
+if(!Cache::has('nodes')){
+    Cache::add('nodes',Node::where('node_status', 1)
+        ->where('node_type','>', 1)
+        ->get());
 }
 
 // Retrieve cached routes

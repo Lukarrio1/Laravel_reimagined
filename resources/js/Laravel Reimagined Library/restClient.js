@@ -1,12 +1,12 @@
 import axios from "axios";
-const node_route = "http://localhost:8000/api/nodes/";
+export const node_route = "http://localhost:8000/api/nodes/";
 
 export const restClient = async (
     route_uuid = "",
     route_params = {},
     data_to_send = {}
 ) => {
-
+    // gets the node from server side cache .
     const {
         data: { node },
     } = await axios.get(node_route + route_uuid);

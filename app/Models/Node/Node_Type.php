@@ -47,6 +47,8 @@ class Node_Type extends Model
         $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
         $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
         $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;
+        $actual_component = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->actual_component;
+        $link_page_node_route = empty($filler) ? '' :\optional(\optional($filler)->properties['value'])->node_route;
 
         return collect([
             'link' => [
@@ -68,7 +70,7 @@ class Node_Type extends Model
                     <input
                     type='text' class='form-control'
                      id='node_route' aria-describedby='node_name' name='node_route'
-                     value='" . $node_route . "' required>
+                     value='" . $link_page_node_route . "' required>
                 </div>
                  <div class='mb-3'>
                       <label for='node_page' class='form-label'>Node Page</label>
@@ -120,11 +122,22 @@ class Node_Type extends Model
             'page' => [
                 'id' => 3,
                 'rules' => [],
-                'handle' => ['page_link' => ['location' => 'properties']],
-                'extra_html' => "<input
+                'handle' => [
+                    'page_link' => ['location' => 'properties'],
+                    'actual_component'=>['location'=>'properties']
+                ],
+                'extra_html' => "<div><input
                     type='hidden' name='page_link'
                     id='page_link'
-                     value='" . $page_link . "'>",
+                     value='" . $page_link . "'>
+                     <div class='mb-3'>
+                    <label for='route ' class='form-label'>Actual Framework Component Name (react)</small></label>
+                    <input
+                    type='text' class='form-control'
+                     id='actual_component' aria-describedby='actual_component' name='actual_component'
+                     value='" . $actual_component . "' required>
+                </div>
+                     </div>",
             ],
             'component' => ['id' => 4, 'rules' => [], 'handle' => []],
         ]);

@@ -104,10 +104,8 @@ class NodeController extends Controller
          'permission_id' => empty($request->permission_id) ? 0 : $request->permission_id,
         ]);
         Node::updateOrCreate(['id' => $request->id], $request->except(
-            isset($current_node_type['rules']) ?
-   \collect($current_node_type['rules'])->keys()->toArray()
-   : []
-        ) + ['properties' => (new Node_Type())->handler($current_node_type['handle'], $request->all()),
+            isset($current_node_type['rules']) ?\collect($current_node_type['rules'])
+            ->keys()->toArray(): []) + ['properties' => (new Node_Type())->handler($current_node_type['handle'], $request->all()),
          'uuid' => !empty($current_node->uuid) ? $current_node->uuid : Str::random(50),
         ])
          ->updatePageLink();
