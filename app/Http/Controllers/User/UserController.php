@@ -26,9 +26,9 @@ class UserController extends Controller
             'role' => 'admin',
         ];
 
-        $search = \request()->get('search','||');
+        $search = \request()->get('search', '||');
         $searchParams = collect(explode('|', $search))
-            ->filter(fn($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -46,26 +46,28 @@ class UserController extends Controller
         $users = User::query()->with('roles');
         $roles = Role::all();
 
-        $searchParams->each(function ($section) use ($users, $translate) {
-            list($key, $value) = $section;
-            // Check if the key is valid in the translation map
-            if (!isset($translate[$key])) {
-                return; // Skip invalid keys
-            }
-            // Convert 'type' value to its corresponding node type ID
-            if ($translate[$key] === 'role') {
-                $convertedValue = $value;
-            } else {
-                $convertedValue = $value;
-            }
-            if ($translate[$key] === 'role') {
-                $users->whereHas('roles', fn($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
-            } else {
-                $users->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
+        $searchParams->when(
+            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
+            fn ($collection) => $collection->each(function ($section) use ($users, $translate) {
+                list($key, $value) = $section;
+                // Check if the key is valid in the translation map
+                if (!isset($translate[$key])) {
+                    return; // Skip invalid keys
+                }
+                // Convert 'type' value to its corresponding node type ID
+                if ($translate[$key] === 'role') {
+                    $convertedValue = $value;
+                } else {
+                    $convertedValue = $value;
+                }
+                if ($translate[$key] === 'role') {
+                    $users->whereHas('roles', fn ($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
+                } else {
+                    $users->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
 
-            }
-
-        });
+                }
+            })
+        );
         $users = $users->take(\request()->get('load_more'))->get();
 
         return \view('User.View', ['users' => $users->map(function (User $user) {
