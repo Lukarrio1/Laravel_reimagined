@@ -39,62 +39,66 @@ class Setting extends Model
     public function SETTING_KEYS($key)
     {
         $keys = collect([
-         'admin_role' => [
-          'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
-          'handle' => ['action' => 'split', 'value' => 'last'],
-         ],
-         'registration_role' => [
-          'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
-          'handle' => ['action' => 'split', 'value' => 'last'],
-         ],
-         'app_name' => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_MAILER') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_HOST') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_PORT') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_USERNAME') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_PASSWORD') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_ENCRYPTION') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_FROM_ADDRESS') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         \strtolower('MAIL_FROM_NAME') => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         'multi_tenancy' => [
-          'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key),
-          'handle' => ['action' => 'split', 'value' => 'first'],
-         ],
-         'mail_url' => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
-         'app_url' => [
-          'field' => $this->SETTING_OPTIONS('input', '', $key),
-          'handle' => ['action' => '', 'value' => ''],
-         ],
+            'admin_role' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
+            'registration_role' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
+            'app_name' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_MAILER') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_HOST') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_PORT') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_USERNAME') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_PASSWORD') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_ENCRYPTION') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_FROM_ADDRESS') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            \strtolower('MAIL_FROM_NAME') => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            'multi_tenancy' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key),
+                'handle' => ['action' => 'split', 'value' => 'first'],
+            ],
+            'mail_url' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            'app_url' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            'app_version' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
         ]);
         return $keys->get($key);
     }
@@ -118,20 +122,21 @@ class Setting extends Model
     public function getAllSettingKeys($key = "")
     {
         $keys = [
-         'admin_role' => "Super Admin Role",
-         'registration_role' => 'Api Registration Role',
-         'app_name' => 'Application Name',
-         'app_url' => 'Application URL',
-         // 'multi_tenancy' => 'Api Multi Tenancy',
-         \strtolower('MAIL_MAILER') => 'Mail Mailer',
-         \strtolower('MAIL_HOST') => 'Mail Host',
-         \strtolower('MAIL_PORT') => 'Mail Port',
-         \strtolower('MAIL_USERNAME') => 'Mail Username',
-         \strtolower('MAIL_PASSWORD') => 'Mail Password',
-         \strtolower('MAIL_ENCRYPTION') => 'Mail Encryption',
-         \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
-         \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
-         'mail_url' => "Mail Url",
+            'admin_role' => "Super Admin Role",
+            'registration_role' => 'Api Registration Role',
+            'app_name' => 'Application Name',
+            'app_url' => 'Application URL',
+            'app_version' => 'Application Version',
+            // 'multi_tenancy' => 'Api Multi Tenancy',
+            \strtolower('MAIL_MAILER') => 'Mail Mailer',
+            \strtolower('MAIL_HOST') => 'Mail Host',
+            \strtolower('MAIL_PORT') => 'Mail Port',
+            \strtolower('MAIL_USERNAME') => 'Mail Username',
+            \strtolower('MAIL_PASSWORD') => 'Mail Password',
+            \strtolower('MAIL_ENCRYPTION') => 'Mail Encryption',
+            \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
+            \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
+            'mail_url' => "Mail Url",
 
         ];
         return $key ? $keys[$key] : $keys;

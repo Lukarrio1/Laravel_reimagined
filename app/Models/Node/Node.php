@@ -141,8 +141,12 @@ class Node extends Model
         if (\optional($this->node_type)['value'] == 2 && !empty(\optional(optional($this->properties)['value'])->node_page)) {
             $page =   Node::find((int) $this->properties['value']->node_page);
             // \dd(collect($page->properties['value'])->toArray());
+            // dd($page->toArray(),$this->toArray());
             $page->update([
-                'properties' => \json_encode(['page_link' => $this->name, 'actual_component'=> $page->properties['value']->actual_component]),
+                'properties' => \json_encode([
+                    'page_link' => $this->name,
+                    'actual_component' => $page->properties['value']->actual_component
+                ]),
                 'permission_id' => $this->permission_id,
             ]);
         }

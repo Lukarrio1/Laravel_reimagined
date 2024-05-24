@@ -1,6 +1,7 @@
 @php
 use Illuminate\Support\Facades\Session;
 $app_name =optional(collect(Cache::get('settings'))->where('key','app_name')->first())->properties;
+$app_version =optional(collect(Cache::get('settings'))->where('key','app_version')->first())->properties;
 $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_tenancy')->first())->getSettingValue('last');
 @endphp
 
@@ -102,7 +103,6 @@ $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_ten
                 </div>
             </div>
         </nav>
-
         <main class="py-4 container ">
             <div class="w3-animate-zoom">
                 @if(Session::has('message'))
@@ -112,6 +112,12 @@ $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_ten
             </div>
         </main>
         @yield('scripts')
+        <footer class="footer bg-white fixed-bottom">
+            <div class="container text-center py-3">
+                <span>Version: {{ $app_version }}</span>
+            </div>
+        </footer>
+
     </div>
 </body>
 </html>

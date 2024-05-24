@@ -34,7 +34,7 @@ class NodeController extends Controller
 
         $nodes = Node::where('node_type', '>', 1)
             ->where('node_status', 1)
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id')
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id','uuid')
             ->with(['permission'])
             ->get()
             ->map(function ($node) use ($permission_ids) {
@@ -55,7 +55,7 @@ class NodeController extends Controller
                 'node_status',
                 1
             )
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id')
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id','uuid')
             ->get()->map(function ($node) {
                 $node->hasAccess = true;
                 return $node;

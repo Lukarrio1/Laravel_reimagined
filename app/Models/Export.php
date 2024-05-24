@@ -15,9 +15,8 @@ class Export extends Model
     public function getAllTables()
     {
         return collect(DB::select('SHOW TABLES'))
-            ->map(fn($value) => \array_values((array) $value))
+            ->map(fn ($value) => \array_values((array) $value))
             ->flatten();
-
     }
 
     public function getAllTableColumns($table)
@@ -27,7 +26,7 @@ class Export extends Model
 
     public function getTableData($table, $table_columns)
     {
-        return DB::table($table)->select($table_columns);
+        return DB::table($table)->select($table_columns)->when(\in_array("created_at", $table_columns), fn ($q) => $q->latest());
     }
 
     public function export($table, $selected_columns)
@@ -41,7 +40,6 @@ class Export extends Model
         return response()->streamDownload(function () use ($csv, $table) {
             echo $csv->getContent();
         }, $table . '.csv');
-
     }
 
     public function readCSV($file)
