@@ -11,6 +11,17 @@ class Setting extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
+
+    public const ANIMATIONS = [
+        // 'w3-animate-fading' => 'w3-animate-fading',
+        'w3-animate-zoom' => 'w3-animate-zoom',
+        'w3-animate-opacity' => 'w3-animate-opacity',
+        'w3-animate-right' => 'w3-animate-right',
+        'w3-animate-left' => 'w3-animate-left',
+        'w3-animate-bottom' => 'w3-animate-bottom',
+        'w3-animate-top' =>  'w3-animate-top'
+    ];
+
     public function SETTING_OPTIONS($key, $value, $setting_key)
     {
         $html = '';
@@ -99,6 +110,14 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input', '', $key),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'app_animation' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', self::ANIMATIONS, $key),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
+            'app_auditing' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', ['true' => true, 'false' => false], $key),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
         ]);
         return $keys->get($key);
     }
@@ -127,6 +146,7 @@ class Setting extends Model
             'app_name' => 'Application Name',
             'app_url' => 'Application URL',
             'app_version' => 'Application Version',
+            'app_animation' => 'Application Animation',
             // 'multi_tenancy' => 'Api Multi Tenancy',
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
@@ -137,6 +157,7 @@ class Setting extends Model
             \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
             \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
             'mail_url' => "Mail Url",
+            "app_auditing" => "Application Auditing"
 
         ];
         return $key ? $keys[$key] : $keys;

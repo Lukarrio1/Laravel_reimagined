@@ -85,6 +85,7 @@ class AuthMiddleware
      */
     protected function handleAuthLevelOne(Request $request, Closure $next, $token, $currentRouteNode)
     {
+        $app_auditing = (int) optional(collect(Cache::get('settings'))->where('key', 'app_auditing')->first())->getSettingValue('last');
         if (!$token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -94,12 +95,15 @@ class AuthMiddleware
         if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
             Auth::setUser($personalAccessToken->tokenable);
             $node_audit_message = empty($currentRouteNode) ? '' : \optional(\optional($currentRouteNode)->properties['value'])->node_audit_message;
-            Audit::create([
-                'user_id' => \request()->user()->id,
-                'node_id' => $currentRouteNode->id,
-                'message' => (new Audit())->setUpMessage($node_audit_message),
-            ]
-            );
+            if ($app_auditing == 1) {
+                Audit::create(
+                    [
+                        'user_id' => \request()->user()->id,
+                        'node_id' => $currentRouteNode->id,
+                        'message' => (new Audit())->setUpMessage($node_audit_message),
+                    ]
+                );
+            }
             // Check admin role
             $adminRoleId = optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
             $adminRole = $adminRoleId ? Role::find($adminRoleId) : null;
@@ -109,8 +113,10 @@ class AuthMiddleware
             }
 
             // Check route-specific permissions
-            if (!empty($currentRouteNode->permission) &&
-                request()->user()->hasPermissionTo(optional($currentRouteNode->permission)->name)) {
+            if (
+                !empty($currentRouteNode->permission) &&
+                request()->user()->hasPermissionTo(optional($currentRouteNode->permission)->name)
+            ) {
                 return $next($request);
             }
 

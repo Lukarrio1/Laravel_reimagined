@@ -122,7 +122,6 @@ class Node extends Model
     public function addAppUrlToNodeRoute($value)
     {
         $value = \collect($value);
-        $port = ':8000';
         if (\in_array($this->node_type['value'], [1])) {
             $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
             $seg = $this->node_type['value'] == 2 ? '/' :'/api/';

@@ -117,7 +117,7 @@
     if (allEditBtns) {
         allEditBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const current_user = users.filter(user => user ? .id == btn.getAttribute('data-user-id'))[0]
+                const current_user = users.filter(user => user?.id == btn.getAttribute('data-user-id'))[0]
                 document.querySelector('#custom_input_user_fields').innerHTML = current_user.updateHtml
                 console.log(current_user)
             })
