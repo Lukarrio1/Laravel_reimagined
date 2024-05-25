@@ -12,7 +12,8 @@
                         <div class="mt-2 text-danger">Example Search Format: {{$search_placeholder}}</div>
                     </div>
                 </div>
-                <div class="text-center"><button type="submit" class="btn btn-primary">Search</button></div>
+                <div class="text-center"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button></div>
+
             </form>
         </div>
     </div>

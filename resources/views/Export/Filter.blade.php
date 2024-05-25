@@ -8,11 +8,15 @@
                 <div class="mb-3">
                     <label for="table" class="form-label">Table</label>
                     <select class="form-select" aria-label="Default select example" name="table">
-                    <option selected value=''>Open this select menu</option>
+                        <option selected value=''>Open this select menu</option>
                         @foreach ($tables as $table )
                         <option value="{{$table}}" {{request('table')==$table?"selected":''}}>{{$table}}</option>
                         @endforeach
                     </select>
+                    @if($table_error!=1)
+                    <div style="color: red;">{{ $table_error }}</div> <!-- Display the error message -->
+                    @endif
+
                 </div>
                 @if(count($table_columns)>0&&request('table')!=null)
                 <div class="mb-3">
@@ -26,7 +30,8 @@
                 </div>
                 @endif
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-primary" title="filter table data"><i class="fas fa-filter"></i></button>
+
                 </div>
             </form>
         </div>

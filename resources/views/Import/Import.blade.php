@@ -22,13 +22,14 @@
                 <div class="mb-3">
                     <label for="csv_file" class="form-label">Csv File</label>
                     <input type="file" name="csv_file" class="form-control" id="csv_file">
-                     @error('csv_file')
-                     <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
-                     @enderror
+                    @error('csv_file')
+                    <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
+                    @enderror
 
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" title="import csv file"><i class="fas fa-file-import"></i>
+                    </button>
                 </div>
 
             </form>

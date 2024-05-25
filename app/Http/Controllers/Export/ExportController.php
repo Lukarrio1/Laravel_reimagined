@@ -14,14 +14,6 @@ class ExportController extends Controller
         $export = new Export();
         $table = \request()->get('table');
         $selected_table_columns = \request()->get('table_columns', []);
-        if (!$table) {
-            return \view('Export.View', [
-                'tables' => $export->getAllTables(),
-                'table_columns' => [],
-                'table_data' => [],
-                'selected_table_columns' => [],
-            ]);
-        }
         $table_columns = [];
         $table_data = [];
         if (!empty($table)) {
@@ -30,7 +22,7 @@ class ExportController extends Controller
         if (\count($selected_table_columns) > 0) {
             $table_data = $export->getTableData($table, $selected_table_columns)->get($selected_table_columns);
         } else {
-            $table_data = $export->getTableData($table, ['*'])->get();
+            $table_data = empty($table) ?: $export->getTableData($table, ['*'])->get();
             $selected_table_columns = $table_columns;
         }
 
@@ -41,6 +33,7 @@ class ExportController extends Controller
             'table_columns' => $table_columns,
             'table_data' => $table_data,
             'selected_table_columns' => $selected_table_columns,
+            'table_error' => !empty($table) ?: "Please select a valid table ."
         ]);
     }
 

@@ -14,13 +14,13 @@
                         <td class="text-center">{{$permission->name}}</td>
                         <td class="text-center">
                             <a href="{{route('editPermission',['permission'=>$permission])}}" class="btn btn-sm btn-warning m-2">
-                                edit
+                                <i class="fa fa-wrench" aria-hidden="true"></i>
                             </a>
                             <form action="{{route('deletePermission',['permission'=>$permission])}}" method="post">
                                 @csrf
                                 @method('delete')
                                 <button class="btn btn-sm btn-danger" type="submit">
-                                    delete
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                             </form>
                         </td>
@@ -31,4 +31,3 @@
         </div>
     </div>
 </div>
-

@@ -20,7 +20,7 @@ $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_ten
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         .scrollable-div {
             width: auto;
@@ -103,7 +103,7 @@ $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_ten
                 </div>
             </div>
         </nav>
-        <main class="py-4 container ">
+        <main class="py-4 container-fluid">
             <div class="w3-animate-zoom">
                 @if(Session::has('message'))
                 <p class="alert text-center {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('message') }}</p>

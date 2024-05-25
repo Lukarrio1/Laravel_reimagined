@@ -27,7 +27,13 @@
                 </div>
                 <input type="hidden" value="{{optional($role)->id}}" name="id">
                 <div class="mb-3 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-{{isset($role)?'warning':'primary'}}">
+                        @if(isset($role))
+                        <i class="fa fa-wrench" aria-hidden="true"></i>
+                        @else
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                        @endif</button>
+
                 </div>
             </form>
         </div>

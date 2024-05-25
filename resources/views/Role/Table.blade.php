@@ -6,7 +6,7 @@
                 <thead>
                     <tr>
                         <th scope="col" class="text-center">Role Name</th>
-                          <th scope="col" class="text-center">Role Permissions</th>
+                        <th scope="col" class="text-center">Role Permissions</th>
                         <th scope="col" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -15,17 +15,22 @@
                     <tr>
                         <td class="text-center">{{$role['name']}}</td>
 
-                        <td class="text-center">{{$role['permission_name']}}</td>
-
+                        <td class="text-center">
+                            <ul class="list-group-flush">
+                                @foreach ($role['permission_name'] as $name )
+                                <li class="list-group-item">{{$name}}</li>
+                                @endforeach
+                            </ul>
+                        </td>
                         <td class="text-center">
                             <a href="{{route('editRole',['role'=>$role['id']])}}" class="btn btn-sm btn-warning m-2">
-                                edit
+                                <i class="fa fa-wrench" aria-hidden="true"></i>
                             </a>
                             <form action="{{route('deleteRole',['role'=>$role['id']])}}" method="post">
                                 @csrf
                                 @method('delete')
                                 <button class="btn btn-sm btn-danger" type="submit">
-                                    delete
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
 
                             </form>

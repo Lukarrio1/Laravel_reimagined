@@ -33,7 +33,8 @@
                     @enderror
                 </div>
                 <div class="mb-3 text-center mt-3">
-                    <button class='btn btn-sm btn-success' type="submit">Update Setting</button>
+                    <button class='btn btn-sm btn-warning' type="submit"><i class="fa fa-wrench" aria-hidden="true"></i></button>
+
                 </div>
             </form>
         </div>

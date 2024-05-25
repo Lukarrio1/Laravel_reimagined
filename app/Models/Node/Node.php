@@ -108,13 +108,14 @@ class Node extends Model
 
     public function getPropertiesAttribute($value)
     {
+        // An item
         return [
             'value' => $this->addAppUrlToNodeRoute(\json_decode($value)),
-            'html_value' => '<small>' . \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
+            'html_value' => "<ul class='list-group list-group-flush'>". \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
                 function ($value, $key) {
-                    return collect(\explode('_', $key))->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value";
+                    return "<li class='list-group-item'>".collect(\explode('_', $key))->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
                 }
-            )->join('<br>') . '</small>'
+            )->join('') . '</ul>'
         ];
     }
 

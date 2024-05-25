@@ -14,7 +14,7 @@ class RoleController extends Controller
     {
         $roles = Role::with('permissions')->get()
             ->map(fn($role) => [ ...$role->toArray(),
-                'permission_name' => collect($role->permissions)->map(fn($permission) => $permission->name)->join(',')]);
+                'permission_name' => collect($role->permissions)->map(fn($permission) => $permission->name)]);
         $permissions = Permission::all();
         return view('Role.View', ['role' => optional($role)->load('permissions'), 'roles' => $roles, 'permissions' => $permissions]);
     }

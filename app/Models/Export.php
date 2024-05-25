@@ -26,7 +26,7 @@ class Export extends Model
 
     public function getTableData($table, $table_columns)
     {
-        return DB::table($table)->select($table_columns)->when(\in_array("created_at", $table_columns), fn ($q) => $q->latest());
+        return  DB::table($table)->select($table_columns)->when(\in_array("created_at", $table_columns), fn ($q) => $q->latest());
     }
 
     public function export($table, $selected_columns)
