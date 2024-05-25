@@ -8,13 +8,13 @@
                 <div class="mb-3">
                     <label for="table" class="form-label">Table</label>
                     <select class="form-select" aria-label="Default select example" name="table">
-                        <option selected>Open this select menu</option>
+                    <option selected value=''>Open this select menu</option>
                         @foreach ($tables as $table )
                         <option value="{{$table}}" {{request('table')==$table?"selected":''}}>{{$table}}</option>
                         @endforeach
                     </select>
                 </div>
-                @if(count($table_columns)>0)
+                @if(count($table_columns)>0&&request('table')!=null)
                 <div class="mb-3">
                     <label for="table" class="form-label">Table Columns</label>
                     <select class="form-select" aria-label="Default select example" name="table_columns[]" multiple size="5">

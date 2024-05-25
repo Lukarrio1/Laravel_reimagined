@@ -1,9 +1,9 @@
+@if (request('table')!=null)
 <div class="col-sm-12">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-    <div class="card-header h4 text-left">
-    Current Table: {{strtoupper(request('table'))}}
-
-    </div>
+        <div class="card-header h4 text-left">
+            Current Table: {{strtoupper(request('table'))}}
+        </div>
         <div class="card-body scrollable-div">
             <table class="table table-responsive-xxl">
 
@@ -31,10 +31,11 @@
         <div class="card-footer bg-white">
             <div class="text-center">
                 <form action="{{route('exportDataNow')}}">
-                <input type="hidden" value="true" name="export">
+                    <input type="hidden" value="true" name="export">
                     <button type="submit" class="btn btn-success btn-lg">Export Data</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+@endif

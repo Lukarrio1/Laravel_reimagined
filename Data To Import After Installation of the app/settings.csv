@@ -9,3 +9,4 @@ id,key,properties,created_at,updated_at
 8,mail_encryption,tls,"2024-05-14 17:57:59","2024-05-14 17:57:59"
 9,mail_from_address,laravel_reimagined@noreply.com,"2024-05-14 17:58:09","2024-05-14 17:58:09"
 10,mail_from_name,"Laravel Re Imagined","2024-05-14 17:58:17","2024-05-14 17:58:17"
+11,app_url,2,"2024-05-24 22:14:42","2024-05-24 22:14:51"

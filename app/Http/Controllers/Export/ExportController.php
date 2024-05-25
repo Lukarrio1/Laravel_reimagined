@@ -12,9 +12,16 @@ class ExportController extends Controller
     public function index()
     {
         $export = new Export();
-        $table = \request()->get('table', 'users');
+        $table = \request()->get('table');
         $selected_table_columns = \request()->get('table_columns', []);
-
+        if (!$table) {
+            return \view('Export.View', [
+                'tables' => $export->getAllTables(),
+                'table_columns' => [],
+                'table_data' => [],
+                'selected_table_columns' => [],
+            ]);
+        }
         $table_columns = [];
         $table_data = [];
         if (!empty($table)) {

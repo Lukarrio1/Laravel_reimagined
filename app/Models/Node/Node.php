@@ -124,7 +124,7 @@ class Node extends Model
         $port = ':8000';
         if (\in_array($this->node_type['value'], [1])) {
             $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
-            $seg = $this->node_type['value'] == 2 ? '/' : $port . '/api/';
+            $seg = $this->node_type['value'] == 2 ? '/' :'/api/';
             $value = $value->put('node_route', $app_url . $seg . $value->get('node_route'));
         }
 
