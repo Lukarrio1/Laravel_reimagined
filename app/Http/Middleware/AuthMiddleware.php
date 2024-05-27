@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthMiddleware
 {
-
     /**
      * Handle an incoming request.
      *
@@ -85,7 +84,10 @@ class AuthMiddleware
      */
     protected function handleAuthLevelOne(Request $request, Closure $next, $token, $currentRouteNode)
     {
-        $app_auditing = (int) optional(collect(Cache::get('settings'))->where('key', 'app_auditing')->first())->getSettingValue('last');
+        $app_auditing = (int) optional(collect(Cache::get('settings'))
+            ->where('key', 'app_auditing')->first())
+            ->getSettingValue('last');
+
         if (!$token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }

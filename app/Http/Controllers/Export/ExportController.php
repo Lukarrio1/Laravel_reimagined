@@ -16,15 +16,31 @@ class ExportController extends Controller
         $selected_table_columns = \request()->get('table_columns', []);
         $table_columns = [];
         $table_data = [];
+        $search = \request()->get('search', '||');
+        $searchParams = collect(explode('|', $search))
+            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+            ->map(function ($section) {
+                return explode(':', $section);
+            });
         if (!empty($table)) {
             $table_columns = $export->getAllTableColumns($table);
         }
         if (\count($selected_table_columns) > 0) {
-            $table_data = $export->getTableData($table, $selected_table_columns)->get($selected_table_columns);
+            $table_data = $export->getTableData($table, $selected_table_columns, $searchParams)->get($selected_table_columns);
         } else {
-            $table_data = empty($table) ?: $export->getTableData($table, ['*'])->get();
+            $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams)->get();
             $selected_table_columns = $table_columns;
         }
+        $searchPlaceholder = \collect($selected_table_columns)
+            ->map(function ($key, $idx) use ($selected_table_columns) {
+                if ($idx == 0) {
+                    return '|' . $key . ":search here";
+                }
+                if ($idx + 1 == count($selected_table_columns)) {
+                    return $key . ":search here|";
+                }
+                return $key . ":search here";
+            })->join('|');
 
         Cache::set('current_table_data_for_export', ['selected_columns' => $table_columns, 'table' => $table]);
 
@@ -33,7 +49,8 @@ class ExportController extends Controller
             'table_columns' => $table_columns,
             'table_data' => $table_data,
             'selected_table_columns' => $selected_table_columns,
-            'table_error' => !empty($table) ?: "Please select a valid table ."
+            'table_error' => !empty($table) ?: "Please select a valid table .",
+            'searchPlaceholder' => $searchPlaceholder
         ]);
     }
 

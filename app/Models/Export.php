@@ -24,9 +24,12 @@ class Export extends Model
         return Schema::getColumnListing($table);
     }
 
-    public function getTableData($table, $table_columns)
+    public function getTableData($table, $table_columns, $searchParams)
     {
-        return  DB::table($table)->select($table_columns)->when(\in_array("created_at", $table_columns), fn ($q) => $q->latest());
+
+        $db = DB::table($table)->select($table_columns)
+            ->when(\in_array("created_at", $table_columns), fn ($q) => $q->latest());
+        return $this->filterTable($db, $searchParams);
     }
 
     public function export($table, $selected_columns)
@@ -65,5 +68,17 @@ class Export extends Model
         }
 
         return $csvData;
+    }
+
+    public function filterTable($query, $searchParams)
+    {
+        $searchParams->when(
+            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
+            fn ($collection) => $collection->each(function ($section) use (&$query) {
+                list($key, $value) = $section;
+                $query->where($key, 'LIKE', '%' . $value . '%');
+            })
+        );
+        return $query;
     }
 }

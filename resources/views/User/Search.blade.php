@@ -6,10 +6,11 @@
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Advanced User Search ({{count($users)}})</label>
+                    <label for="exampleInputEmail1" class="form-label">Users :<span class="badge text-bg-secondary">({{count($users)}})</span></label>
+
                     <input type="text" class="form-control" name="search" value="{{request()->get('search')}}">
                     <div id="" class="form-text">
-                        <div class="mt-2 text-danger">Example Search Format: {{$search_placeholder}}</div>
+                        <div class="mt-2 text-primary">Example Search Format: {{$search_placeholder}}</div>
                     </div>
                 </div>
                 <div class="text-center"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button></div>

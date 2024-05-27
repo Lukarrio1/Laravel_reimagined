@@ -11,8 +11,6 @@
                     <tr>
                         @foreach ($selected_table_columns as $column )
                         <th scope="col">{{collect(explode('_',$column))->map(fn($word)=>ucfirst($word))->join(' ')}}</th>
-
-
                         @endforeach
                     </tr>
                 </thead>

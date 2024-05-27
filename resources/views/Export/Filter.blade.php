@@ -28,6 +28,15 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Advanced {{ucfirst(request('table'))}} Search ({{count($table_data)}})
+                    </label>
+                    <input type="text" class="form-control" name="search" value="{{request()->get('search')}}">
+                    <div id="" class="form-text">
+                        <div class="mt-2 text-primary">Example Search Format: {{$searchPlaceholder}}</div>
+                    </div>
+                </div>
+
                 @endif
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary" title="filter table data"><i class="fas fa-filter"></i></button>

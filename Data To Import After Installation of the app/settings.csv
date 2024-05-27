@@ -1,7 +1,7 @@
 id,key,properties,created_at,updated_at
 1,admin_role,Admin_1,"2024-05-14 17:56:26","2024-05-14 17:56:26"
 2,registration_role,"Regular User_2","2024-05-14 17:56:31","2024-05-15 22:04:04"
-3,app_name,Laravel-Re-Imagined,"2024-05-14 17:56:40","2024-05-15 19:06:07"
+3,app_name,"Laravel Re Imagined","2024-05-14 17:56:40","2024-05-24 22:15:49"
 4,mail_host,sandbox.smtp.mailtrap.io,"2024-05-14 17:57:04","2024-05-14 17:57:04"
 5,mail_port,2525,"2024-05-14 17:57:17","2024-05-14 18:38:59"
 6,mail_username,e1e0f01cad57ee,"2024-05-14 17:57:30","2024-05-14 17:57:30"
@@ -9,4 +9,7 @@ id,key,properties,created_at,updated_at
 8,mail_encryption,tls,"2024-05-14 17:57:59","2024-05-14 17:57:59"
 9,mail_from_address,laravel_reimagined@noreply.com,"2024-05-14 17:58:09","2024-05-14 17:58:09"
 10,mail_from_name,"Laravel Re Imagined","2024-05-14 17:58:17","2024-05-14 17:58:17"
-11,app_url,2,"2024-05-24 22:14:42","2024-05-24 22:14:51"
+11,app_url,http://localhost:8000,"2024-05-24 22:14:42","2024-05-24 22:37:40"
+12,app_version,1.9,"2024-05-24 22:16:18","2024-05-25 18:03:13"
+13,app_animation,w3-animate-opacity_w3-animate-opacity,"2024-05-25 20:09:50","2024-05-25 20:16:52"
+14,app_auditing,true_1,"2024-05-25 20:26:50","2024-05-25 20:35:53"
