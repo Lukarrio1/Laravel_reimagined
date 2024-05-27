@@ -2,6 +2,7 @@
 
 namespace App\Models\Node;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -17,14 +18,14 @@ class Node_Type extends Model
         $methods = \collect((new Node())->getControllerMethods());
         $options = '';
         // creates a string that has the controller name and method as options
-        $methods->filter(fn($con,$loc)=>\in_array('Api',\explode('\\',$loc)))
-        ->each(function ($controller, $location) use (&$options, $filler) {
-            collect($controller)
-            ->each(function ($method) use ($location, &$options, $filler) {
-                $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
-                $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $location . "::" . $method . "</option>";
+        $methods->filter(fn ($con, $loc) => \in_array('Api', \explode('\\', $loc)))
+            ->each(function ($controller, $location) use (&$options, $filler) {
+                collect($controller)
+                    ->each(function ($method) use ($location, &$options, $filler) {
+                        $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
+                        $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $location . "::" . $method . "</option>";
+                    });
             });
-        });
         $node_pages_options = '';
         // creates a string that has node pages as option
         Node::where('node_type', 3)->get()->each(function ($page) use (&$node_pages_options, $filler) {
@@ -37,19 +38,31 @@ class Node_Type extends Model
             $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
             $route_method_options .= "<option value='$route_method' $selected>$route_method</option>";
         });
-        $node_route = empty($filler) ? '' :\collect(\explode('/',\optional(\optional($filler)->properties['value'])->node_route))
-        ->filter(function($dt,$key)use($filler){
-            if(array_search('api',\explode('/',\optional(\optional($filler)->properties['value'])->node_route))<$key){
-               return true;
-            }
-            return false;
-        })->join('/');
+        $node_route = empty($filler) ? '' : \collect(\explode('/', \optional(\optional($filler)->properties['value'])->node_route))
+            ->filter(function ($dt, $key) use ($filler) {
+                if (array_search('api', \explode('/', \optional(\optional($filler)->properties['value'])->node_route)) < $key) {
+                    return true;
+                }
+                return false;
+            })->join('/');
         $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
         $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
         $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;
         $actual_component = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->actual_component;
-        $link_page_node_route = empty($filler) ? '' :\optional(\optional($filler)->properties['value'])->node_route;
+        $link_page_node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
+        $app_auditing = (int) optional(collect(Cache::get('settings'))
+            ->where('key', 'app_auditing')->first())
+            ->getSettingValue('last') == 1 ? "<div class='mb-3'>
+                    <label for='route ' class='form-label'>Node Audit Message <small>( use {name} for user name, {at} for the current time and date.)</small></label>
+                    <input
+                    type='text' class='form-control'
+                     id='node_audit_message' aria-describedby='node_audit_message' name='node_audit_message'
+                     value='" . $node_audit_message . "'>
+                </div>" : '';
 
+        $node_message_auditing_rules =  (int) optional(collect(Cache::get('settings'))
+            ->where('key', 'app_auditing')->first())
+            ->getSettingValue('last') == 1 ? ['location' => 'properties'] : [];
         return collect([
             'link' => [
                 'id' => 2,
@@ -87,24 +100,18 @@ class Node_Type extends Model
                     'node_route' => ['location' => 'properties'],
                     'route_function' => ['location' => 'properties'],
                     'route_method' => ['location' => 'properties'],
-                    'node_audit_message' => ['location' => 'properties'],
+                    'node_audit_message' => $node_message_auditing_rules,
                 ],
-                'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required','node_audit_message'=>'required'],
+                'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required', 'node_audit_message' => ''],
                 'extra_html' => "<div>
                  <div class='mb-3'>
-                    <label for='route ' class='form-label'>Node route <small>(you can add parameters to the route eg. /test/{param}/{param1})</small></label>
+                    <label for='route ' class='form-label'>Node route <small>(you can add parameters to the route eg. test/{param}/{param1})</small></label>
                     <input
                     type='text' class='form-control'
                      id='node_route' aria-describedby='node_name' name='node_route'
                      value='" . $node_route . "' required>
                 </div>
-                   <div class='mb-3'>
-                    <label for='route ' class='form-label'>Node Audit Message <small>( use {name} for user name, {at} for the current time and date.)</small></label>
-                    <input
-                    type='text' class='form-control'
-                     id='node_audit_message' aria-describedby='node_audit_message' name='node_audit_message'
-                     value='" . $node_audit_message . "' required>
-                </div>
+                 $app_auditing
                   <div class='mb-3'>
                       <label for='route_function' class='form-label'>Route Function</label>
                       <select id='route_function' class='form-select' name='route_function' required>
@@ -124,7 +131,7 @@ class Node_Type extends Model
                 'rules' => [],
                 'handle' => [
                     'page_link' => ['location' => 'properties'],
-                    'actual_component'=>['location'=>'properties']
+                    'actual_component' => ['location' => 'properties']
                 ],
                 'extra_html' => "<div><input
                     type='hidden' name='page_link'
@@ -147,7 +154,8 @@ class Node_Type extends Model
     {
         $storage = \collect([]);
         collect($handler)->keys()->each(function ($key) use ($storage, $data) {
-            $storage->put($key, $data[$key]);
+            if (!empty($data[$key]))
+                $storage->put($key, $data[$key]);
         });
         return \json_encode($storage->toArray());
     }
