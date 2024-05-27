@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use App\TenantTrait;
+use App\HasCustomPagination;
 use App\Models\Tenant\Tenant;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Scopes\TenantScope;
@@ -18,6 +20,7 @@ class User extends Authenticatable
     use Notifiable;
     use HasRoles;
     use HasApiTokens;
+    use HasCustomPagination;
     // use Encryptable;
     // use SoftDeletes;
     use TenantTrait;

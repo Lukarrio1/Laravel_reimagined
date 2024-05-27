@@ -79,12 +79,15 @@ class NodeController extends Controller
             })
         );
 
-
+        // take(\request('load_more'))
+        \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);
         return \view('Nodes.View', [
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
-            'nodes' => $nodes->latest()->take(\request('load_more'))->get(),
+            'nodes_count' => $nodes->get()->count(),
+            'nodes' => $nodes->latest()->customPaginate(5, (int)\request()->get('page'))->get(),
+
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),

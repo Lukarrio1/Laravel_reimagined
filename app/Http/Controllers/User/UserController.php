@@ -68,14 +68,15 @@ class UserController extends Controller
                 }
             })
         );
-        $users = $users->take(\request()->get('load_more'))->get();
+        \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);
+        $users = $users->customPaginate(5,\request('page'))->get();
 
         return \view('User.View', ['users' => $users->map(function (User $user) {
             $user->role_name = \optional(\optional($user->roles)->first())->name;
             $user->role = $user->roles->first();
             $user = $user->updateUserHtml();
             return $user;
-        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder]);
+        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder,'users_count'=>User::all()->count()]);
     }
 
     public function assignRole(Request $request, User $user)

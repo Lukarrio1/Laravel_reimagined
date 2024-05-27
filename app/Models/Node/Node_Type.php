@@ -50,19 +50,20 @@ class Node_Type extends Model
         $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;
         $actual_component = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->actual_component;
         $link_page_node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
-        $app_auditing = (int) optional(collect(Cache::get('settings'))
+        $is_auditing_on = (int) optional(collect(Cache::get('settings'))
             ->where('key', 'app_auditing')->first())
-            ->getSettingValue('last') == 1 ? "<div class='mb-3'>
+            ->getSettingValue('last') == 1;
+
+        $app_auditing = $is_auditing_on ? "<div class='mb-3'>
                     <label for='route ' class='form-label'>Node Audit Message <small>( use {name} for user name, {at} for the current time and date.)</small></label>
                     <input
                     type='text' class='form-control'
                      id='node_audit_message' aria-describedby='node_audit_message' name='node_audit_message'
-                     value='" . $node_audit_message . "'>
+                     value='" . $node_audit_message . "' required>
                 </div>" : '';
 
-        $node_message_auditing_rules =  (int) optional(collect(Cache::get('settings'))
-            ->where('key', 'app_auditing')->first())
-            ->getSettingValue('last') == 1 ? ['location' => 'properties'] : [];
+        $node_message_auditing_rules =  $is_auditing_on == 1 ? ['location' => 'properties'] : [];
+
         return collect([
             'link' => [
                 'id' => 2,

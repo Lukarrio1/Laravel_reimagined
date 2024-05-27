@@ -4,7 +4,7 @@
             <form action="{{route('viewNodes')}}" action="get">
                 <div class="mb-3">
                     <label for="search" class="form-label">
-                        Nodes:<span class="badge text-bg-secondary">({{count($nodes)}})</span>
+                        Nodes:<span class="badge text-bg-secondary">({{$nodes_count}})</span>
                     </label>
                     <input type="text" class="form-control" id="search" name="search" value="{{request('search')}}">
                     <div class="mt-2 text-primary">Example Search Format: {{$search_placeholder}}</div>
@@ -75,7 +75,28 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-                <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?load_more='.request()->get('load_more')+10}}">load more</a>
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous Page Link -->
+                        <li class="page-item">
+                            <a class="page-link" href="{{route('viewNodes').'?page='.request()->get('page')-1}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo; Previous</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="!#" aria-label="Previous">
+                                <span aria-hidden="true">{{request()->get('page')}} </span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="{{route('viewNodes').'?page='.request()->get('page')+1}}" aria-label="Next">
+                                <span aria-hidden="true">Next &raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                {{-- <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?page='.request()->get('page')+10}}">load more</a> --}}
 
             </div>
         </div>

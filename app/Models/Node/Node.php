@@ -4,6 +4,7 @@ namespace App\Models\Node;
 
 use ReflectionClass;
 use ReflectionMethod;
+use App\HasCustomPagination;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Node extends Model
 {
-    use HasFactory;
+    use HasFactory, HasCustomPagination;
 
     protected $guarded = ['id'];
 
@@ -111,9 +112,9 @@ class Node extends Model
         // An item
         return [
             'value' => $this->addAppUrlToNodeRoute(\json_decode($value)),
-            'html_value' => "<ul class='list-group list-group-flush'>". \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
+            'html_value' => "<ul class='list-group list-group-flush'>" . \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
                 function ($value, $key) {
-                    return "<li class='list-group-item'>".collect(\explode('_', $key))->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
+                    return "<li class='list-group-item'>" . collect(\explode('_', $key))->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
                 }
             )->join('') . '</ul>'
         ];
@@ -124,7 +125,7 @@ class Node extends Model
         $value = \collect($value);
         if (\in_array($this->node_type['value'], [1])) {
             $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
-            $seg = $this->node_type['value'] == 2 ? '/' :'/api/';
+            $seg = $this->node_type['value'] == 2 ? '/' : '/api/';
             $value = $value->put('node_route', $app_url . $seg . $value->get('node_route'));
         }
 

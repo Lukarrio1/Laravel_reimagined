@@ -6,7 +6,7 @@
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Users :<span class="badge text-bg-secondary">({{count($users)}})</span></label>
+                    <label for="exampleInputEmail1" class="form-label">Users :<span class="badge text-bg-secondary">({{$users_count}})</span></label>
 
                     <input type="text" class="form-control" name="search" value="{{request()->get('search')}}">
                     <div id="" class="form-text">

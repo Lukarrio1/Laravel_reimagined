@@ -77,12 +77,32 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-                <a class="btn btn-sm btn-primary" href="{{route('viewUsers').'?load_more='.request()->get('load_more')+10}}">load more</a>
 
+                    <nav aria-label="Page navigation" class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous Page Link -->
+                            <li class="page-item">
+                                <a class="page-link" href="{{route('viewUsers').'?page='.request()->get('page')-1}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo; Previous</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="!#" aria-label="Previous">
+                                    <span aria-hidden="true">{{request()->get('page')}} </span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="{{route('viewUsers').'?page='.request()->get('page')+1}}" aria-label="Next">
+                                    <span aria-hidden="true">Next &raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    {{-- <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?page='.request()->get('page')+10}}">load more</a> --}}
             </div>
         </div>
         <div class="modal fade " id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">

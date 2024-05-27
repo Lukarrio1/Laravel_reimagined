@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -26,17 +27,18 @@ class Setting extends Model
     {
         $html = '';
         $prev_val = '';
-        // \optional(self::where('key',$setting_key)->first())->getSettingValue();
+        $field_value =self::where('key', $setting_key)->first()->properties ?? '';
         $value = !empty($prev_val) ? $prev_val : collect($value);
         switch ($key) {
             case 'drop_down':
-                $value->each(function ($key, $val) use (&$html) {
-                    $html .= "<option value='" . $val . "_" . $key . "'>$val</option>";
+                $value->each(function ($key, $val) use (&$html, $field_value) {
+                    $selected = $field_value == $val . "_" . $key ? "selected" : '';
+                    $html .= "<option value='" . $val . "_" . $key . "' $selected>$val</option>";
                 });
                 $html = "<select class='form-select' name='value'>$html</select>";
                 break;
             case 'input':
-                $html = "<input class='form-control' name='value' value='" . $value->join('') . "'>";
+                $html = "<input class='form-control' name='value' value='" . $field_value . "'>";
                 break;
 
             default:
