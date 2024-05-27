@@ -1,9 +1,21 @@
 @php
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
+
+
 $app_name =optional(collect(Cache::get('settings'))->where('key','app_name')->first())->properties;
 $app_version =optional(collect(Cache::get('settings'))->where('key','app_version')->first())->properties;
 $app_animation =optional(collect(Cache::get('settings'))->where('key','app_animation')->first())->getSettingValue('last');
 $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_tenancy')->first())->getSettingValue('last');
+
+function getUriFromUrl($url)
+{
+
+// Get the URI for the provided URL
+return URL::to($url);
+}
+
+
 @endphp
 
 <!doctype html>
@@ -40,22 +52,38 @@ $multi_tenancy =optional(collect(Cache::get('settings'))->where('key','multi_ten
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('home'))? 'red' : 'black' }}" href="{{ url('/') }}">
                     {{$app_name}}
                 </a>
                 @auth
-                <a class="navbar-brand" href="{{route('viewNodes')}}" aria-current="page">Nodes</a>
-                <a class="navbar-brand" href="{{route('viewRoles')}}">Roles</a>
-                <a class="navbar-brand" href="{{route('viewPermissions')}}">Permissions</a>
-                <a class="navbar-brand" href="{{route('viewUsers')}}">Users</a>
-                <a class="navbar-brand" href="{{route('viewCache')}}">Cache</a>
-                <a class="navbar-brand" href="{{route('exportData')}}">Export</a>
-                <a class="navbar-brand" href="{{route('importView')}}">Import</a>
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewNodes'))? 'red' : 'black' }}" href="{{route('viewNodes')}}" aria-current="page">
+                    Nodes
+                </a>
+
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewRoles'))? 'red' : 'black' }}" href="{{route('viewRoles')}}">Roles</a>
+
+
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewPermissions'))? 'red' : 'black' }}" href="{{route('viewPermissions')}}">Permissions</a>
+
+
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewUsers'))? 'red' : 'black' }}" href="{{route('viewUsers')}}">Users</a>
+
+
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewCache'))? 'red' : 'black' }}" href="{{route('viewCache')}}">Cache</a>
+
+
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('exportData'))? 'red' : 'black' }}" href="{{route('exportData')}}">Export</a>
+
+
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('importView'))? 'red' : 'black' }}" href="{{route('importView')}}">Import</a>
+
                 @if($multi_tenancy=='true')
-                <a class="navbar-brand" href="{{route('exportData')}}">Multi Tenancy</a>
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewCache'))? 'red' : 'black' }}" href="{{route('exportData')}}">Multi Tenancy</a>
+
                 @endif
-                <a class="navbar-brand" href="{{route('viewSettings')}}">Settings</a>
+                <a class="navbar-brand" style="color:{{request()->url()==getUriFromUrl(route('viewSettings'))? 'red' : 'black' }}" href="{{route('viewSettings')}}">Settings</a>
+
+
                 @endauth
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">

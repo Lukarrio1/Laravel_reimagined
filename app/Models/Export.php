@@ -79,6 +79,7 @@ class Export extends Model
                 $query->where($key, 'LIKE', '%' . $value . '%');
             })
         );
+
         return $query;
     }
 }
