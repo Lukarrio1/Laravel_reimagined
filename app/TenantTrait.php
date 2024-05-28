@@ -11,7 +11,7 @@ trait TenantTrait
 {
     public function initializeTenancy()
     {
-        static::addGlobalScope(new TenantScope);
+        // static::addGlobalScope(new TenantScope);
     }
 
     public function land_lord()

@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Session;
 
 class ExportController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:can export');
+    }
+
     public function index()
     {
         $export = new Export();

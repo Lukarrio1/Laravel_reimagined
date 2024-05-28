@@ -18,7 +18,7 @@ class NodeController extends Controller
 
     public function __construct()
     {
-
+        $this->middleware('can:can crud nodes');
         $this->cache = new CacheController();
     }
     public function index($node = null)

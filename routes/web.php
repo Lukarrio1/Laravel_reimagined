@@ -11,6 +11,7 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Cache\CacheController;
 use App\Http\Controllers\Export\ExportController;
 use App\Http\Controllers\Import\ImportController;
+use App\Http\Controllers\Tenant\TenantController;
 use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Permission\PermissionController;
 
@@ -21,10 +22,12 @@ if (!Cache::has('settings')) {
 
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
+
     Route::get('/nodes', [NodeController::class, 'index'])->name('viewNodes');
     Route::post('/node', [NodeController::class, 'save'])->name('saveNode');
     Route::get('/node/{node}', [NodeController::class, 'node'])->name('viewNode');
     Route::delete('/node/delete/{node}', [NodeController::class, 'delete'])->name('deleteNode');
+
 
     Route::get('/roles', [RoleController::class, 'index'])->name('viewRoles');
     Route::get('/role/{role}', [RoleController::class, 'edit'])->name('editRole');
@@ -53,6 +56,15 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::get('/import', [ImportController::class, 'index'])->name('importView');
     Route::post('/import/data', [ImportController::class, 'import'])->name('importData');
+
+    $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
+        ->getSettingValue('first');
+    if ($multi_tenancy == 1) {
+        Route::get('/tenants', [TenantController::class, 'index'])->name('viewTenants');
+        Route::get('/tenant/{tenant}', [TenantController::class, 'index'])->name('editTenant');
+        Route::post('/tenant', [TenantController::class, 'save'])->name('updateOrCreateTenant');
+        Route::delete('/tenant/{tenant}/delete', [TenantController::class, 'delete'])->name('deleteTenant');
+    }
 
     Route::get('/', [NodeController::class, 'index'])->name('home');
 });

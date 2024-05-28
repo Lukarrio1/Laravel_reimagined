@@ -16,8 +16,9 @@ class ImportController extends Controller
     public function __construct()
     {
         $this->export = new Export();
-
+        $this->middleware('can:can crud roles');
     }
+
     public function index()
     {
         return view('Import.View', ['table_names' => $this->export->getAllTables()]);
@@ -27,9 +28,10 @@ class ImportController extends Controller
     {
         $export = new Export();
         $first_rules = [
-            'csv_file' => ['required',
-            // 'mimes:csv'
-        ],
+            'csv_file' => [
+                'required',
+                // 'mimes:csv'
+            ],
             'table_name' => ['required'],
         ];
         $validator = Validator::make($request->all(), $first_rules);
@@ -44,7 +46,7 @@ class ImportController extends Controller
 
         $csv_data = \collect($this->export->readCSV($request->file('csv_file')));
         $table_columns = \collect($csv_data->first());
-        $table_data = $csv_data->filter(fn($_, $index) => $index > 0)->map(function ($data, $key) use ($table_columns) {
+        $table_data = $csv_data->filter(fn ($_, $index) => $index > 0)->map(function ($data, $key) use ($table_columns) {
             $temp = collect([]);
             $table_columns->each(function ($column, $c_key) use ($temp, $data) {
                 $temp->put($column, $data[$c_key]);

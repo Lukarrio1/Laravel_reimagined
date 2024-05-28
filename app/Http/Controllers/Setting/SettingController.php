@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class SettingController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:can crud settings');
+    }
+
     public function index($setting_key = 'admin_role')
     {
         $setting = new Setting();

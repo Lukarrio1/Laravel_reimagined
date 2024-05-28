@@ -10,6 +10,12 @@ use App\Http\Requests\Role\RoleSaveRequest;
 
 class RoleController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:can crud roles');
+    }
+
     public function index($role = null)
     {
         \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);

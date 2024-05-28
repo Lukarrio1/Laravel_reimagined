@@ -9,6 +9,12 @@ use App\Http\Requests\Permission\PermissionSaveRequest;
 
 class PermissionController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:can crud permissions');
+    }
+
     public function index($permission = null)
     {
         \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);

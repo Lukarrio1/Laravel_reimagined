@@ -27,7 +27,7 @@ class Setting extends Model
     {
         $html = '';
         $prev_val = '';
-        $field_value =self::where('key', $setting_key)->first()->properties ?? '';
+        $field_value = self::where('key', $setting_key)->first()->properties ?? '';
         $value = !empty($prev_val) ? $prev_val : collect($value);
         switch ($key) {
             case 'drop_down':
@@ -100,6 +100,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key),
                 'handle' => ['action' => 'split', 'value' => 'first'],
             ],
+            'multi_tenancy_role' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
             'mail_url' => [
                 'field' => $this->SETTING_OPTIONS('input', '', $key),
                 'handle' => ['action' => '', 'value' => ''],
@@ -142,14 +146,19 @@ class Setting extends Model
 
     public function getAllSettingKeys($key = "")
     {
-        $keys = [
+
+        $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
+            ->getSettingValue('first');
+        $keys = \collect([
             'admin_role' => "Super Admin Role",
             'registration_role' => 'Api Registration Role',
             'app_name' => 'Application Name',
             'app_url' => 'Application URL',
             'app_version' => 'Application Version',
             'app_animation' => 'Application Animation',
-            // 'multi_tenancy' => 'Api Multi Tenancy',
+            'multi_tenancy' => 'Api Multi Tenancy',
+            "multi_tenancy_role" => "Api Multi Tenancy Role",
+            "app_auditing" => "Application Auditing",
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',
@@ -159,9 +168,11 @@ class Setting extends Model
             \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
             \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
             'mail_url' => "Mail Url",
-            "app_auditing" => "Application Auditing"
-
-        ];
-        return $key ? $keys[$key] : $keys;
+        ])->when($multi_tenancy == 0, function ($collection) {
+            return $collection->filter((function ($item, $key) {
+                return $key != "multi_tenancy_role";
+            }));
+        });
+        return $key ? $keys->get($key) : $keys->toArray();
     }
 }

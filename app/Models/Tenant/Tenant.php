@@ -14,7 +14,16 @@ class Tenant extends Model
     use HasFactory;
     use TenantTrait;
 
-    protected $guarded =['id'];
+    protected $guarded = ['id'];
+    protected $appends = ['api_base_url'];
+
+    public function getStatusAttribute($value)
+    {
+        return ['value' => $value, 'human_value' => [0 => "In Active", 1 => "Active"][$value]];
+    }
 
 
+    public function getApiBaseUrlAttribute(){
+        // return
+    }
 }

@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Session;
 
 class CacheController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:can clear cache');
+    }
+
     public function index()
     {
         return view('Cache.View');
