@@ -77,29 +77,10 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
+                @include('Components.Pagination',['route_name'=>'viewUsers'])
 
-                    <nav aria-label="Page navigation" class="mt-5">
-                        <ul class="pagination justify-content-center">
-                            <!-- Previous Page Link -->
-                            <li class="page-item">
-                                <a class="page-link" href="{{route('viewUsers').'?page='.request()->get('page')-1}}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo; Previous</span>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="!#" aria-label="Previous">
-                                    <span aria-hidden="true">{{request()->get('page')}} </span>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="{{route('viewUsers').'?page='.request()->get('page')+1}}" aria-label="Next">
-                                    <span aria-hidden="true">Next &raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
 
-                    {{-- <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?page='.request()->get('page')+10}}">load more</a> --}}
+                {{-- <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?page='.request()->get('page')+10}}">load more</a> --}}
             </div>
         </div>
         <div class="modal fade " id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
@@ -137,7 +118,7 @@
     if (allEditBtns) {
         allEditBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const current_user = users.filter(user => user?.id == btn.getAttribute('data-user-id'))[0]
+                const current_user = users.filter(user => user.id == btn.getAttribute('data-user-id'))[0]
                 document.querySelector('#custom_input_user_fields').innerHTML = current_user.updateHtml
                 console.log(current_user)
             })

@@ -45,26 +45,7 @@
         <div class="card-footer bg-white">
             <div class="text-center">
 
-                <nav aria-label="Page navigation" class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        <!-- Previous Page Link -->
-                        <li class="page-item">
-                            <a class="page-link" href="{{route('viewRoles').'?page='.request()->get('page')-1}}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo; Previous</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="!#" aria-label="Previous">
-                                <span aria-hidden="true">{{request()->get('page')}} </span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="{{route('viewRoles').'?page='.request()->get('page')+1}}" aria-label="Next">
-                                <span aria-hidden="true">Next &raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+              @include('Components.Pagination',['route_name'=>'viewRoles'])
 
                 {{-- <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?page='.request()->get('page')+10}}">load more</a> --}}
             </div>
