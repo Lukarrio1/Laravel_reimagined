@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Role;
 
+use App\Models\Setting;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
@@ -19,7 +20,11 @@ class RoleController extends Controller
     public function index($role = null)
     {
         \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);
-        $roles = Role::with('permissions')->skip((int) 5 * (int) \request('page') - (int) 5)
+        $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
+        $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
+        $roles = Role::with('permissions')
+            ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
+            ->skip((int) 5 * (int) \request('page') - (int) 5)
             ->take((int) 5)->get()
             ->map(fn ($role) => [
                 ...$role->toArray(),

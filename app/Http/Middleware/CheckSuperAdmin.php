@@ -20,14 +20,14 @@ class CheckSuperAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        $user = Auth::user();
+        $user = request()->user();
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
         $multi_tenancy = (int)\optional(Setting::where('key', 'multi_tenancy')->first())->getSettingValue('first');
         $multi_tenancy_role = $multi_tenancy == 0 ?: Role::find(\optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue('last'));
         $role = !empty($setting) ? Role::find((int)$setting) : null;
 
         // Check if the user is authenticated and has the "Super Admin" role
-        if ($user->hasRole($role) || $user->hasRole($multi_tenancy_role)) {
+        if (!empty($role) && $user->hasRole($role) || !empty($multi_tenancy_role) && $user->hasRole($multi_tenancy_role)) {
             return $next($request);
         }
         Auth::logout();

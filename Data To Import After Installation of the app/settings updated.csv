@@ -1,0 +1,16 @@
+key,properties
+admin_role,"Super Admin_1"
+registration_role,"authenticated user_2"
+app_name,"Laravel Re Imagined"
+mail_host,sandbox.smtp.mailtrap.io
+mail_port,2525
+mail_username,e1e0f01cad57ee
+mail_password,245e87234a7039
+mail_encryption,tls
+mail_from_address,laravel_reimagined@noreply.com
+mail_from_name,"Laravel Re Imagined"
+app_url,http://localhost:8000
+app_animation,w3-animate-zoom_w3-animate-zoom
+app_auditing,false_
+app_version,1.95
+multi_tenancy,0_false

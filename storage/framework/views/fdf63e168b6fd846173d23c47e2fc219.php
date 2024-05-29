@@ -6,7 +6,7 @@
                     <label for="search" class="form-label">
                         Nodes:<span class="badge text-bg-secondary">(<?php echo e($nodes_count); ?>)</span>
                     </label>
-                    <input type="text" class="form-control" id="search" name="search" value="<?php echo e(request('search')); ?>">
+                    <input type="text" class="form-control" id="node_search" name="search" value="<?php echo e(request('search')); ?>">
                     <div class="mt-2 text-primary">Example Search Format: <?php echo e($search_placeholder); ?></div>
 
                 </div>
@@ -75,10 +75,22 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-            <?php echo $__env->make('Components.Pagination',['route_name'=>'viewNodes'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                <?php echo $__env->make('Components.Pagination',['route_name'=>'viewNodes'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
         </div>
 
     </div>
 </div>
+
+<?php $__env->startSection('scripts'); ?>
+<script>
+    const searchField = document.querySelector('#node_search')
+    if (searchField) {
+        searchField.addEventListener('input', (e) => {
+            localStorage.setitem('node_search', e.target.value)
+        })
+    }
+
+</script>
+<?php $__env->stopSection(); ?>
 <?php /**PATH /Users/niritechuser15/Documents/Development/laravel-reimagined/resources/views/Nodes/Table.blade.php ENDPATH**/ ?>

@@ -33,8 +33,10 @@
          <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can import', auth()->user())): ?>
          <a class="navbar-brand" style="color:<?php echo e(request()->url()==URL::to(route('importView'))? 'red' : 'black'); ?>" href="<?php echo e(route('importView')); ?>">Import</a>
          <?php endif; ?>
+         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can crud tenant', auth()->user())): ?>
          <?php if($multi_tenancy==1): ?>
          <a class="navbar-brand" style="color:<?php echo e(request()->url()==URL::to(route('viewTenants'))? 'red' : 'black'); ?>" href="<?php echo e(route('viewTenants')); ?>">Multi Tenancy</a>
+         <?php endif; ?>
          <?php endif; ?>
          <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can crud settings', auth()->user())): ?>
          <a class="navbar-brand" style="color:<?php echo e(request()->url()==URL::to(route('viewSettings'))? 'red' : 'black'); ?>" href="<?php echo e(route('viewSettings')); ?>">Settings</a>

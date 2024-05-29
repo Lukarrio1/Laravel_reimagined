@@ -80,7 +80,10 @@ class NodeController extends Controller
         );
 
         // take(\request('load_more'))
-        \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);
+        \request()->merge([
+            'page' => \request('page') == null ? 1 : \request('page'),
+            'search' => request()->get('search')
+        ]);
         return \view('Nodes.View', [
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,

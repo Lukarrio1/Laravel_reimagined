@@ -8,6 +8,7 @@
                 <thead>
                     <tr>
                         <th scope="col" class="text-center">Role Name</th>
+                        <th scope="col" class="text-center">Role Priority</th>
                         <th scope="col" class="text-center">Role Permissions</th>
                         <th scope="col" class="text-center">Action</th>
                     </tr>
@@ -16,7 +17,7 @@
                     @foreach ($roles as $role )
                     <tr>
                         <td class="text-center">{{$role['name']}}</td>
-
+                        <td class="text-center">{{$role['priority']}}</td>
                         <td class="text-center">
                             <ul class="list-group-flush">
                                 @foreach ($role['permission_name'] as $name )

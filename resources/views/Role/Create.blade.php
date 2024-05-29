@@ -15,7 +15,15 @@
 
                 </div>
                 <div class="mb-3">
-                    <label for="role_name" class="form-label">Permissions (<small class="text-danger">Use shift to select more than 1 permission</small>)</label>
+                    <label for="role_priority" class="form-label">Role priority</label>
+                    <input type="number" class="form-control" id="role_priority" aria-describedby="emailHelp" value="{{isset($role)?optional($role)->priority:old('priority')}}" name="priority">
+                    @error('priority')
+                    <div style="color: red;">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="role_name" class="form-label">Permissions (<small class="text-primary">Use shift to select more than 1 permission</small>)</label>
                     <select class="form-select" multiple aria-label="Multiple select example" name="permissions[]">
                         <option selected>Open this select menu</option>
                         @foreach ($permissions as $permission )

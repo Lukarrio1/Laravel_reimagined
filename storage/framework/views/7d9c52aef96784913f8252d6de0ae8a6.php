@@ -22,7 +22,22 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
                 <div class="mb-3">
-                    <label for="role_name" class="form-label">Permissions (<small class="text-danger">Use shift to select more than 1 permission</small>)</label>
+                    <label for="role_priority" class="form-label">Role priority</label>
+                    <input type="number" class="form-control" id="role_priority" aria-describedby="emailHelp" value="<?php echo e(isset($role)?optional($role)->priority:old('priority')); ?>" name="priority">
+                    <?php $__errorArgs = ['priority'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <div style="color: red;"><?php echo e($message); ?></div>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                </div>
+
+                <div class="mb-3">
+                    <label for="role_name" class="form-label">Permissions (<small class="text-primary">Use shift to select more than 1 permission</small>)</label>
                     <select class="form-select" multiple aria-label="Multiple select example" name="permissions[]">
                         <option selected>Open this select menu</option>
                         <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

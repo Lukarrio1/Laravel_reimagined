@@ -6,7 +6,7 @@
                     <label for="search" class="form-label">
                         Nodes:<span class="badge text-bg-secondary">({{$nodes_count}})</span>
                     </label>
-                    <input type="text" class="form-control" id="search" name="search" value="{{request('search')}}">
+                    <input type="text" class="form-control" id="node_search" name="search" value="{{request('search')}}">
                     <div class="mt-2 text-primary">Example Search Format: {{$search_placeholder}}</div>
 
                 </div>
@@ -75,9 +75,21 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-            @include('Components.Pagination',['route_name'=>'viewNodes'])
+                @include('Components.Pagination',['route_name'=>'viewNodes'])
             </div>
         </div>
 
     </div>
 </div>
+
+@section('scripts')
+<script>
+    const searchField = document.querySelector('#node_search')
+    if (searchField) {
+        searchField.addEventListener('input', (e) => {
+            localStorage.setitem('node_search', e.target.value)
+        })
+    }
+
+</script>
+@endsection

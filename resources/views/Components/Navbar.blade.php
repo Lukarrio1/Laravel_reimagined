@@ -32,9 +32,11 @@
          @can('can import', auth()->user())
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('importView'))? 'red' : 'black' }}" href="{{route('importView')}}">Import</a>
          @endcan
+         @can('can crud tenant', auth()->user())
          @if($multi_tenancy==1)
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewTenants'))? 'red' : 'black' }}" href="{{route('viewTenants')}}">Multi Tenancy</a>
          @endif
+         @endcan
          @can('can crud settings', auth()->user())
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewSettings'))? 'red' : 'black' }}" href="{{route('viewSettings')}}">Settings</a>
          @endcan

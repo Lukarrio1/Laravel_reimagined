@@ -40,15 +40,17 @@ class ImportController extends Controller
         }
         $file_columns = \collect($export->readCSV($request->file('csv_file')))->first();
         $table_columns = $export->getAllTableColumns($request->table_name);
-        if ($file_columns != $table_columns) {
+        $table_validation = \collect(get_object_vars((object)$file_columns))
+            ->filter(fn ($key) => \in_array($key, \get_object_vars((object)$table_columns)))->count() <=
+            \count(\get_object_vars((object)$table_columns));
+        if (!$table_validation) {
             return \redirect()->back()->withErrors(['csv_file' => 'The database table columns does not match the fields presented in the csv file.']);
         }
-
         $csv_data = \collect($this->export->readCSV($request->file('csv_file')));
         $table_columns = \collect($csv_data->first());
-        $table_data = $csv_data->filter(fn ($_, $index) => $index > 0)->map(function ($data, $key) use ($table_columns) {
+        $table_data = $csv_data->filter(fn ($_, $index) => $index > 0)->map(function ($data, $key) use ($file_columns) {
             $temp = collect([]);
-            $table_columns->each(function ($column, $c_key) use ($temp, $data) {
+            collect(\get_object_vars((object)$file_columns))->each(function ($column, $c_key) use ($temp, $data) {
                 $temp->put($column, $data[$c_key]);
             });
             return $temp->toArray();

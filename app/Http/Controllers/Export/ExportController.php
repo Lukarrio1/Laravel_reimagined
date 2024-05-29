@@ -22,12 +22,14 @@ class ExportController extends Controller
         $selected_table_columns = \request()->get('table_columns', []);
         $table_columns = [];
         $table_data = [];
+
         $search = \request()->get('search', '||');
         $searchParams = collect(explode('|', $search))
             ->filter(fn ($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
+
         if (!empty($table)) {
             $table_columns = $export->getAllTableColumns($table);
         }
@@ -37,6 +39,7 @@ class ExportController extends Controller
             $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams)->get();
             $selected_table_columns = $table_columns;
         }
+
         $searchPlaceholder = \collect($selected_table_columns)
             ->map(function ($key, $idx) use ($selected_table_columns) {
                 if ($idx == 0) {
@@ -48,7 +51,7 @@ class ExportController extends Controller
                 return $key . ":search here";
             })->join('|');
 
-        Cache::set('current_table_data_for_export', ['selected_columns' => $table_columns, 'table' => $table]);
+        Cache::set('current_table_data_for_export', ['selected_columns' => $selected_table_columns, 'table' => $table]);
 
         return \view('Export.View', [
             'tables' => $export->getAllTables(),

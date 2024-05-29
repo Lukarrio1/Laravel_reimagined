@@ -26,6 +26,7 @@ class TenantRoleAndPermissionSeeder extends Seeder
             ['name' => 'can crud users',],
             ['name' => 'can clear cache',],
             ['name' => 'can crud settings',],
+            ['name' => 'can crud tenant',],
         ];
 
         // $role = ' api owner';

@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Role;
 
+use App\Models\Setting;
+use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RoleSaveRequest extends FormRequest
@@ -21,8 +23,14 @@ class RoleSaveRequest extends FormRequest
      */
     public function rules(): array
     {
+
+        $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
+        $role = !empty($setting) ? Role::find((int)$setting) : null;
+        $highest_priority = !\request()->user()->hasRole($role) ? ['not_in:' . Role::min('priority'),'required'] : [];
+
         return [
-            'name'=>['required','unique:roles,name,'.$this->id]
+            'name' => ['required', 'unique:roles,name,' . $this->id,],
+            'priority' =>$highest_priority
         ];
     }
 }

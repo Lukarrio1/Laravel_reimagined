@@ -8,6 +8,7 @@
                 <thead>
                     <tr>
                         <th scope="col" class="text-center">Role Name</th>
+                        <th scope="col" class="text-center">Role Priority</th>
                         <th scope="col" class="text-center">Role Permissions</th>
                         <th scope="col" class="text-center">Action</th>
                     </tr>
@@ -16,7 +17,7 @@
                     <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
                         <td class="text-center"><?php echo e($role['name']); ?></td>
-
+                        <td class="text-center"><?php echo e($role['priority']); ?></td>
                         <td class="text-center">
                             <ul class="list-group-flush">
                                 <?php $__currentLoopData = $role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>

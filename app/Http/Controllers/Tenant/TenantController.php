@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Validator;
 
 class TenantController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('can:can crud tenant');
+    }
+
     public function index($Tenant = null)
     {
         $tenants = Tenant::query();

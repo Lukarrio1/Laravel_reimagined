@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -50,7 +51,11 @@ class UserController extends Controller
         })->join('|');
 
         $users = User::query()->with('roles');
-        $roles = Role::all();
+        $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
+        $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
+        $roles = Role::query()
+        ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
+        ->get();
 
         $searchParams->when(
             $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
@@ -75,14 +80,14 @@ class UserController extends Controller
             })
         );
         \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);
-        $users = $users->customPaginate(5,\request('page'))->get();
+        $users = $users->customPaginate(5, \request('page'))->get();
 
         return \view('User.View', ['users' => $users->map(function (User $user) {
             $user->role_name = \optional(\optional($user->roles)->first())->name;
             $user->role = $user->roles->first();
             $user = $user->updateUserHtml();
             return $user;
-        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder,'users_count'=>User::all()->count()]);
+        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder, 'users_count' => User::all()->count()]);
     }
 
     public function assignRole(Request $request, User $user)
