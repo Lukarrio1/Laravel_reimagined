@@ -69,8 +69,7 @@ unset($__errorArgs, $__bag); ?>
                     <?php $__currentLoopData = $settings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $setting): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
                         <td><?php echo e($setting->getAllSettingKeys($setting->key)); ?></td>
-                        <td><?php echo e($setting->getSettingValue('first')); ?></td>
-
+                        <td><?php echo e(!empty($setting->getAllSettingKeys($setting->key))?$setting->getSettingValue('first'):''); ?></td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>

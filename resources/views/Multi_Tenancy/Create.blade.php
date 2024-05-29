@@ -35,10 +35,18 @@
                     <label for="tenant_status" class="form-label">Tenant Active Status</label>
                     <select id="tenant_status" class="form-select" name="status">
                         @foreach(['Active'=>1,'Inactive'=>0] as $value=>$key)
-                        <option value="{{$key}}" {{isset($tenant)&&$key==$tenant->status['value']?"selected":''}}>{{$value}}</option>\
+                        <option value="{{$key}}" {{isset($tenant)&&$key==$tenant->status['value']?"selected":''}}>{{$value}}</option>
                         @endforeach
                     </select>
                 </div>
+               <div class="mb-3">
+                   <label for="tenant_owner" class="form-label">Tenant Owner</label>
+                   <select id="tenant_owner" class="form-select" name="owner_id">
+                       @foreach($users as $user)
+                       <option value="{{$user->id}}" {{isset($tenant)&&$user->id==$tenant->owner_id?"selected":''}}>{{$user->name}}</option>
+                       @endforeach
+                   </select>
+               </div>
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary">
                         @if(isset($tenant))

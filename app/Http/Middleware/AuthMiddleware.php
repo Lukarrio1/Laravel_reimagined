@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use PSpell\Config;
 use App\Models\Audit;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -26,16 +27,16 @@ class AuthMiddleware
     public function handle(Request $request, Closure $next)
     {
         // return $next($request);
-
         // Force response content to be JSON
+
         $request->headers->set('Accept', 'application/json');
 
         // Extract the token from the request
         $token = $request->bearerToken();
-
+        // dd(\request()->tenant);
         // Determine the current route's function name
         $currentRoute = join('::', explode('@', Route::currentRouteAction()));
-
+        Cache::set('tenant_id', Route::current()->parameter('tenant'));
         $currentRouteNode = null;
         // Retrieve the route node from the cache
         if (Cache::has('routes')) {
@@ -96,6 +97,7 @@ class AuthMiddleware
 
         if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
             Auth::setUser($personalAccessToken->tokenable);
+            // Cache::set('tenant_' . \auth()->id(), \request()->get('tenant'));
             $node_audit_message = empty($currentRouteNode) ? '' : \optional(\optional($currentRouteNode)->properties['value'])->node_audit_message;
             if ($app_auditing == 1) {
                 Audit::create(

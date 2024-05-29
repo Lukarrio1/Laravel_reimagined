@@ -2,6 +2,7 @@
 
 namespace App\Models\Node;
 
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,9 +39,15 @@ class Node_Type extends Model
             $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
             $route_method_options .= "<option value='$route_method' $selected>$route_method</option>";
         });
+        $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())->getSettingValue('first');
+        $setting
+            = (int)optional(collect(Cache::get('settings'))
+                ->where('key', 'admin_role')->first())
+                ->getSettingValue();
+        $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
         $node_route = empty($filler) ? '' : \collect(\explode('/', \optional(\optional($filler)->properties['value'])->node_route))
-            ->filter(function ($dt, $key) use ($filler) {
-                if (array_search('api', \explode('/', \optional(\optional($filler)->properties['value'])->node_route)) < $key) {
+            ->filter(function ($dt, $key) use ($filler, $multi_tenancy,$role_for_checking) {
+                if (array_search($multi_tenancy == 1 &&!\auth()->user()->hasRole($role_for_checking)? "{tenant}" : 'api', \explode('/', \optional(\optional($filler)->properties['value'])->node_route)) < $key) {
                     return true;
                 }
                 return false;

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
             $table->foreignId('node_id')->references('id')->on('nodes');
+            $table->integer('tenant_id')->nullable();
             $table->longText('message');
             $table->timestamps();
         });

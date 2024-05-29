@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\TenantTrait;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,11 @@ class Setting extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-
+    use TenantTrait;
+    public function __construct()
+    {
+        // $this->initializeTenancy();
+    }
 
     public const ANIMATIONS = [
         // 'w3-animate-fading' => 'w3-animate-fading',
@@ -51,13 +56,14 @@ class Setting extends Model
 
     public function SETTING_KEYS($key)
     {
+        $roles = Role::all()->pluck('id', 'name');
         $keys = collect([
             'admin_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'registration_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'app_name' => [
@@ -101,7 +107,7 @@ class Setting extends Model
                 'handle' => ['action' => 'split', 'value' => 'first'],
             ],
             'multi_tenancy_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Role::all()->pluck('id', 'name'), $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'mail_url' => [

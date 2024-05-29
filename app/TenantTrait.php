@@ -11,15 +11,21 @@ trait TenantTrait
 {
     public function initializeTenancy()
     {
-        // static::addGlobalScope(new TenantScope);
+        static::addGlobalScope(new TenantScope);
     }
 
-    public function land_lord()
+    // public function land_lord()
+    // {
+    //     return $this->hasOneThrough(Tenant::class, TenantUser::class, 'user_id', 'id', 'id', 'tenant_id');
+    // }
+
+    public function tenants()
     {
-        return $this->hasOneThrough(Tenant::class, TenantUser::class, 'user_id', 'id', 'id', 'tenant_id');
+        return $this->hasManyThrough(User::class, TenantUser::class, 'tenant_id', 'id', 'id', 'user_id');
     }
 
-    public function tenants(){
-        return $this->hasManyThrough(User::class, TenantUser::class, 'tenant_id', 'id', 'id', 'user_id');
+    public function owner()
+    {
+        return  $this->hasOne(Tenant::class, 'id', 'tenant_id');
     }
 }

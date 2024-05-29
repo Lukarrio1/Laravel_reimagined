@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Node;
 use App\Models\Node\Node;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\Tenant\Tenant;
 use App\Models\Node\Node_Type;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
@@ -14,12 +15,13 @@ use App\Http\Controllers\Cache\CacheController;
 
 class NodeController extends Controller
 {
-    public $cache;
+    public $cache,$tenancy;
 
     public function __construct()
     {
         $this->middleware('can:can crud nodes');
         $this->cache = new CacheController();
+        $this->tenancy = new Tenant();
     }
     public function index($node = null)
     {
@@ -115,7 +117,7 @@ class NodeController extends Controller
         }
         $request->merge([
             'permission_id' => empty($request->permission_id) ? 0 : $request->permission_id,
-        ]);
+        ]+$this->tenancy->addTenantIdToCurrentItem(\optional(\auth()->user()->land)->id));
         Node::updateOrCreate(['id' => $request->id], $request->except(
             isset($current_node_type['rules']) ? \collect($current_node_type['rules'])
                 ->keys()->toArray() : []

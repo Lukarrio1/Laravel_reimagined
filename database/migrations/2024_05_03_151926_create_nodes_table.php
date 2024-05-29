@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('authentication_level');
             $table->integer('permission_id')->default(0);
             $table->longText('uuid')->nullable();
+            $table->integer('tenant_id')->nullable();
             $table->timestamps();
         });
     }

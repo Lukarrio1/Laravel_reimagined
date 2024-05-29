@@ -10,9 +10,7 @@ class UserController extends Controller
     public function profile()
     {
 
-        $user = request()->user()->load(['roles.permissions'=>fn($q)=>$q->select('id')]);
+        $user = request()->user()->load(['roles.permissions' => fn ($q) => $q->select('id')]);
         return \response()->json(['user' => $user]);
     }
-
-
 }

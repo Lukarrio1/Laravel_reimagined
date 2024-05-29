@@ -2,9 +2,14 @@
 
 namespace App\Models\Node;
 
+use App\TenantTrait;
 use ReflectionClass;
 use ReflectionMethod;
+use App\Models\Setting;
 use App\HasCustomPagination;
+use App\Models\Tenant\Tenant;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +19,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Node extends Model
 {
     use HasFactory, HasCustomPagination;
+    use TenantTrait;
 
+    public function __construct()
+    {
+        $this->initializeTenancy();
+    }
     protected $guarded = ['id'];
 
     public const Authentication_Levels = [
@@ -123,9 +133,12 @@ class Node extends Model
     public function addAppUrlToNodeRoute($value)
     {
         $value = \collect($value);
+        // $setting = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
+        // // $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
         if (\in_array($this->node_type['value'], [1])) {
             $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
-            $seg = $this->node_type['value'] == 2 ? '/' : '/api/';
+            // dd(\request()->user(),Auth::user());
+            $seg = $this->node_type['value'] == 2 ? '/' : '/api/' . (!empty($this->owner) ? "tenant/{tenant}/" : '');
             $value = $value->put('node_route', $app_url . $seg . $value->get('node_route'));
         }
 

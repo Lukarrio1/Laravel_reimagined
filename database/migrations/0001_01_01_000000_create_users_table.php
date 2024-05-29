@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->timestamp('email_verified_at')->nullable();
             $table->longText('password_reset_token')->nullable();
             $table->string('password');
+            $table->integer('tenant_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -55,8 +55,7 @@
                     @foreach ($settings as $setting )
                     <tr>
                         <td>{{$setting->getAllSettingKeys($setting->key)}}</td>
-                        <td>{{$setting->getSettingValue('first')}}</td>
-
+                        <td>{{!empty($setting->getAllSettingKeys($setting->key))?$setting->getSettingValue('first'):''}}</td>
                     </tr>
                     @endforeach
                 </tbody>

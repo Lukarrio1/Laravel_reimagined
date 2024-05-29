@@ -26,7 +26,7 @@ class User extends Authenticatable
     use TenantTrait;
     public function __construct()
     {
-      $this->initializeTenancy();
+    // $this->initializeTenancy();
     }
     /**
      * The attributes that are mass assignable.
@@ -37,7 +37,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'password_reset_token'
+        'password_reset_token',
+        'tenant_id'
     ];
     // protected $encryptable = ['name','email'];
 
@@ -117,4 +118,8 @@ class User extends Authenticatable
         return $this;
     }
 
+    public function land()
+    {
+        return $this->hasOne(Tenant::class, 'owner_id', 'id');
+    }
 }

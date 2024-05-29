@@ -26,11 +26,11 @@ class RoleSaveRequest extends FormRequest
 
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
         $role = !empty($setting) ? Role::find((int)$setting) : null;
-        $highest_priority = !\request()->user()->hasRole($role) ? ['not_in:' . Role::min('priority'),'required'] : [];
+        $highest_priority = !\request()->user()->hasRole($role) ? ['not_in:' . Role::min('priority'), 'required'] : ['required'];
 
         return [
             'name' => ['required', 'unique:roles,name,' . $this->id,],
-            'priority' =>$highest_priority
+            'priority' => $highest_priority
         ];
     }
 }

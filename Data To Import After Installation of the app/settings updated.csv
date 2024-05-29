@@ -1,5 +1,4 @@
 key,properties
-admin_role,"Super Admin_1"
 registration_role,"authenticated user_2"
 app_name,"Laravel Re Imagined"
 mail_host,sandbox.smtp.mailtrap.io

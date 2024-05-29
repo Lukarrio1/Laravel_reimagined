@@ -15,8 +15,10 @@
             <table class="table bg-white">
                 <thead>
                     <tr>
+                        <th scope="col">Owner</th>
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
+                        <th scope="col">Api Base Url</th>
                         <th scope="col">Description</th>
                         <th scope="col">Status</th>
                         <th scope="col" class="text-center">Handle</th>
@@ -25,8 +27,10 @@
                 <tbody>
                     <?php $__currentLoopData = $tenants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tenant): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
+                        <th scope="row"><?php echo e($tenant->owner->name); ?></th>
                         <th scope="row"><?php echo e($tenant->name); ?></th>
                         <td><?php echo e($tenant->email); ?></td>
+                        <td><?php echo e($tenant->api_base_url); ?></td>
                         <td><?php echo e($tenant->description); ?></td>
                         <td><?php echo e($tenant->status['human_value']); ?></td>
                         <td class="text-center">

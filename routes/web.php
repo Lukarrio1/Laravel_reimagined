@@ -16,11 +16,16 @@ use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Permission\PermissionController;
 
 Auth::routes();
-if (!Cache::has('settings')) {
-    Cache::add('settings', Setting::all());
-}
+
+
+
 
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
+
+    if (!Cache::has('settings')) {
+        Cache::add('settings', Setting::where('tenant_id',auth()->user()->tenant_id)->get());
+    }
+
 
 
     Route::get('/nodes', [NodeController::class, 'index'])->name('viewNodes');

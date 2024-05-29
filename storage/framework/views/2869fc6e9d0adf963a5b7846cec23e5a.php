@@ -56,10 +56,18 @@ unset($__errorArgs, $__bag); ?>
                     <label for="tenant_status" class="form-label">Tenant Active Status</label>
                     <select id="tenant_status" class="form-select" name="status">
                         <?php $__currentLoopData = ['Active'=>1,'Inactive'=>0]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value=>$key): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($key); ?>" <?php echo e(isset($tenant)&&$key==$tenant->status['value']?"selected":''); ?>><?php echo e($value); ?></option>\
+                        <option value="<?php echo e($key); ?>" <?php echo e(isset($tenant)&&$key==$tenant->status['value']?"selected":''); ?>><?php echo e($value); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
+               <div class="mb-3">
+                   <label for="tenant_owner" class="form-label">Tenant Owner</label>
+                   <select id="tenant_owner" class="form-select" name="owner_id">
+                       <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                       <option value="<?php echo e($user->id); ?>" <?php echo e(isset($tenant)&&$user->id==$tenant->owner_id?"selected":''); ?>><?php echo e($user->name); ?></option>
+                       <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                   </select>
+               </div>
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary">
                         <?php if(isset($tenant)): ?>

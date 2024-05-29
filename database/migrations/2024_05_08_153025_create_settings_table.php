@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('key');
             $table->longText('properties');
+            $table->integer('tenant_id')->nullable();
             $table->timestamps();
         });
     }
