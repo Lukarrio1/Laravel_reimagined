@@ -20,7 +20,7 @@ class RoleController extends Controller
     public function index($role = null)
     {
         $roles_count = Role::all()->count();
-        $max_amount_of_pages= $roles_count/5;
+        $max_amount_of_pages = $roles_count / 5;
         \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
@@ -33,7 +33,13 @@ class RoleController extends Controller
                 'permission_name' => collect($role->permissions)->map(fn ($permission) => $permission->name)
             ]);
         $permissions = Permission::all();
-        return view('Role.View', ['role' => optional($role)->load('permissions'), 'roles' => $roles, 'permissions' => $permissions, 'roles_count' => $roles_count]);
+        return view('Role.View', [
+            'role' => optional($role)->load('permissions'),
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'roles_count' => $roles_count,
+            'page_count' => \ceil($max_amount_of_pages)
+        ]);
     }
 
     public function save(RoleSaveRequest $request)

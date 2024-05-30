@@ -89,7 +89,7 @@ class UserController extends Controller
             $user->role = $user->roles->first();
             $user = $user->updateUserHtml();
             return $user;
-        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder, 'users_count' => $users_count]);
+        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder, 'users_count' => $users_count, 'page_count' => \ceil($max_amount_of_pages)]);
     }
 
     public function assignRole(Request $request, User $user)

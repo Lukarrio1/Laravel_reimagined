@@ -85,7 +85,7 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-                @include('Components.Pagination',['route_name'=>'viewNodes'])
+                @include('Components.Pagination',['route_name'=>'viewNodes','page_count'=>$page_count])
             </div>
         </div>
 

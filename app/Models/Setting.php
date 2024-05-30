@@ -42,6 +42,13 @@ class Setting extends Model
                 });
                 $html = "<select class='form-select' name='value'>$html</select>";
                 break;
+            case 'multi_select':
+                $value->each(function ($key, $val) use (&$html, $field_value) {
+                    $selected = $field_value == $val . "_" . $key ? "selected" : '';
+                    $html .= "<option value='" . $val . "_" . $key . "' $selected>$val</option>";
+                });
+                $html = "<select class='form-select' name='value[]' multiple>$html</select>";
+                break;
             case 'input':
                 $html = "<input class='form-control' name='value' value='" . $field_value . "'>";
                 break;
@@ -130,6 +137,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('drop_down', ['true' => true, 'false' => false], $key),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
+            'allowed_login_roles' => [
+                'field' => $this->SETTING_OPTIONS('multi_select', $roles, $key),
+                'handle' => ['action' => 'multi_split', 'value' => 'last'],
+            ],
         ]);
         return $keys->get($key);
     }
@@ -142,7 +153,14 @@ class Setting extends Model
                 $value = !empty($value) ? $value : $key['value'];
                 $value = \explode('_', $this->properties)[$value == 'last' ? count(explode('_', $this->properties)) - 1 : 0];
                 break;
-
+            case 'multi_split':
+                $value = !empty($value) ? $value : $key['value'];
+                $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
+                    ->filter(fn ($item, $idx) =>  $idx == 0)->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
+                    ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
+                    collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
+                        ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
+                break;
             default:
                 $value = $this->properties;
                 break;
@@ -158,6 +176,7 @@ class Setting extends Model
         $keys = \collect([
             'admin_role' => "Super Admin Role",
             'registration_role' => 'Api Registration Role',
+            'allowed_login_roles' => "Allowed Login Roles",
             'app_name' => 'Application Name',
             'app_url' => 'Application URL',
             'app_version' => 'Application Version',

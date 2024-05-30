@@ -7,8 +7,8 @@
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="!#" aria-label="Previous">
-                <span aria-hidden="true">{{request()->get('page')}} </span>
+            <a class="page-link" href="#!" aria-label="Previous">
+                <span aria-hidden="true">{{request()->get('page')}}/{{$page_count}} </span>
             </a>
         </li>
         <li class="page-item">

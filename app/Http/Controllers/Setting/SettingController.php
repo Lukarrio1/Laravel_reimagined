@@ -48,11 +48,14 @@ class SettingController extends Controller
         }
         $multi_tenancy_role_id = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int)$multi_tenancy_role_id) : null;
+        $value = $request->setting_key == "allowed_login_roles" ? \collect($request->value)->map(function ($item) {
+            return \collect(\explode(' ', $item))->join("--");
+        })->join('|') : $request->value;
         Setting::updateOrCreate(
             [
                 'key' => $request->setting_key
             ] + $this->tenancy->addTenantIdToCurrentItem(\auth()->user()->tenant_id),
-            $request->merge(['properties' => $request->value])->all()
+            $request->merge(['properties' => $value])->all()
                 + $this->tenancy->addTenantIdToCurrentItem(Cache::get('tenant_id'))
         );
         Session::flash('message', 'The setting value was saved successfully.');

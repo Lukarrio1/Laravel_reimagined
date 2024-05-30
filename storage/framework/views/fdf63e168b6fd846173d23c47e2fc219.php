@@ -85,7 +85,7 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-                <?php echo $__env->make('Components.Pagination',['route_name'=>'viewNodes'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                <?php echo $__env->make('Components.Pagination',['route_name'=>'viewNodes','page_count'=>$page_count], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
         </div>
 

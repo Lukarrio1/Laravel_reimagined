@@ -58,7 +58,7 @@
                     @foreach ($settings as $setting )
                     <tr>
                         <td>{{$setting->getAllSettingKeys($setting->key)}}</td>
-                        <td>{{!empty($setting->getAllSettingKeys($setting->key))?$setting->getSettingValue('first'):''}}</td>
+                        <td>{!!$setting->getSettingValue('first')!!}</td>
                         <td>
                             @can('can view settings delete button',auth()->user())
                             <form action="{{route('deleteSetting',['setting_key'=>$setting->key])}}" method="post">

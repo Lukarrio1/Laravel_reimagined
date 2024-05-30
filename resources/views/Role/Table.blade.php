@@ -26,22 +26,27 @@
                             </ul>
                         </td>
                         <td class="text-center">
+
+                            @can('can view roles edit button', auth()->user())
                             <a href="{{route('editRole',['role'=>$Role['id']])}}" class="btn btn-sm btn-warning m-2">
                                 @if(optional($role)->id==$Role['id'])
                                 <i class="fa fa-spinner" aria-hidden="true"></i>
                                 @else
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                                 @endif
-
                             </a>
+                            @endcan
+                            @if($Role['core']!=1)
+                            @can('can view roles delete button', auth()->user())
                             <form action="{{route('deleteRole',['role'=>$Role['id']])}}" method="post">
                                 @csrf
                                 @method('delete')
                                 <button class="btn btn-sm btn-danger" type="submit">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
-
                             </form>
+                            @endcan
+                            @endif
                         </td>
                     </tr>
                     @endforeach

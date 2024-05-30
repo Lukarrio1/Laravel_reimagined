@@ -7,8 +7,8 @@
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="!#" aria-label="Previous">
-                <span aria-hidden="true"><?php echo e(request()->get('page')); ?> </span>
+            <a class="page-link" href="#!" aria-label="Previous">
+                <span aria-hidden="true"><?php echo e(request()->get('page')); ?>/<?php echo e($page_count); ?> </span>
             </a>
         </li>
         <li class="page-item">

@@ -84,7 +84,7 @@ class NodeController extends Controller
             = $nodes->get()->count() / 5;
         // take(\request('load_more'))
         \request()->merge([
-            'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages+1) : \request('page')),
+            'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
             'search' => request()->get('search')
         ]);
         return \view('Nodes.View', [
@@ -97,6 +97,7 @@ class NodeController extends Controller
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
             'search_placeholder' => $searchPlaceholder,
+            'page_count' => \ceil($max_amount_of_pages)
         ]);
     }
 

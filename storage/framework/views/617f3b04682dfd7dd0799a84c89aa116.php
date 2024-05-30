@@ -16,6 +16,7 @@
                     <tr>
                         <td class="text-center"><?php echo e($Permission->name); ?></td>
                         <td class="text-center">
+                            <?php if($Permission->core!=true): ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view permissions edit button',auth()->user())): ?>
                             <a href="<?php echo e(route('editPermission',['permission'=>$Permission])); ?>" class="btn btn-sm btn-warning m-2">
                                 <?php if(optional($permission)->id==$Permission->id): ?>
@@ -35,7 +36,7 @@
                                 </button>
                             </form>
                             <?php endif; ?>
-
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

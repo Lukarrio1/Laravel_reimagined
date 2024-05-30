@@ -23,11 +23,19 @@ class CheckSuperAdmin
     {
         $user = request()->user();
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
+        $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last');
         $multi_tenancy = (int)\optional(Setting::where('key', 'multi_tenancy')->first())->getSettingValue('first');
         $multi_tenancy_role = $multi_tenancy == 0 ? null : Role::find(\optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue('last'));
         $role = !empty($setting) ? Role::find((int)$setting) : null;
+
         // Check if the user is authenticated and has the "Super Admin" role
-        if (!empty($role) && $user->hasRole($role) || !empty($multi_tenancy_role) && $user->hasRole($multi_tenancy_role)) {
+        if (
+            !empty($role) && $user->hasRole($role) ||
+            !empty($multi_tenancy_role) &&
+            $user->hasRole($multi_tenancy_role) ||
+            !empty(\auth()->user()) &&
+            \in_array(auth()->user()->roles->pluck('id')->first(), $allowed_login_roles->toArray())
+        ) {
             Cache::add('tenant_id', \auth()->user()->tenant_id);
             return $next($request);
         }

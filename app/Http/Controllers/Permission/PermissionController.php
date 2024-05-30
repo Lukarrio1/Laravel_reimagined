@@ -23,7 +23,7 @@ class PermissionController extends Controller
         $permissions = Permission::latest()
             ->skip((int) 6 * (int)  \request('page') - (int) 6)
             ->take((int) 6)->get();
-        return view('Permission.View', ['permissions' => $permissions, 'permissions_count' => $permissions_count, 'permission' => $permission]);
+        return view('Permission.View', ['permissions' => $permissions, 'permissions_count' => $permissions_count, 'permission' => $permission, 'page_count' => \ceil($max_amount_of_pages)]);
     }
 
     public function save(PermissionSaveRequest $request)

@@ -72,7 +72,7 @@ unset($__errorArgs, $__bag); ?>
                     <?php $__currentLoopData = $settings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $setting): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
                         <td><?php echo e($setting->getAllSettingKeys($setting->key)); ?></td>
-                        <td><?php echo e(!empty($setting->getAllSettingKeys($setting->key))?$setting->getSettingValue('first'):''); ?></td>
+                        <td><?php echo $setting->getSettingValue('first'); ?></td>
                         <td>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings delete button',auth()->user())): ?>
                             <form action="<?php echo e(route('deleteSetting',['setting_key'=>$setting->key])); ?>" method="post">

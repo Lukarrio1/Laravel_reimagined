@@ -26,22 +26,27 @@
                             </ul>
                         </td>
                         <td class="text-center">
+
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view roles edit button', auth()->user())): ?>
                             <a href="<?php echo e(route('editRole',['role'=>$Role['id']])); ?>" class="btn btn-sm btn-warning m-2">
                                 <?php if(optional($role)->id==$Role['id']): ?>
                                 <i class="fa fa-spinner" aria-hidden="true"></i>
                                 <?php else: ?>
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                                 <?php endif; ?>
-
                             </a>
+                            <?php endif; ?>
+                            <?php if($Role['core']!=1): ?>
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view roles delete button', auth()->user())): ?>
                             <form action="<?php echo e(route('deleteRole',['role'=>$Role['id']])); ?>" method="post">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('delete'); ?>
                                 <button class="btn btn-sm btn-danger" type="submit">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
-
                             </form>
+                            <?php endif; ?>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

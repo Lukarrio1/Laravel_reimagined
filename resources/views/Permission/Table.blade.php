@@ -16,6 +16,7 @@
                     <tr>
                         <td class="text-center">{{$Permission->name}}</td>
                         <td class="text-center">
+                            @if($Permission->core!=true)
                             @can('can view permissions edit button',auth()->user())
                             <a href="{{route('editPermission',['permission'=>$Permission])}}" class="btn btn-sm btn-warning m-2">
                                 @if(optional($permission)->id==$Permission->id)
@@ -35,7 +36,7 @@
                                 </button>
                             </form>
                             @endcan
-
+                            @endif
                         </td>
                     </tr>
                     @endforeach
