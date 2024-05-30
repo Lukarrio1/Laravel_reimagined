@@ -38,6 +38,7 @@ class TenantRoleAndPermissionSeeder extends Seeder
             ['name' => 'can view roles data table'],
             ['name' => 'can crud users',],
             ['name' => 'can view users delete button'],
+            ['name' => 'can edit users password'],
             ['name' => 'can view users edit button'],
             ['name' => 'can view users edit form'],
             ['name' => 'can view users data table'],

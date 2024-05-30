@@ -15,7 +15,7 @@ use App\Http\Controllers\Cache\CacheController;
 
 class NodeController extends Controller
 {
-    public $cache,$tenancy;
+    public $cache, $tenancy;
 
     public function __construct()
     {
@@ -80,10 +80,11 @@ class NodeController extends Controller
                 $nodes->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
             })
         );
-
+        $max_amount_of_pages
+            = $nodes->get()->count() / 5;
         // take(\request('load_more'))
         \request()->merge([
-            'page' => \request('page') == null ? 1 : \request('page'),
+            'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages+1) : \request('page')),
             'search' => request()->get('search')
         ]);
         return \view('Nodes.View', [
@@ -92,7 +93,6 @@ class NodeController extends Controller
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $nodes->get()->count(),
             'nodes' => $nodes->latest()->customPaginate(5, (int)\request()->get('page'))->get(),
-
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
@@ -117,7 +117,7 @@ class NodeController extends Controller
         }
         $request->merge([
             'permission_id' => empty($request->permission_id) ? 0 : $request->permission_id,
-        ]+$this->tenancy->addTenantIdToCurrentItem(\optional(\auth()->user()->land)->id));
+        ] + $this->tenancy->addTenantIdToCurrentItem(\optional(\auth()->user()->land)->id));
         Node::updateOrCreate(['id' => $request->id], $request->except(
             isset($current_node_type['rules']) ? \collect($current_node_type['rules'])
                 ->keys()->toArray() : []

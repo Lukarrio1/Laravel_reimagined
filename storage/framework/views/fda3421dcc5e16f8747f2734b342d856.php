@@ -36,6 +36,7 @@
                                 <button type="submit" class="btn btn-sm btn-danger m-1" title="delete user"><i class="fa fa-trash" aria-hidden="true"></i></button>
                             </form>
                             <?php endif; ?>
+
                         </td>
                     </tr>
                     <div class="modal fade" id="assignRoleModal<?php echo e($user->id); ?>" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">

@@ -31,7 +31,10 @@ class SettingController extends Controller
             'key_value' => $setting->SETTING_KEYS($setting_key)['field'],
             'setting_key' => $setting_key,
             'settings' => $setting->query()
-                ->where('tenant_id', \auth()->user()->tenant_id)
+                ->when(
+                    !empty(\auth()->user()) && !empty($role_for_checking) && \auth()->user()->hasRole($role_for_checking),
+                    fn ($q) => $q->where('tenant_id', \auth()->user()->tenant_id)
+                )
                 ->get(),
         ]);
     }

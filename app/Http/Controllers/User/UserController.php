@@ -54,8 +54,8 @@ class UserController extends Controller
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
         $roles = Role::query()
-        ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
-        ->get();
+            ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
+            ->get();
 
         $searchParams->when(
             $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
@@ -79,7 +79,9 @@ class UserController extends Controller
                 }
             })
         );
-        \request()->merge(['page' => \request('page') == null ? 1 : \request('page')]);
+        $users_count = User::all()->count();
+        $max_amount_of_pages = $users_count / 5;
+        \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
         $users = $users->customPaginate(5, \request('page'))->get();
 
         return \view('User.View', ['users' => $users->map(function (User $user) {
@@ -87,7 +89,7 @@ class UserController extends Controller
             $user->role = $user->roles->first();
             $user = $user->updateUserHtml();
             return $user;
-        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder, 'users_count' => User::all()->count()]);
+        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder, 'users_count' => $users_count]);
     }
 
     public function assignRole(Request $request, User $user)

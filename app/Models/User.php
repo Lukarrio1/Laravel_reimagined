@@ -114,7 +114,12 @@ class User extends Authenticatable
 
     public function updateUserHtml()
     {
-        $this->updateHtml = collect($this->updateFieldTemplate())->join(' ');
+        $this->updateHtml = collect($this->updateFieldTemplate())->filter(function($field,$key){
+            if(\in_array($key,['password','confirm_password'])){
+                return auth()->user()->hasPermissionTo("can edit users password");
+            }
+            return true;
+        })->join(' ');
         return $this;
     }
 

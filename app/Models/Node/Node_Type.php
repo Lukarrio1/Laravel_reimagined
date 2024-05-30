@@ -46,8 +46,8 @@ class Node_Type extends Model
                 ->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
         $node_route = empty($filler) ? '' : \collect(\explode('/', \optional(\optional($filler)->properties['value'])->node_route))
-            ->filter(function ($dt, $key) use ($filler, $multi_tenancy,$role_for_checking) {
-                if (array_search($multi_tenancy == 1 &&!\auth()->user()->hasRole($role_for_checking)? "{tenant}" : 'api', \explode('/', \optional(\optional($filler)->properties['value'])->node_route)) < $key) {
+            ->filter(function ($dt, $key) use ($filler, $multi_tenancy, $role_for_checking) {
+                if (array_search($multi_tenancy == 1 && !\auth()->user()->hasRole($role_for_checking) ? "{tenant}" : 'api', \explode('/', \optional(\optional($filler)->properties['value'])->node_route)) < $key) {
                     return true;
                 }
                 return false;
