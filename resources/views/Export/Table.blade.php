@@ -27,12 +27,15 @@
 
         </div>
         <div class="card-footer bg-white">
+            @can('can view export button', auth()->user())
             <div class="text-center">
                 <form action="{{route('exportDataNow')}}">
                     <input type="hidden" value="true" name="export">
                     <button type="submit" class="btn btn-success btn-lg">Export Data</button>
                 </form>
             </div>
+            @endcan
+
         </div>
     </div>
 </div>

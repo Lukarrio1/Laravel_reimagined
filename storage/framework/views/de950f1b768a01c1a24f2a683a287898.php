@@ -14,22 +14,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td class="text-center"><?php echo e($role['name']); ?></td>
-                        <td class="text-center"><?php echo e($role['priority']); ?></td>
+                        <td class="text-center"><?php echo e($Role['name']); ?></td>
+                        <td class="text-center"><?php echo e($Role['priority']); ?></td>
                         <td class="text-center">
                             <ul class="list-group-flush">
-                                <?php $__currentLoopData = $role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php $__currentLoopData = $Role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li class="list-group-item"><?php echo e($name); ?></li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
                         </td>
                         <td class="text-center">
-                            <a href="<?php echo e(route('editRole',['role'=>$role['id']])); ?>" class="btn btn-sm btn-warning m-2">
+                            <a href="<?php echo e(route('editRole',['role'=>$Role['id']])); ?>" class="btn btn-sm btn-warning m-2">
+                                <?php if(optional($role)->id==$Role['id']): ?>
+                                <i class="fa fa-spinner" aria-hidden="true"></i>
+                                <?php else: ?>
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
+                                <?php endif; ?>
+
                             </a>
-                            <form action="<?php echo e(route('deleteRole',['role'=>$role['id']])); ?>" method="post">
+                            <form action="<?php echo e(route('deleteRole',['role'=>$Role['id']])); ?>" method="post">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('delete'); ?>
                                 <button class="btn btn-sm btn-danger" type="submit">
@@ -46,7 +51,7 @@
         <div class="card-footer bg-white">
             <div class="text-center">
 
-              <?php echo $__env->make('Components.Pagination',['route_name'=>'viewRoles'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                <?php echo $__env->make('Components.Pagination',['route_name'=>'viewRoles'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
                 
             </div>

@@ -12,20 +12,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $__currentLoopData = $permissions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Permission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td class="text-center"><?php echo e($permission->name); ?></td>
+                        <td class="text-center"><?php echo e($Permission->name); ?></td>
                         <td class="text-center">
-                            <a href="<?php echo e(route('editPermission',['permission'=>$permission])); ?>" class="btn btn-sm btn-warning m-2">
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view permissions edit button',auth()->user())): ?>
+                            <a href="<?php echo e(route('editPermission',['permission'=>$Permission])); ?>" class="btn btn-sm btn-warning m-2">
+                                <?php if(optional($permission)->id==$Permission->id): ?>
+                                <i class="fa fa-spinner" aria-hidden="true"></i>
+                                <?php else: ?>
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
+                                <?php endif; ?>
+
                             </a>
-                            <form action="<?php echo e(route('deletePermission',['permission'=>$permission])); ?>" method="post">
+                            <?php endif; ?>
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view permissions delete button', auth()->user())): ?>
+                            <form action="<?php echo e(route('deletePermission',['permission'=>$Permission])); ?>" method="post">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('delete'); ?>
                                 <button class="btn btn-sm btn-danger" type="submit">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
+
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -34,7 +44,7 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-            <?php echo $__env->make('Components.Pagination',['route_name'=>'viewPermissions'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                <?php echo $__env->make('Components.Pagination',['route_name'=>'viewPermissions'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
         </div>
 

@@ -56,4 +56,11 @@ class SettingController extends Controller
         Session::flash('alert-class', 'alert-success');
         return \redirect()->route('viewSettings');
     }
+
+    public function delete($setting_key)
+    {
+        $setting = Setting::where('key', $setting_key)->first();
+        $setting->delete();
+        return \redirect()->route('viewSettings');
+    }
 }

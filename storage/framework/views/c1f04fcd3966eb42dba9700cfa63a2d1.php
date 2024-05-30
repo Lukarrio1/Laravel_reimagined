@@ -28,12 +28,15 @@
 
         </div>
         <div class="card-footer bg-white">
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view export button', auth()->user())): ?>
             <div class="text-center">
                 <form action="<?php echo e(route('exportDataNow')); ?>">
                     <input type="hidden" value="true" name="export">
                     <button type="submit" class="btn btn-success btn-lg">Export Data</button>
                 </form>
             </div>
+            <?php endif; ?>
+
         </div>
     </div>
 </div>

@@ -38,25 +38,33 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $__currentLoopData = $nodes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $node): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $__currentLoopData = $nodes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Node): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td><strong><?php echo e($node->name); ?></strong></td>
-                        <td><?php echo e($node->small_description); ?></td>
-                        <td><?php echo e($node->authentication_level['human_value']); ?></td>
-                        <td><?php echo e($node->node_type['human_value']); ?></td>
-                        <td><?php echo e($node->node_status['human_value']); ?></td>
-                        <td><?php echo e(optional(optional($node)->permission)->name); ?></td>
-                        <td><?php echo e($node->uuid); ?></td>
-                        <td><?php echo $node->properties['html_value']; ?></td>
+                        <td><strong><?php echo e($Node->name); ?></strong></td>
+                        <td><?php echo e($Node->small_description); ?></td>
+                        <td><?php echo e($Node->authentication_level['human_value']); ?></td>
+                        <td><?php echo e($Node->node_type['human_value']); ?></td>
+                        <td><?php echo e($Node->node_status['human_value']); ?></td>
+                        <td><?php echo e(optional(optional($Node)->permission)->name); ?></td>
+                        <td><?php echo e($Node->uuid); ?></td>
+                        <td><?php echo $Node->properties['html_value']; ?></td>
                         <td>
                             <ul class="list-group list-group-flush">
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view nodes edit button', auth()->user())): ?>
                                 <li class="list-group-item text-center">
-                                    <a href="<?php echo e(route('viewNode',['node'=>$node])); ?>" class="btn btn-warning btn-sm m-2 h4" title="edit node">
+                                    <a href="<?php echo e(route('viewNode',['node'=>$Node])); ?>" class="btn btn-warning btn-sm m-2 h4" title="edit node">
+                                        <?php if(optional($node)->id==$Node->id): ?>
+                                        <i class="fa fa-spinner" aria-hidden="true"></i>
+                                        <?php else: ?>
                                         <i class="fa fa-wrench" aria-hidden="true"></i>
+                                        <?php endif; ?>
+
                                     </a>
                                 </li>
+                                <?php endif; ?>
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view nodes delete button', auth()->user())): ?>
                                 <li class="list-group-item text-center">
-                                    <form action="<?php echo e(route('deleteNode',['node'=>$node])); ?>" method="post">
+                                    <form action="<?php echo e(route('deleteNode',['node'=>$Node])); ?>" method="post">
                                         <?php echo method_field('delete'); ?>
                                         <?php echo csrf_field(); ?>
                                         <button type="submit" class="btn btn-danger btn-sm h4" title="delete node">
@@ -64,6 +72,8 @@
                                         </button>
                                     </form>
                                 </li>
+                                <?php endif; ?>
+
                             </ul>
                         </td>
                     </tr>

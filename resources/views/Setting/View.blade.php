@@ -5,6 +5,7 @@
         <div class="card-header text-center bg-white h4">
             Settings
         </div>
+        @can('can view settings edit or create form', auth()->user())
         <div class="card-body">
             <form>
                 <div class="mb-3">
@@ -38,17 +39,19 @@
                 </div>
             </form>
         </div>
+        @endcan
     </div>
 </div>
 <div class="col-sm-8 offset-sm-2 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-
+        @can('can view settings data table', auth()->user())
         <div class="card-body">
             <table class="table">
                 <thead>
                     <tr>
                         <th scope="col">Settings key</th>
                         <th scope="col">Settings Value</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,11 +59,24 @@
                     <tr>
                         <td>{{$setting->getAllSettingKeys($setting->key)}}</td>
                         <td>{{!empty($setting->getAllSettingKeys($setting->key))?$setting->getSettingValue('first'):''}}</td>
+                        <td>
+                            @can('can view settings delete button',auth()->user())
+                            <form action="{{route('deleteSetting',['setting_key'=>$setting->key])}}" method="post">
+                                @csrf
+                                @method('delete')
+                                <button class="btn btn-sm btn-danger" type="submit">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            @endcan
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        @endcan
+
     </div>
 </div>
 @endsection

@@ -19,17 +19,24 @@
                         <td>{{$user->email}}</td>
                         <td>{{$user->role_name}}</td>
                         <td class="text-center">
+                            @can('can view users assign roles button', auth()->user())
                             <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#assignRoleModal{{$user->id}}" title="assign role to user">
                                 <i class="fas fa-user-plus"></i>
                             </button>
+                            @endcan
+                            @can('can view users edit button', auth()->user())
                             <button type="button" class="btn btn-warning m-1 user_edit_button" data-bs-toggle="modal" data-bs-target="#editUserModal" title="edit user" data-user-id="{{$user->id}}">
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                             </button>
+                            @endcan
+                            @can('can view users delete button', auth()->user())
                             <form action="{{route('deleteUser',['user'=>$user])}}" method="post">
                                 @method('delete')
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-danger m-1" title="delete user"><i class="fa fa-trash" aria-hidden="true"></i></button>
                             </form>
+                            @endcan
+
                         </td>
                     </tr>
                     <div class="modal fade" id="assignRoleModal{{$user->id}}" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">

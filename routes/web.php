@@ -55,6 +55,7 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::get('/settings', [SettingController::class, 'index'])->name('viewSettings');
     Route::post('/save/setting', [SettingController::class, 'save'])->name('saveSetting');
+    Route::delete('/delete/setting/{setting_key}', [SettingController::class, 'delete'])->name('deleteSetting');
 
     Route::get('/exports', [ExportController::class, 'index'])->name('exportData');
     Route::get('/export/data', [ExportController::class, 'export'])->name('exportDataNow');

@@ -12,20 +12,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($permissions as $permission )
+                    @foreach ($permissions as $Permission )
                     <tr>
-                        <td class="text-center">{{$permission->name}}</td>
+                        <td class="text-center">{{$Permission->name}}</td>
                         <td class="text-center">
-                            <a href="{{route('editPermission',['permission'=>$permission])}}" class="btn btn-sm btn-warning m-2">
+                            @can('can view permissions edit button',auth()->user())
+                            <a href="{{route('editPermission',['permission'=>$Permission])}}" class="btn btn-sm btn-warning m-2">
+                                @if(optional($permission)->id==$Permission->id)
+                                <i class="fa fa-spinner" aria-hidden="true"></i>
+                                @else
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
+                                @endif
+
                             </a>
-                            <form action="{{route('deletePermission',['permission'=>$permission])}}" method="post">
+                            @endcan
+                            @can('can view permissions delete button', auth()->user())
+                            <form action="{{route('deletePermission',['permission'=>$Permission])}}" method="post">
                                 @csrf
                                 @method('delete')
                                 <button class="btn btn-sm btn-danger" type="submit">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                             </form>
+                            @endcan
+
                         </td>
                     </tr>
                     @endforeach
@@ -34,7 +44,7 @@
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">
-            @include('Components.Pagination',['route_name'=>'viewPermissions'])
+                @include('Components.Pagination',['route_name'=>'viewPermissions'])
             </div>
         </div>
 

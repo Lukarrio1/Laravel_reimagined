@@ -38,25 +38,33 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($nodes as $node )
+                    @foreach ($nodes as $Node )
                     <tr>
-                        <td><strong>{{$node->name}}</strong></td>
-                        <td>{{$node->small_description}}</td>
-                        <td>{{$node->authentication_level['human_value']}}</td>
-                        <td>{{$node->node_type['human_value']}}</td>
-                        <td>{{$node->node_status['human_value']}}</td>
-                        <td>{{optional(optional($node)->permission)->name}}</td>
-                        <td>{{$node->uuid}}</td>
-                        <td>{!!$node->properties['html_value']!!}</td>
+                        <td><strong>{{$Node->name}}</strong></td>
+                        <td>{{$Node->small_description}}</td>
+                        <td>{{$Node->authentication_level['human_value']}}</td>
+                        <td>{{$Node->node_type['human_value']}}</td>
+                        <td>{{$Node->node_status['human_value']}}</td>
+                        <td>{{optional(optional($Node)->permission)->name}}</td>
+                        <td>{{$Node->uuid}}</td>
+                        <td>{!!$Node->properties['html_value']!!}</td>
                         <td>
                             <ul class="list-group list-group-flush">
+                                @can('can view nodes edit button', auth()->user())
                                 <li class="list-group-item text-center">
-                                    <a href="{{route('viewNode',['node'=>$node])}}" class="btn btn-warning btn-sm m-2 h4" title="edit node">
+                                    <a href="{{route('viewNode',['node'=>$Node])}}" class="btn btn-warning btn-sm m-2 h4" title="edit node">
+                                        @if(optional($node)->id==$Node->id)
+                                        <i class="fa fa-spinner" aria-hidden="true"></i>
+                                        @else
                                         <i class="fa fa-wrench" aria-hidden="true"></i>
+                                        @endif
+
                                     </a>
                                 </li>
+                                @endcan
+                                @can('can view nodes delete button', auth()->user())
                                 <li class="list-group-item text-center">
-                                    <form action="{{route('deleteNode',['node'=>$node])}}" method="post">
+                                    <form action="{{route('deleteNode',['node'=>$Node])}}" method="post">
                                         @method('delete')
                                         @csrf
                                         <button type="submit" class="btn btn-danger btn-sm h4" title="delete node">
@@ -64,6 +72,8 @@
                                         </button>
                                     </form>
                                 </li>
+                                @endcan
+
                             </ul>
                         </td>
                     </tr>

@@ -14,22 +14,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($roles as $role )
+                    @foreach ($roles as $Role )
                     <tr>
-                        <td class="text-center">{{$role['name']}}</td>
-                        <td class="text-center">{{$role['priority']}}</td>
+                        <td class="text-center">{{$Role['name']}}</td>
+                        <td class="text-center">{{$Role['priority']}}</td>
                         <td class="text-center">
                             <ul class="list-group-flush">
-                                @foreach ($role['permission_name'] as $name )
+                                @foreach ($Role['permission_name'] as $name )
                                 <li class="list-group-item">{{$name}}</li>
                                 @endforeach
                             </ul>
                         </td>
                         <td class="text-center">
-                            <a href="{{route('editRole',['role'=>$role['id']])}}" class="btn btn-sm btn-warning m-2">
+                            <a href="{{route('editRole',['role'=>$Role['id']])}}" class="btn btn-sm btn-warning m-2">
+                                @if(optional($role)->id==$Role['id'])
+                                <i class="fa fa-spinner" aria-hidden="true"></i>
+                                @else
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
+                                @endif
+
                             </a>
-                            <form action="{{route('deleteRole',['role'=>$role['id']])}}" method="post">
+                            <form action="{{route('deleteRole',['role'=>$Role['id']])}}" method="post">
                                 @csrf
                                 @method('delete')
                                 <button class="btn btn-sm btn-danger" type="submit">
@@ -46,7 +51,7 @@
         <div class="card-footer bg-white">
             <div class="text-center">
 
-              @include('Components.Pagination',['route_name'=>'viewRoles'])
+                @include('Components.Pagination',['route_name'=>'viewRoles'])
 
                 {{-- <a class="btn btn-sm btn-primary" href="{{route('viewNodes').'?page='.request()->get('page')+10}}">load more</a> --}}
             </div>

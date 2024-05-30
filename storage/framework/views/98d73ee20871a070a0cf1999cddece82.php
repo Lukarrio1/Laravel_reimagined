@@ -4,6 +4,7 @@
         <div class="card-header text-center bg-white h4">
             Settings
         </div>
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings edit or create form', auth()->user())): ?>
         <div class="card-body">
             <form>
                 <div class="mb-3">
@@ -52,17 +53,19 @@ unset($__errorArgs, $__bag); ?>
                 </div>
             </form>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 <div class="col-sm-8 offset-sm-2 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings data table', auth()->user())): ?>
         <div class="card-body">
             <table class="table">
                 <thead>
                     <tr>
                         <th scope="col">Settings key</th>
                         <th scope="col">Settings Value</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,11 +73,24 @@ unset($__errorArgs, $__bag); ?>
                     <tr>
                         <td><?php echo e($setting->getAllSettingKeys($setting->key)); ?></td>
                         <td><?php echo e(!empty($setting->getAllSettingKeys($setting->key))?$setting->getSettingValue('first'):''); ?></td>
+                        <td>
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings delete button',auth()->user())): ?>
+                            <form action="<?php echo e(route('deleteSetting',['setting_key'=>$setting->key])); ?>" method="post">
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('delete'); ?>
+                                <button class="btn btn-sm btn-danger" type="submit">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
+        <?php endif; ?>
+
     </div>
 </div>
 <?php $__env->stopSection(); ?>
