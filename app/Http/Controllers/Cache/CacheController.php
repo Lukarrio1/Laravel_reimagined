@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers\Cache;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Session;
 
 class CacheController extends Controller
 {
+    public $cacheOptions = [
+        "clear_system_cache" => "cache:clear",
+        'clear_views_cache' => 'view:clear',
+        "reload_cache" => 'optimize',
+        // "autoload_classes" => ''
+    ];
 
     public function __construct()
     {
@@ -16,13 +23,19 @@ class CacheController extends Controller
 
     public function index()
     {
-        return view('Cache.View');
+
+        return view('Cache.View', ['cacheOptions' => $this->cacheOptions]);
     }
 
     public function clearCache()
     {
-        Artisan::call('cache:clear');
-        Artisan::call('optimize');
+        $cache_to_clear = \collect(\request()->all())->keys();
+        if (\count($cache_to_clear) > 0) {
+            $cache_to_clear->each(fn ($key) => Artisan::call($this->cacheOptions[$key]));
+        } else {
+            Artisan::call('cache:clear');
+            Artisan::call('optimize');
+        }
         Session::flash('message', 'The system cache was refreshed successfully.');
         Session::flash('alert-class', 'alert-success');
 

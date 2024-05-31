@@ -37,6 +37,7 @@ class CheckSuperAdmin
             \in_array(auth()->user()->roles->pluck('id')->first(), $allowed_login_roles->toArray())
         ) {
             Cache::add('tenant_id', \auth()->user()->tenant_id);
+            Cache::add('setting_allowed_login_roles',$allowed_login_roles->toArray());
             return $next($request);
         }
         Auth::logout();

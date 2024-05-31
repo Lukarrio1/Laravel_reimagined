@@ -44,7 +44,7 @@ class Setting extends Model
                 break;
             case 'multi_select':
                 $value->each(function ($key, $val) use (&$html, $field_value) {
-                    $selected = $field_value == $val . "_" . $key ? "selected" : '';
+                    $selected = \in_array($key, Cache::get('setting_allowed_login_roles', [])) ? "selected" : '';
                     $html .= "<option value='" . $val . "_" . $key . "' $selected>$val</option>";
                 });
                 $html = "<select class='form-select' name='value[]' multiple>$html</select>";
@@ -52,7 +52,6 @@ class Setting extends Model
             case 'input':
                 $html = "<input class='form-control' name='value' value='" . $field_value . "'>";
                 break;
-
             default:
                 # code...
                 break;
@@ -155,8 +154,9 @@ class Setting extends Model
                 break;
             case 'multi_split':
                 $value = !empty($value) ? $value : $key['value'];
-                $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
-                    ->filter(fn ($item, $idx) =>  $idx == 0)->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
+                $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
+                    ->map(fn ($item) => \collect(\explode('_', $item))
+                        ->filter(fn ($item, $idx) =>  $idx == 0)->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
                     ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
                     collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
                         ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
