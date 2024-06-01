@@ -1,14 +1,16 @@
-id,key,properties,created_at,updated_at
-2,registration_role,"Regular User_2","2024-05-14 17:56:31","2024-05-15 22:04:04"
-3,app_name,"Laravel Re Imagined","2024-05-14 17:56:40","2024-05-24 22:15:49"
-4,mail_host,sandbox.smtp.mailtrap.io,"2024-05-14 17:57:04","2024-05-14 17:57:04"
-5,mail_port,2525,"2024-05-14 17:57:17","2024-05-14 18:38:59"
-6,mail_username,e1e0f01cad57ee,"2024-05-14 17:57:30","2024-05-14 17:57:30"
-7,mail_password,245e87234a7039,"2024-05-14 17:57:45","2024-05-14 17:57:45"
-8,mail_encryption,tls,"2024-05-14 17:57:59","2024-05-14 17:57:59"
-9,mail_from_address,laravel_reimagined@noreply.com,"2024-05-14 17:58:09","2024-05-14 17:58:09"
-10,mail_from_name,"Laravel Re Imagined","2024-05-14 17:58:17","2024-05-14 17:58:17"
-11,app_url,http://localhost:8000,"2024-05-24 22:14:42","2024-05-24 22:37:40"
-13,app_animation,w3-animate-zoom_w3-animate-zoom,"2024-05-25 20:09:50","2024-05-27 18:22:19"
-14,app_auditing,false_,"2024-05-25 20:26:50","2024-05-27 15:57:36"
-15,app_version,1.95,"2024-05-27 17:27:15","2024-05-27 17:27:15"
+key,properties,created_at,updated_at
+admin_role,"Super Admin_1","2024-05-30 21:35:00","2024-05-30 21:35:00"
+registration_role,"Authenticated User_2",,"2024-06-01 15:26:24"
+app_name,"Laravel Re Imagined v2",,"2024-05-31 15:20:10"
+mail_host,sandbox.smtp.mailtrap.io,,
+mail_port,2525,,
+mail_username,e1e0f01cad57ee,,
+mail_password,245e87234a7039,,
+mail_encryption,tls,,
+mail_from_address,laravel_reimagined@noreply.com,,
+mail_from_name,"Laravel Re Imagined",,
+app_url,http://localhost:8000,,
+app_animation,w3-animate-zoom_w3-animate-zoom,,
+app_auditing,false_,,
+app_version,1.98,,"2024-06-01 16:47:36"
+allowed_login_roles,Authenticated--User_2|Admin_3,"2024-05-30 21:39:43","2024-06-01 16:18:19"

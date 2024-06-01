@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Setting extends Model
 {
     use HasFactory;
-    protected $guarded = ['id'];
     use TenantTrait;
+    protected $guarded = ['id'];
     public function __construct()
     {
         // $this->initializeTenancy();
@@ -28,12 +28,11 @@ class Setting extends Model
         'w3-animate-top' =>  'w3-animate-top'
     ];
 
-    public function SETTING_OPTIONS($key, $value, $setting_key)
+    public function SETTING_OPTIONS($key, $value, $setting_key, $field_value)
     {
         $html = '';
         $prev_val = '';
-        $field_value = optional(collect(Cache::get('settings'))->where('key', $setting_key)->first())->properties;
-        //  self::where('key', $setting_key)->first()->properties ?? '';
+        $field_value = $key == "multi_select" ? $field_value : \optional(\optional($field_value->where('key', $setting_key))->first())->properties;
         $value = !empty($prev_val) ? $prev_val : collect($value);
         switch ($key) {
             case 'drop_down':
@@ -45,7 +44,7 @@ class Setting extends Model
                 break;
             case 'multi_select':
                 $value->each(function ($key, $val) use (&$html, $field_value) {
-                    $selected = \in_array($key, Cache::get('setting_allowed_login_roles', [])) ? "selected" : '';
+                    $selected = \in_array($key, \collect($field_value)->toArray()) ? "selected" : '';
                     $html .= "<option value='" . $val . "_" . $key . "' $selected>$val</option>";
                 });
                 $html = "<select class='form-select' name='value[]' multiple>$html</select>";
@@ -97,84 +96,88 @@ class Setting extends Model
 
     //     return $html;
     // }
-    public function SETTING_KEYS($key)
+    public function SETTING_KEYS($key, $field_value)
     {
         $roles = Role::all()->pluck('id', 'name');
         $keys = collect([
             'admin_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'registration_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'app_name' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_MAILER') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_HOST') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_PORT') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_USERNAME') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_PASSWORD') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_ENCRYPTION') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_FROM_ADDRESS') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             \strtolower('MAIL_FROM_NAME') => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             'multi_tenancy' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', [true => 'true', false => 'false'], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'first'],
             ],
             'multi_tenancy_role' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'mail_url' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             'app_url' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             'app_version' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key),
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
             'app_animation' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', self::ANIMATIONS, $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', self::ANIMATIONS, $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'app_auditing' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', ['true' => true, 'false' => false], $key),
+                'field' => $this->SETTING_OPTIONS('drop_down', ['true' => true, 'false' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'allowed_login_roles' => [
-                'field' => $this->SETTING_OPTIONS('multi_select', $roles, $key),
+                'field' => $this->SETTING_OPTIONS('multi_select', $roles, $key, Cache::get('setting_allowed_login_roles', [])),
+                'handle' => ['action' => 'multi_split', 'value' => 'last'],
+            ],
+            'not_exportable_tables' => [
+                'field' => $this->SETTING_OPTIONS('multi_select', array_flip(\collect((new Export())->getAllTables())->toArray()), $key, Cache::get('exportable_tables', [])),
                 'handle' => ['action' => 'multi_split', 'value' => 'last'],
             ],
         ]);
@@ -183,7 +186,8 @@ class Setting extends Model
 
     public function getSettingValue($value = '')
     {
-        $key = $this->SETTING_KEYS($this->key)['handle'];
+
+        $key = $this->SETTING_KEYS($this->key, optional(collect(Cache::get('settings'))))['handle'];
         switch ($key['action']) {
             case 'split':
                 $value = !empty($value) ? $value : $key['value'];
@@ -221,6 +225,7 @@ class Setting extends Model
             'multi_tenancy' => 'Api Multi Tenancy',
             "multi_tenancy_role" => "Api Multi Tenancy Role",
             "app_auditing" => "Application Auditing",
+            'not_exportable_tables' => 'Not Exportable Tables',
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',
