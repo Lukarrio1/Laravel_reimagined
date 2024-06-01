@@ -8,7 +8,7 @@
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="key" class="form-label">Setting Key (<small class="text-danger">Please request the setting value by pressing the blue button.</small>)</label>
+                    <label for="key" class="form-label">Setting Key (<small class="text-primary">Please request the setting value by pressing the blue button.</small>)</label>
                     <select id="key" class="form-select" name="setting_key">
                         <?php $__currentLoopData = $keys; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <option value="<?php echo e($key); ?>" <?php echo e(request()->get('setting_key')==$key?"selected":''); ?>><?php echo e($value); ?></option>

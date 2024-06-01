@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Cache\CacheController;
 
 class SettingController extends Controller
 {
@@ -35,6 +36,7 @@ class SettingController extends Controller
                     !empty(\auth()->user()) && !empty($role_for_checking) && \auth()->user()->hasRole($role_for_checking),
                     fn ($q) => $q->where('tenant_id', \auth()->user()->tenant_id)
                 )
+                ->latest('updated_at')
                 ->get(),
         ]);
     }
@@ -58,8 +60,14 @@ class SettingController extends Controller
             $request->merge(['properties' => $value])->all()
                 + $this->tenancy->addTenantIdToCurrentItem(Cache::get('tenant_id'))
         );
+        Cache::forget('settings');
+        Cache::forget('setting_allowed_login_roles');
+        Cache::set('settings', Setting::latest()->get());
+        $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last');
+        Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
         Session::flash('message', 'The setting value was saved successfully.');
         Session::flash('alert-class', 'alert-success');
+        // (new CacheController())->clearCache();
         return \redirect()->route('viewSettings');
     }
 

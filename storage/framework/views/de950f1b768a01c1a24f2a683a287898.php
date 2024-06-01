@@ -21,7 +21,7 @@
                         <td class="text-center">
                             <ul class="list-group-flush">
                                 <?php $__currentLoopData = $Role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <li class="list-group-item"><?php echo e($name); ?></li>
+                                <li class="list-group-item"><bold><?php echo e($name); ?></bold></li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
                         </td>

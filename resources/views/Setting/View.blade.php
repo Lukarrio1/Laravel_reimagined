@@ -9,7 +9,7 @@
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="key" class="form-label">Setting Key (<small class="text-danger">Please request the setting value by pressing the blue button.</small>)</label>
+                    <label for="key" class="form-label">Setting Key (<small class="text-primary">Please request the setting value by pressing the blue button.</small>)</label>
                     <select id="key" class="form-select" name="setting_key">
                         @foreach($keys as $key=>$value)
                         <option value="{{$key}}" {{request()->get('setting_key')==$key?"selected":''}}>{{$value}}</option>

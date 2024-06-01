@@ -32,7 +32,8 @@ class Setting extends Model
     {
         $html = '';
         $prev_val = '';
-        $field_value = self::where('key', $setting_key)->first()->properties ?? '';
+        $field_value = optional(collect(Cache::get('settings'))->where('key', $setting_key)->first())->properties;
+        //  self::where('key', $setting_key)->first()->properties ?? '';
         $value = !empty($prev_val) ? $prev_val : collect($value);
         switch ($key) {
             case 'drop_down':
@@ -59,7 +60,43 @@ class Setting extends Model
 
         return $html;
     }
+    // deprecated
+    // public function SETTING_OPTIONS($type, $options, $settingKey)
+    // {
+    //     $html = '';
+    //     $fieldValue = optional(collect(Cache::get('settings'))->firstWhere('key', $settingKey))->properties;
 
+    //     $options = collect($options);
+
+    //     switch ($type) {
+    //         case 'drop_down':
+    //             $htmlOptions = $options->map(function ($optionValue, $optionKey) use ($fieldValue) {
+    //                 $selected = $fieldValue == $optionValue . "_" . $optionKey ? "selected" : '';
+    //                 return "<option value='{$optionValue}_{$optionKey}' {$selected}>{$optionValue}</option>";
+    //             })->implode('');
+
+    //             $html = "<select class='form-select' name='value'>{$htmlOptions}</select>";
+    //             break;
+
+    //         case 'multi_select':
+    //             $allowedRoles = Cache::get('setting_allowed_login_roles', []);
+    //             $htmlOptions = $options->map(function ($optionValue, $optionKey) use ($allowedRoles) {
+    //                 $selected = in_array($optionKey, $allowedRoles) ? "selected" : '';
+    //                 return "<option value='{$optionValue}_{$optionKey}' {$selected}>{$optionValue}</option>";
+    //             })->implode('');
+    //             $html = "<select class='form-select' name='value[]' multiple>{$htmlOptions}</select>";
+    //             break;
+    //         case 'input':
+    //             $html = "<input class='form-control' name='value' value='{$fieldValue}'>";
+    //             break;
+
+    //         default:
+    //             // Handle any other cases if necessary
+    //             break;
+    //     }
+
+    //     return $html;
+    // }
     public function SETTING_KEYS($key)
     {
         $roles = Role::all()->pluck('id', 'name');

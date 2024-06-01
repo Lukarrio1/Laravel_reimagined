@@ -30,7 +30,11 @@ class CacheController extends Controller
     public function clearCache()
     {
         $cache_to_clear = \collect(\request()->all())->keys();
-        if (\count($cache_to_clear) > 0) {
+        if (
+            \collect($this->cacheOptions)->keys()
+            ->filter(fn ($key) => in_array($key, $cache_to_clear->toArray()))->count()
+            == \count($this->cacheOptions)
+        ) {
             $cache_to_clear->each(fn ($key) => Artisan::call($this->cacheOptions[$key]));
         } else {
             Artisan::call('cache:clear');

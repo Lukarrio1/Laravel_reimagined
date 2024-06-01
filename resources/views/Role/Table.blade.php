@@ -21,7 +21,7 @@
                         <td class="text-center">
                             <ul class="list-group-flush">
                                 @foreach ($Role['permission_name'] as $name )
-                                <li class="list-group-item">{{$name}}</li>
+                                <li class="list-group-item"><bold>{{$name}}</bold></li>
                                 @endforeach
                             </ul>
                         </td>

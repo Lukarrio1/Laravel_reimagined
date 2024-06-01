@@ -27,7 +27,9 @@ class RoleController extends Controller
         $roles = Role::with('permissions')
             ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
             ->skip((int) 5 * (int) \request('page') - (int) 5)
-            ->take((int) 5)->get()
+            ->take((int) 5)
+            ->orderBy('priority','asc')
+            ->get()
             ->map(fn ($role) => [
                 ...$role->toArray(),
                 'permission_name' => collect($role->permissions)->map(fn ($permission) => $permission->name)
