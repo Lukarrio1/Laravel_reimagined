@@ -15,7 +15,7 @@ class SettingController extends Controller
 
         $settings =
             // Cache::get('settings')->whereIn('id',[3,11]);
-            Setting::whereIn('id', [3, 11, 12])->select('key', 'properties', 'id')->get();
+            Setting::select('key', 'properties', 'id')->get();
         return \response()->json(['settings' => $settings]);
     }
 }

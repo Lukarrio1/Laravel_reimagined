@@ -226,6 +226,7 @@ class Setting extends Model
             "multi_tenancy_role" => "Api Multi Tenancy Role",
             "app_auditing" => "Application Auditing",
             'not_exportable_tables' => 'Not Exportable Tables',
+            "delete_after_inactive"=> "delete_after_inactive",
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',

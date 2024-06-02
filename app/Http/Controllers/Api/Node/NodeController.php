@@ -34,12 +34,12 @@ class NodeController extends Controller
 
         $nodes = Node::where('node_type', '>', 1)
             ->where('node_status', 1)
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id','uuid')
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid')
             ->with(['permission'])
             ->get()
             ->map(function ($node) use ($permission_ids) {
                 if ($node->node_type['value'] == 3) {
-                    $node->hasAccess = empty($node->permission_id) ? true : \in_array($node->permission_id, $permission_ids->toArray());
+                    $node->hasAccess = $node->authentication_level['value'] == 0 && !empty(\request()->user()) ? false : (empty($node->permission_id) ? true : \in_array($node->permission_id, $permission_ids->toArray()));
                 }
                 return $node;
             });
@@ -55,9 +55,9 @@ class NodeController extends Controller
                 'node_status',
                 1
             )
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id','uuid')
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid')
             ->get()->map(function ($node) {
-                $node->hasAccess = true;
+                $node->hasAccess = empty(auth()->user());
                 return $node;
             });
 
