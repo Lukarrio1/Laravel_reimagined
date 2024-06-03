@@ -17,20 +17,21 @@ class NodeController extends Controller
 
     public function nodes()
     {
-        $id = request()->user()->id;
+        $id = request()->user()->id ?? null;
 
         $permission_ids  = \collect([]);
         $user = User::with('roles.permissions')->find($id);
         if (Cache::has('auth_user_permissions_' . $id)) {
             $permission_ids = Cache::get('auth_user_permissions_' . $id);
         } else {
-            \collect($user->roles)->each(function ($role) use ($permission_ids) {
-                \collect($role->permissions)->each(function ($permission) use ($permission_ids) {
-                    $permission_ids->push($permission->id);
+            \collect(\collect($user)->get('roles', []))->each(function ($role) use ($permission_ids) {
+                \collect(\collect($role)->get('permissions', []))->each(function ($permission) use ($permission_ids) {
+                    $permission_ids->push(\optional($permission)->id);
                 });
             });
             Cache::set('auth_user_permissions_' . $id, $permission_ids);
         }
+
 
         $nodes = Node::where('node_type', '>', 1)
             ->where('node_status', 1)
@@ -38,8 +39,13 @@ class NodeController extends Controller
             ->with(['permission'])
             ->get()
             ->map(function ($node) use ($permission_ids) {
-                if ($node->node_type['value'] == 3) {
-                    $node->hasAccess = $node->authentication_level['value'] == 0 && !empty(\request()->user()) ? false : (empty($node->permission_id) ? true : \in_array($node->permission_id, $permission_ids->toArray()));
+                $node->hasAccess = true;
+                if (
+                    empty(\request()->user()) && $node->authentication_level['value'] == 1 ||
+                    !empty(\request()->user()) && $node->authentication_level['value'] == 0 ||
+                    !empty($node->permission_id) && !\in_array($node->permission_id, $permission_ids->toArray())
+                ) {
+                    $node->hasAccess = false;
                 }
                 return $node;
             });
@@ -57,7 +63,7 @@ class NodeController extends Controller
             )
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid')
             ->get()->map(function ($node) {
-                $node->hasAccess = empty(auth()->user());
+                $node->hasAccess = true;
                 return $node;
             });
 

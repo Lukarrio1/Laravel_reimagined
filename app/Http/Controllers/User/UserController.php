@@ -13,7 +13,6 @@ use App\Http\Requests\User\UserUpdateRequest;
 
 class UserController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('can:can crud users');
