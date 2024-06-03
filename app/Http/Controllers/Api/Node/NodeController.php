@@ -52,6 +52,22 @@ class NodeController extends Controller
         return ['nodes' => $nodes];
     }
 
+    public function guest_nodes()
+    {
+
+        $nodes = Node::where('node_type', '>', 1)
+            ->where('node_status', 1)
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid')
+            ->with(['permission'])
+            ->get()
+            ->map(function ($node) {
+                $node->hasAccess = true;
+                $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
+                return $node;
+            });
+        return ['nodes' => $nodes];
+    }
+
 
     public function unauthNodes()
     {
