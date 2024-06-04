@@ -18,7 +18,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Node extends Model
 {
-    use HasFactory, HasCustomPagination;
+    use HasFactory;
+    use HasCustomPagination;
     use TenantTrait;
 
     public function __construct()

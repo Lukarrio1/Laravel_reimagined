@@ -47,10 +47,14 @@ class Setting extends Model
                     $selected = \in_array($key, \collect($field_value)->toArray()) ? "selected" : '';
                     $html .= "<option value='" . $val . "_" . $key . "' $selected>$val</option>";
                 });
+                // dd(\collect($field_value)->toArray());
                 $html = "<select class='form-select' name='value[]' multiple>$html</select>";
                 break;
             case 'input':
                 $html = "<input class='form-control' name='value' value='" . $field_value . "'>";
+                break;
+            case 'input_number':
+                $html = "<input class='form-control' type='number' placeholder='How many months ?' name='value' value='" . $field_value . "'>";
                 break;
             default:
                 # code...
@@ -176,10 +180,15 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('multi_select', $roles, $key, Cache::get('setting_allowed_login_roles', [])),
                 'handle' => ['action' => 'multi_split', 'value' => 'last'],
             ],
-            'not_exportable_tables' => [
-                'field' => $this->SETTING_OPTIONS('multi_select', array_flip(\collect((new Export())->getAllTables())->toArray()), $key, Cache::get('exportable_tables', [])),
-                'handle' => ['action' => 'multi_split', 'value' => 'last'],
+            'delete_inactive_users' => [
+                'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
             ],
+            // delete_inactive_users
+            // 'not_exportable_tables' => [
+            //     'field' => $this->SETTING_OPTIONS('multi_select', \collect(array_flip(\collect((new Export())->getAllTables())->toArray())), $key, Cache::get('not_exportable_tables', [])),
+            //     'handle' => ['action' => 'multi_split', 'value' => 'last'],
+            // ],
         ]);
         return $keys->get($key);
     }
@@ -201,6 +210,7 @@ class Setting extends Model
                     ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
                     collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
                         ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
+
                 break;
             default:
                 $value = $this->properties;
@@ -225,8 +235,8 @@ class Setting extends Model
             'multi_tenancy' => 'Api Multi Tenancy',
             "multi_tenancy_role" => "Api Multi Tenancy Role",
             "app_auditing" => "Application Auditing",
-            'not_exportable_tables' => 'Not Exportable Tables',
-            "delete_after_inactive"=> "delete_after_inactive",
+            // 'not_exportable_tables' => 'Not Exportable Tables',
+            "delete_inactive_users" => "Delete Inactive Users (months)",
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',

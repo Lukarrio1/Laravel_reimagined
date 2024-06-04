@@ -17,10 +17,11 @@ class Export extends Model
     {
         $excluded_tables = \collect(\explode('|', optional(collect(Cache::get('settings'))->where('key', 'exportable_tables')->first())->properties))
             ->map(fn ($item_1) => \collect(\explode('_', $item_1))->filter(fn ($item_2, $idx) => $idx < (count(\explode('_', $item_1))) - 1)->join("_")) ?? \collect([]);
+
         $tables = collect(DB::select('SHOW TABLES'))
             ->map(fn ($value) => \array_values((array) $value))
-            ->flatten()
-            ->filter(fn ($item, $key) => !\in_array($item, $excluded_tables->toArray()));
+            ->flatten();
+        // ->filter(fn ($item, $key) => !\in_array($item, $excluded_tables->toArray()));
         return $tables;
     }
 
