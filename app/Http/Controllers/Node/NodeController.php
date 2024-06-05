@@ -15,7 +15,8 @@ use App\Http\Controllers\Cache\CacheController;
 
 class NodeController extends Controller
 {
-    public $cache, $tenancy;
+    public $cache;
+    public $tenancy;
 
     public function __construct()
     {
@@ -81,7 +82,7 @@ class NodeController extends Controller
             })
         );
         $max_amount_of_pages
-            = $nodes->get()->count() / 5;
+            = $nodes->get()->count() / 8;
         // take(\request('load_more'))
         \request()->merge([
             'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
@@ -92,7 +93,7 @@ class NodeController extends Controller
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $nodes->get()->count(),
-            'nodes' => $nodes->latest()->customPaginate(5, (int)\request()->get('page'))->get(),
+            'nodes' => $nodes->latest("updated_at")->customPaginate(8, (int)\request()->get('page'))->get(),
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
