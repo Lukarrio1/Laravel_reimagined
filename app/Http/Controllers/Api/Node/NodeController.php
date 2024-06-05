@@ -33,8 +33,7 @@ class NodeController extends Controller
         }
 
 
-        $nodes = Node::where('node_type', '>', 1)
-            ->where('node_status', 1)
+        $nodes = Node::where('node_status', 1)
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid')
             ->with(['permission'])
             ->get()
@@ -55,8 +54,7 @@ class NodeController extends Controller
     public function guest_nodes()
     {
 
-        $nodes = Node::where('node_type', '>', 1)
-            ->where('node_status', 1)
+        $nodes = Node::where('node_status', 1)
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid')
             ->with(['permission'])
             ->get()

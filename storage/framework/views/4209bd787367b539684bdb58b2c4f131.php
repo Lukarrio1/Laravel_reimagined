@@ -27,6 +27,16 @@
                         <option value="<?php echo e($column); ?>"><?php echo e($column); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
+                    <?php $__errorArgs = ['table_error'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <div style="color: red;"><?php echo e($message); ?></div>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Advanced <?php echo e(ucfirst(request('table'))); ?> Search (<?php echo e(count($table_data)); ?>)

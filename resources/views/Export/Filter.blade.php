@@ -27,6 +27,9 @@
                         <option value="{{$column}}">{{$column}}</option>
                         @endforeach
                     </select>
+                    @error('table_error')
+                    <div style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Advanced {{ucfirst(request('table'))}} Search ({{count($table_data)}})

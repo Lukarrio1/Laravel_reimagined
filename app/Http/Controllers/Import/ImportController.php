@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ImportController extends Controller
 {
-
     public $export;
     public function __construct()
     {

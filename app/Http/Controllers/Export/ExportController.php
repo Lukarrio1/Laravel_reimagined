@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Session;
 
 class ExportController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('can:can export');
@@ -30,10 +29,18 @@ class ExportController extends Controller
                 return explode(':', $section);
             });
 
+
         if (!empty($table)) {
             $table_columns = $export->getAllTableColumns($table);
         }
         if (\count($selected_table_columns) > 0) {
+            $table_validation = \collect($selected_table_columns)
+                ->filter(function ($item) use ($table_columns) {
+                    return in_array($item, $table_columns);
+                })->count() < \count($selected_table_columns);
+            if ($table_validation) {
+                return \redirect()->back()->withErrors(['table_error' => 'The table selected does not contain the selected columns']);
+            }
             $table_data = $export->getTableData($table, $selected_table_columns, $searchParams)->get($selected_table_columns);
         } else {
             $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams)->get();

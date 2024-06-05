@@ -56,6 +56,9 @@ class Setting extends Model
             case 'input_number':
                 $html = "<input class='form-control' type='number' placeholder='How many months ?' name='value' value='" . $field_value . "'>";
                 break;
+            case 'input_email':
+                $html = "<input class='form-control' type='email' name='value' value='" . $field_value . "'>";
+                break;
             default:
                 # code...
                 break;
@@ -184,6 +187,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'site_email_address' => [
+                'field' => $this->SETTING_OPTIONS('input_email', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
             // delete_inactive_users
             // 'not_exportable_tables' => [
             //     'field' => $this->SETTING_OPTIONS('multi_select', \collect(array_flip(\collect((new Export())->getAllTables())->toArray())), $key, Cache::get('not_exportable_tables', [])),
@@ -231,6 +238,7 @@ class Setting extends Model
             'app_name' => 'Application Name',
             'app_url' => 'Application URL',
             'app_version' => 'Application Version',
+            "site_email_address" => "Site Email Address",
             'app_animation' => 'Application Animation',
             'multi_tenancy' => 'Api Multi Tenancy',
             "multi_tenancy_role" => "Api Multi Tenancy Role",
