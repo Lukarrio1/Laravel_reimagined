@@ -11,7 +11,6 @@ use App\Http\Requests\Role\RoleSaveRequest;
 
 class RoleController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('can:can crud roles');
@@ -28,7 +27,7 @@ class RoleController extends Controller
             ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
             ->skip((int) 5 * (int) \request('page') - (int) 5)
             ->take((int) 5)
-            ->orderBy('priority','asc')
+            ->orderBy('priority', 'asc')
             ->get()
             ->map(fn ($role) => [
                 ...$role->toArray(),
@@ -47,7 +46,7 @@ class RoleController extends Controller
     public function save(RoleSaveRequest $request)
     {
         Role::updateOrCreate(['id' => $request->id], $request->all() + ['guard' => 'api'])
-            ->syncPermissions(Permission::whereIn('id', $request->permissions)
+            ->syncPermissions(Permission::whereIn('id', $request->get('permissions', []))
                 ->pluck('name')->toArray());
         Session::flash('message', 'The role was saved successfully.');
         Session::flash('alert-class', 'alert-success');

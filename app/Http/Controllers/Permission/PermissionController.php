@@ -9,7 +9,6 @@ use App\Http\Requests\Permission\PermissionSaveRequest;
 
 class PermissionController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('can:can crud permissions');

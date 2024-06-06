@@ -38,14 +38,8 @@ class NodeController extends Controller
             ->with(['permission'])
             ->get()
             ->map(function ($node) use ($permission_ids) {
-                $node->hasAccess = true;
-                if (
-                    empty(\request()->user()) && $node->authentication_level['value'] == 1 ||
-                    !empty(\request()->user()) && $node->authentication_level['value'] == 0 ||
-                    !empty($node->permission_id) && !\in_array($node->permission_id, $permission_ids->toArray())
-                ) {
-                    $node->hasAccess = false;
-                }
+                $node->hasAccess = $node->authentication_level['value'] == 0 ||
+                    !empty($node->permission_id) && !\auth()->user()->hasPermissionTo($node->permission->name) ? false : true;
                 return $node;
             });
         return ['nodes' => $nodes];
@@ -59,7 +53,6 @@ class NodeController extends Controller
             ->with(['permission'])
             ->get()
             ->map(function ($node) {
-                $node->hasAccess = true;
                 $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
                 return $node;
             });
