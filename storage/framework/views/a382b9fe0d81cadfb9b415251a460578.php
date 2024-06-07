@@ -22,10 +22,10 @@
             </div>
 
             <div class="flex items-center gap-3 sm:gap-6">
-                <?php if (isset($component)) { $__componentOriginald1db52f335a36ef6e9a7182c84fdf72a = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald1db52f335a36ef6e9a7182c84fdf72a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'laravel-exceptions-renderer::components.theme-swicher','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('laravel-exceptions-renderer::theme-swicher'); ?>
+                <?php if (isset($component)) { $__componentOriginal9b6ddd2809dd60ece07dfaf1f3ef876f = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9b6ddd2809dd60ece07dfaf1f3ef876f = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'laravel-exceptions-renderer::components.theme-switcher','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('laravel-exceptions-renderer::theme-switcher'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
@@ -34,13 +34,13 @@
 <?php $component->withAttributes([]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginald1db52f335a36ef6e9a7182c84fdf72a)): ?>
-<?php $attributes = $__attributesOriginald1db52f335a36ef6e9a7182c84fdf72a; ?>
-<?php unset($__attributesOriginald1db52f335a36ef6e9a7182c84fdf72a); ?>
+<?php if (isset($__attributesOriginal9b6ddd2809dd60ece07dfaf1f3ef876f)): ?>
+<?php $attributes = $__attributesOriginal9b6ddd2809dd60ece07dfaf1f3ef876f; ?>
+<?php unset($__attributesOriginal9b6ddd2809dd60ece07dfaf1f3ef876f); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginald1db52f335a36ef6e9a7182c84fdf72a)): ?>
-<?php $component = $__componentOriginald1db52f335a36ef6e9a7182c84fdf72a; ?>
-<?php unset($__componentOriginald1db52f335a36ef6e9a7182c84fdf72a); ?>
+<?php if (isset($__componentOriginal9b6ddd2809dd60ece07dfaf1f3ef876f)): ?>
+<?php $component = $__componentOriginal9b6ddd2809dd60ece07dfaf1f3ef876f; ?>
+<?php unset($__componentOriginal9b6ddd2809dd60ece07dfaf1f3ef876f); ?>
 <?php endif; ?>
             </div>
         </div>

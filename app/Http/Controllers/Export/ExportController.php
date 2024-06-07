@@ -38,8 +38,15 @@ class ExportController extends Controller
                 ->filter(function ($item) use ($table_columns) {
                     return in_array($item, $table_columns);
                 })->count() < \count($selected_table_columns);
+
+            $failed_keys
+                = \collect($selected_table_columns)
+                ->filter(function ($item) use ($table_columns) {
+                    return !in_array($item, $table_columns);
+                })->join(',');
+
             if ($table_validation) {
-                return \redirect()->back()->withErrors(['table_error' => 'The table selected does not contain the selected columns']);
+                return \redirect()->back()->withErrors(['table_error' => "$table does not contain $failed_keys."]);
             }
             $table_data = $export->getTableData($table, $selected_table_columns, $searchParams)->get($selected_table_columns);
         } else {

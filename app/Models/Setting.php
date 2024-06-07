@@ -191,6 +191,18 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input_email', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'redirect_to_after_login' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            'redirect_to_after_register' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            'redirect_to_after_logout' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
             // delete_inactive_users
             // 'not_exportable_tables' => [
             //     'field' => $this->SETTING_OPTIONS('multi_select', \collect(array_flip(\collect((new Export())->getAllTables())->toArray())), $key, Cache::get('not_exportable_tables', [])),
@@ -243,6 +255,9 @@ class Setting extends Model
             'multi_tenancy' => 'Api Multi Tenancy',
             "multi_tenancy_role" => "Api Multi Tenancy Role",
             "app_auditing" => "Application Auditing",
+            "redirect_to_after_login" => "React router redirect to after login",
+            "redirect_to_after_register" => "React router redirect to after register",
+            "redirect_to_after_logout" => "React router redirect to after logout",
             // 'not_exportable_tables' => 'Not Exportable Tables',
             "delete_inactive_users" => "Delete Inactive Users (months)",
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
