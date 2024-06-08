@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\User\UserUpdateRequest;
 
 class UserController extends Controller
@@ -93,8 +94,13 @@ class UserController extends Controller
 
     public function assignRole(Request $request, User $user)
     {
-        $role = Role::findById($request->role);
-        $user->syncRoles([$role]);
+
+        $role = $request->role ? Role::findById($request->role) : null;
+        if (empty($role)) {
+            $user->syncRoles([]);
+        } else {
+            $user->syncRoles([$role]);
+        }
         Session::flash('message', 'The role was assigned successfully.');
         Session::flash('alert-class', 'alert-success');
 

@@ -192,16 +192,16 @@ class Setting extends Model
                 'handle' => ['action' => '', 'value' => ''],
             ],
             'redirect_to_after_login' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
-                'handle' => ['action' => '', 'value' => ''],
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options',[]), $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'redirect_to_after_register' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
-                'handle' => ['action' => '', 'value' => ''],
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options',[]), $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'redirect_to_after_logout' => [
-                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
-                'handle' => ['action' => '', 'value' => ''],
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options',[]), $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             // delete_inactive_users
             // 'not_exportable_tables' => [

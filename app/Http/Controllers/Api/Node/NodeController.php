@@ -39,7 +39,7 @@ class NodeController extends Controller
             ->get()
             ->map(function ($node) use ($permission_ids) {
                 $node->hasAccess = $node->authentication_level['value'] == 0 ||
-                    !empty($node->permission_id) && !\auth()->user()->hasPermissionTo($node->permission->name) ? false : true;
+                    !empty($node->permission) && !\auth()->user()->hasPermissionTo(\optional($node->permission)->name) ? false : true;
                 return $node;
             });
         return ['nodes' => $nodes];

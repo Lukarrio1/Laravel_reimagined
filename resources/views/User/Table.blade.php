@@ -53,7 +53,7 @@
                                         <div class="mb-3">
                                             <label for="role_name" class="form-label">Role</label>
                                             <select class="form-select" name="role">
-                                                <option selected>Open this select menu</option>
+                                                <option selected value="">Open this select menu</option>
                                                 @foreach ($roles as $role )
                                                 <option value="{{$role->id}}" {{optional($user->role)->id==$role->id?"selected":''}}>
                                                     {{$role->name}}</option>

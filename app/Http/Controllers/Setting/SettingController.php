@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use PSpell\Config;
 use App\Models\Setting;
+use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use App\Models\Tenant\Tenant;
 use Spatie\Permission\Models\Role;
@@ -30,9 +31,11 @@ class SettingController extends Controller
         $multi_tenancy_role_id = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int)$multi_tenancy_role_id) : null;
         $field_value = optional(collect(Cache::get('settings')));
+
         return view('Setting.View', [
             'keys' => $setting->getAllSettingKeys(),
             'key_value' => $setting->SETTING_KEYS($setting_key, $field_value)['field'],
+            'allowed_for_api_use' => \collect(Setting::query()->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
             'setting_key' => $setting_key,
             'settings' => $setting->query()
                 ->when(
@@ -46,7 +49,6 @@ class SettingController extends Controller
 
     public function save(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make($request->all(), ['value' => ['required'], 'setting_key' => ['required']]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -60,9 +62,8 @@ class SettingController extends Controller
         Setting::updateOrCreate(
             [
                 'key' => $request->setting_key
-            ] + $this->tenancy->addTenantIdToCurrentItem(\auth()->user()->tenant_id),
+            ],
             $request->merge(['properties' => $value])->all()
-                + $this->tenancy->addTenantIdToCurrentItem(Cache::get('tenant_id'))
         );
         Cache::forget('settings');
         Cache::forget('setting_allowed_login_roles');

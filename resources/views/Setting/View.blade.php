@@ -33,6 +33,21 @@
                     <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                     @enderror
                 </div>
+                <div class="mb-3">
+                    <div class="mb-3">
+                        <label for="role_name" class="form-label">Allowed for api use</label>
+                        <select class="form-select" name="allowed_for_api_use">
+                            <option selected>Open this select menu</option>
+                            @foreach (['Yes'=>1,'No'=>0] as $key=>$value )
+                            <option value="{{$value}}" {{$allowed_for_api_use==$value?'selected':''}}>{{$key}}</option>
+
+
+                            @endforeach
+                        </select>
+                    </div>
+
+                </div>
+
                 <div class="mb-3 text-center mt-3">
                     <button class='btn btn-sm btn-warning' type="submit"><i class="fa fa-wrench" aria-hidden="true"></i></button>
 
@@ -51,6 +66,7 @@
                     <tr>
                         <th scope="col">Settings key</th>
                         <th scope="col">Settings Value</th>
+                        <th scope="col">Allowed For Api Use</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -59,6 +75,7 @@
                     <tr>
                         <td>{{$setting->getAllSettingKeys($setting->key)}}</td>
                         <td>{!!$setting->getSettingValue('first')!!}</td>
+                        <td>{{$setting->allowed_for_api_use?"Yes":"No"}}</td>
                         <td>
                             @can('can view settings delete button',auth()->user())
                             <form action="{{route('deleteSetting',['setting_key'=>$setting->key])}}" method="post">

@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\Setting;
+use App\Models\Node\Node;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckSuperAdmin;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Node\NodeController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\User\UserController;
@@ -23,8 +25,18 @@ Auth::routes();
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     if (!Cache::has('settings')) {
-        Cache::add('settings', Setting::where('tenant_id',auth()->user()->tenant_id)->get());
+        Cache::add('settings', Setting::where('tenant_id', auth()->user()->tenant_id)->get());
     }
+    if (!Cache::has('redirect_to_options')) {
+        $links =  Node::query()->where('node_type', 2)->get()->map(function ($item) {
+            $temp = \collect([]);
+            $temp->put('name', $item->name);
+            $temp->put('route', $item->properties['value']->node_route);
+            return $temp->toArray();
+        })->pluck('route', 'name');
+        Cache::add('redirect_to_options', $links);
+    }
+
 
 
 
@@ -72,5 +84,5 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
         Route::delete('/tenant/{tenant}/delete', [TenantController::class, 'delete'])->name('deleteTenant');
     }
 
-    Route::get('/', [NodeController::class, 'index'])->name('home');
+    Route::get('/', [DashboardController::class, 'index'])->name('home');
 });

@@ -23,7 +23,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
                 <input type="hidden" value="<?php echo e(optional($permission)->id); ?>" name="id">
                 <div class="mb-3 text-center">
-                    <button type="submit" class="btn btn-<?php echo e(isset($role)?'warning':'primary'); ?>">
+                    <button type="submit" class="btn btn-<?php echo e(isset($permission)?'warning':'primary'); ?>">
                         <?php if(isset($permission)): ?>
                         <i class="fa fa-wrench" aria-hidden="true"></i>
                         <?php else: ?>

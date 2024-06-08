@@ -53,7 +53,7 @@
                                         <div class="mb-3">
                                             <label for="role_name" class="form-label">Role</label>
                                             <select class="form-select" name="role">
-                                                <option selected>Open this select menu</option>
+                                                <option selected value="">Open this select menu</option>
                                                 <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($role->id); ?>" <?php echo e(optional($user->role)->id==$role->id?"selected":''); ?>>
                                                     <?php echo e($role->name); ?></option>

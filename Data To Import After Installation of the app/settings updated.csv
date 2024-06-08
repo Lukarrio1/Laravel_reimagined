@@ -1,15 +1,22 @@
-key,properties
-registration_role,"authenticated user_2"
-app_name,"Laravel Re Imagined"
-mail_host,sandbox.smtp.mailtrap.io
-mail_port,2525
-mail_username,e1e0f01cad57ee
-mail_password,245e87234a7039
-mail_encryption,tls
-mail_from_address,laravel_reimagined@noreply.com
-mail_from_name,"Laravel Re Imagined"
-app_url,http://localhost:8000
-app_animation,w3-animate-zoom_w3-animate-zoom
-app_auditing,false_
-app_version,1.95
-multi_tenancy,0_false
+id,key,properties,tenant_id,allowed_for_api_use
+72,admin_role,"Super Admin_1",,0
+73,registration_role,"authenticated user_2",,0
+74,app_name,"Laravel Re Imagined",,1
+75,mail_host,sandbox.smtp.mailtrap.io,,0
+76,mail_port,2525,,0
+77,mail_username,e1e0f01cad57ee,,0
+78,mail_password,245e87234a7039,,0
+79,mail_encryption,tls,,0
+80,mail_from_address,laravel_reimagined@noreply.com,,0
+81,mail_from_name,"Laravel Re Imagined",,0
+82,app_url,http://localhost:8000,,0
+83,app_animation,w3-animate-opacity_w3-animate-opacity,,1
+84,app_auditing,false_,,0
+85,app_version,1.95,,1
+86,allowed_login_roles,Authenticated--User_2|Admin_3,,0
+87,delete_inactive_users,6,,0
+88,site_email_address,laravelreimagined@gmail.com,,1
+89,redirect_to_after_login,/,,1
+90,redirect_to_after_register,/,,1
+91,redirect_to_after_logout,/login,,1
+92,multi_tenancy,0_false,,0

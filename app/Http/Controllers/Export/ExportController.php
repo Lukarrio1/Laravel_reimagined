@@ -81,6 +81,7 @@ class ExportController extends Controller
     {
         $export = new Export();
         $current_export_data = Cache::get('current_table_data_for_export');
+        // \dd($current_export_data);
         Cache::forget('current_table_data_for_export');
         Session::flash('message', 'The data was export successfully.');
         Session::flash('alert-class', 'alert-success');

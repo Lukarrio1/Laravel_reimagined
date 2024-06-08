@@ -47,6 +47,21 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
+                <div class="mb-3">
+                    <div class="mb-3">
+                        <label for="role_name" class="form-label">Allowed for api use</label>
+                        <select class="form-select" name="allowed_for_api_use">
+                            <option selected>Open this select menu</option>
+                            <?php $__currentLoopData = ['Yes'=>1,'No'=>0]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($value); ?>" <?php echo e($allowed_for_api_use==$value?'selected':''); ?>><?php echo e($key); ?></option>
+
+
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                    </div>
+
+                </div>
+
                 <div class="mb-3 text-center mt-3">
                     <button class='btn btn-sm btn-warning' type="submit"><i class="fa fa-wrench" aria-hidden="true"></i></button>
 
@@ -65,6 +80,7 @@ unset($__errorArgs, $__bag); ?>
                     <tr>
                         <th scope="col">Settings key</th>
                         <th scope="col">Settings Value</th>
+                        <th scope="col">Allowed For Api Use</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -73,6 +89,7 @@ unset($__errorArgs, $__bag); ?>
                     <tr>
                         <td><?php echo e($setting->getAllSettingKeys($setting->key)); ?></td>
                         <td><?php echo $setting->getSettingValue('first'); ?></td>
+                        <td><?php echo e($setting->allowed_for_api_use?"Yes":"No"); ?></td>
                         <td>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings delete button',auth()->user())): ?>
                             <form action="<?php echo e(route('deleteSetting',['setting_key'=>$setting->key])); ?>" method="post">

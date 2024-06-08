@@ -16,7 +16,7 @@
                 </div>
                 <input type="hidden" value="{{optional($permission)->id}}" name="id">
                 <div class="mb-3 text-center">
-                    <button type="submit" class="btn btn-{{isset($role)?'warning':'primary'}}">
+                    <button type="submit" class="btn btn-{{isset($permission)?'warning':'primary'}}">
                         @if(isset($permission))
                         <i class="fa fa-wrench" aria-hidden="true"></i>
                         @else

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('key');
             $table->longText('properties');
-            $table->integer('tenant_id')->nullable();
+            $table->string('tenant_id')->nullable();
+            $table->boolean('allowed_for_api_use')->nullable();
             $table->timestamps();
         });
     }

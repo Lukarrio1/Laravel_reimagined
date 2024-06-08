@@ -6,6 +6,7 @@ use Closure;
 use PSpell\Config;
 use App\Models\Audit;
 use App\Models\Setting;
+use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -36,6 +37,7 @@ class AuthMiddleware
         // dd(\request()->tenant);
         // Determine the current route's function name
         $currentRoute = join('::', explode('@', Route::currentRouteAction()));
+
         Cache::set('tenant_id', Route::current()->parameter('tenant'));
         $currentRouteNode = null;
         // Retrieve the route node from the cache
@@ -53,7 +55,7 @@ class AuthMiddleware
         if (empty($currentRouteNode)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+        $this->updateNode($currentRouteNode->id);
         // Check the required authentication level
         $authLevel = $currentRouteNode->authentication_level['value'];
         if (in_array($authLevel, [0, 2])) {
@@ -133,5 +135,10 @@ class AuthMiddleware
         }
 
         return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    protected function updateNode($id)
+    {
+        // Node::find($id)->touch();
     }
 }
