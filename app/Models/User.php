@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\TenantTrait;
+use App\TracksUserLogin;
 use App\HasCustomPagination;
 use App\Models\Tenant\Tenant;
 use Laravel\Sanctum\HasApiTokens;
@@ -24,9 +25,12 @@ class User extends Authenticatable
     // use Encryptable;
     // use SoftDeletes;
     use TenantTrait;
+    use TracksUserLogin;
+
     public function __construct()
     {
-    // $this->initializeTenancy();
+        // $this->initializeTenancy();
+        $this->TracksUserLogin();
     }
     /**
      * The attributes that are mass assignable.
@@ -114,8 +118,8 @@ class User extends Authenticatable
 
     public function updateUserHtml()
     {
-        $this->updateHtml = collect($this->updateFieldTemplate())->filter(function($field,$key){
-            if(\in_array($key,['password','confirm_password'])){
+        $this->updateHtml = collect($this->updateFieldTemplate())->filter(function ($field, $key) {
+            if (\in_array($key, ['password', 'confirm_password'])) {
                 return auth()->user()->hasPermissionTo("can edit users password");
             }
             return true;

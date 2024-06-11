@@ -93,7 +93,8 @@ class NodeController extends Controller
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $nodes->get()->count(),
-            'nodes' => $nodes->latest("updated_at")->customPaginate(8, (int)\request()->get('page'))->get(),
+            'nodes' => $nodes->latest("updated_at")->customPaginate(8, (int)\request()->get('page'))->get()
+                ->when($node, fn ($collection) => [$node, ...$collection->filter(fn ($item) =>\optional($item)->id != $node->id)]),
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),

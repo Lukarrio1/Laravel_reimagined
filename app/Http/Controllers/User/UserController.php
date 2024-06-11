@@ -82,14 +82,20 @@ class UserController extends Controller
         $users_count = User::all()->count();
         $max_amount_of_pages = $users_count / 5;
         \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
-        $users = $users->customPaginate(5, \request('page'))->get();
+        $users = $users->latest('updated_at')->customPaginate(5, \request('page'))->get();
 
-        return \view('User.View', ['users' => $users->map(function (User $user) {
-            $user->role_name = \optional(\optional($user->roles)->first())->name;
-            $user->role = $user->roles->first();
-            $user = $user->updateUserHtml();
-            return $user;
-        }), 'roles' => $roles, 'search_placeholder' => $searchPlaceholder, 'users_count' => $users_count, 'page_count' => \ceil($max_amount_of_pages)]);
+        return \view('User.View', [
+            'users' => $users->map(function (User $user) {
+                $user->role_name = \optional(\optional($user->roles)->first())->name;
+                $user->role = $user->roles->first();
+                $user = $user->updateUserHtml();
+                return $user;
+            }),
+            'roles' => $roles,
+            'search_placeholder' => $searchPlaceholder,
+            'users_count' => $users_count,
+            'page_count' => \ceil($max_amount_of_pages)
+        ]);
     }
 
     public function assignRole(Request $request, User $user)

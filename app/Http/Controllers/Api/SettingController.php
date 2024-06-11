@@ -18,7 +18,7 @@ class SettingController extends Controller
             Setting::select('key', 'properties', 'id', 'allowed_for_api_use')
             ->where('allowed_for_api_use', 1)->get()
             ->map(function ($item) {
-                $item->properties = $item->getSettingValue('last');
+                $item->properties =['key'=> $item->getSettingValue('first'),'value' => $item->getSettingValue('last')];
                 return $item;
             });
         return \response()->json(['settings' => $settings]);
