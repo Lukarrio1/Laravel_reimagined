@@ -78,6 +78,9 @@ class Export extends Model
 
     public function filterTable($query, $searchParams)
     {
+        if (empty($searchParams)) {
+            return $query;
+        }
         $searchParams->when(
             $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
             fn ($collection) => $collection->each(function ($section) use (&$query) {

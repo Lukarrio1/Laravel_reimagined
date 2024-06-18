@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenant\Tenant;
 use App\Models\Node\Node_Type;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
@@ -59,7 +60,6 @@ class NodeController extends Controller
                 return explode(':', $section);
             });
 
-
         // Query for Nodes and apply filters based on search parameters
         $nodes = Node::query();
 
@@ -81,25 +81,28 @@ class NodeController extends Controller
                 $nodes->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
             })
         );
+        $node_count = $nodes->count();
         $max_amount_of_pages
             = $nodes->get()->count() / 8;
         // take(\request('load_more'))
         \request()->merge([
             'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
-            'search' => request()->get('search')
+            'search' =>  request()->get('search')
         ]);
+
         return \view('Nodes.View', [
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
-            'nodes_count' => $nodes->get()->count(),
+            'nodes_count' =>$node_count,
             'nodes' => $nodes->latest("updated_at")->customPaginate(8, (int)\request()->get('page'))->get()
-                ->when($node, fn ($collection) => [$node, ...$collection->filter(fn ($item) =>\optional($item)->id != $node->id)]),
+                ->when($node, fn ($collection) => [$node, ...$collection->filter(fn ($item) => \optional($item)->id != $node->id)]),
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
             'search_placeholder' => $searchPlaceholder,
-            'page_count' => \ceil($max_amount_of_pages)
+            'page_count' => \ceil($max_amount_of_pages),
+            'search' => request()->get('search')
         ]);
     }
 

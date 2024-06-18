@@ -11,14 +11,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $take=10;
-        $users = User::query();
-        $nodes = Node::query();
-        $audits = Audit::query();
+        $take = 10;
+        $users = User::query()->latest();
+        $nodes = Node::query()->orderBy('updated_at', 'desc');
+        $audits = Audit::query()->latest('created_at');
         return \view('Dashboard.View', [
-            'new_users' => $users->latest()->take($take)->get(),
-            'last_used_routes' => $nodes->where('node_type', 1)->orderBy('updated_at', 'desc')->take($take)->get(),
-            'audit_history' => $audits->latest('created_at')->take($take)->get()
+            'new_users' => $users->take($take)->get(),
+            'last_used_routes' => $nodes->where('node_type', 1)->take($take)->get(),
+            'audit_history' => $audits->take($take)->get()
         ]);
     }
 }

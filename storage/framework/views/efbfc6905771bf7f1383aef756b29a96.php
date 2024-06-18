@@ -2,8 +2,9 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header"><?php echo e(__('Reset Password')); ?></div>
+            <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+
+                <div class="card-header text-center h3 bg-white"><?php echo e(__('Reset Password')); ?></div>
 
                 <div class="card-body">
                     <?php if(session('status')): ?>
@@ -45,7 +46,7 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
+                            <div class="col-md-6 offset-md-4 text-center">
                                 <button type="submit" class="btn btn-primary">
                                     <?php echo e(__('Send Password Reset Link')); ?>
 

@@ -15,7 +15,7 @@ if (!Cache::has('routes')) {
         ->get();
 
     // Add routes to cache
-    Cache::add('routes', $nodes, now()->addMinutes(30)); // Cache with expiration (optional)
+    Cache::add('routes', $nodes); // Cache with expiration (optional)
 }
 
 if (!Cache::has('settings')) {
@@ -35,33 +35,29 @@ if (!Cache::has('nodes')) {
 
 // Retrieve cached routes
 $routes = Cache::get('routes');
-// Register each route with its corresponding method and function
-// Route::prefix('{tenant}')->group(function () use ($routes) {
-    $routes->each(function ($route) {
-        $properties = $route->properties['value'];
-        // Validate required properties to avoid errors
-        if (empty($properties->route_method) || empty($properties->node_route) || empty($properties->route_function)) {
-            return; // Skip invalid or incomplete routes
-        }
-        // Determine route method, path, and function
-        $method = strtolower($properties->route_method); // Ensure method is lowercase
-        $node_route = \collect(\explode('/', $properties->node_route))
-            ->filter(function ($dt, $key) use ($properties) {
-                if (array_search('api', \explode('/', $properties->node_route)) < $key) {
-                    return true;
-                }
-                return false;
-            })->join('/');
-        // Extract controller and method from the route function
-        $routeFunctionParts = explode('::', $properties->route_function);
-        if (count($routeFunctionParts) !== 2) {
-            return; // Skip if route function format is invalid
-        }
 
-        list($controller, $methodName) = $routeFunctionParts;
+$routes->each(function ($route) {
+    $properties = $route->properties['value'];
+    if (empty($properties->route_method) || empty($properties->node_route) || empty($properties->route_function)) {
+        return;
+    }
+    $method = strtolower($properties->route_method);
+    $node_route = \collect(\explode('/', $properties->node_route))
+        ->filter(function ($dt, $key) use ($properties) {
+            if (array_search('api', \explode('/', $properties->node_route)) < $key) {
+                return true;
+            }
+            return false;
+        })->join('/');
 
-        // Register the route with the specified method, path, and middleware
-        Route::$method($node_route, [$controller, $methodName])
-            ->middleware(AuthMiddleware::class);
-    });
-// });
+    $routeFunctionParts = explode('::', $properties->route_function);
+    if (count($routeFunctionParts) !== 2) {
+        return;
+    }
+
+    list($controller, $methodName) = $routeFunctionParts;
+
+    Route::$method($node_route, [$controller, $methodName])
+        ->middleware(AuthMiddleware::class);
+});
+

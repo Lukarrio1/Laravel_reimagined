@@ -6,7 +6,7 @@
                     <label for="search" class="form-label">
                         Nodes:<span class="badge text-bg-secondary">(<?php echo e($nodes_count); ?>)</span>
                     </label>
-                    <input type="text" class="form-control" id="node_search" name="search" value="<?php echo e(request('search')); ?>">
+                    <input type="text" class="form-control" id="node_search" name="search" value="<?php echo e($search); ?>">
                     <div class="mt-2 text-primary">Example Search Format: <?php echo e($search_placeholder); ?></div>
 
                 </div>

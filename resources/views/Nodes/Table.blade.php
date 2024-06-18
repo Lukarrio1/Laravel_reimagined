@@ -6,7 +6,7 @@
                     <label for="search" class="form-label">
                         Nodes:<span class="badge text-bg-secondary">({{$nodes_count}})</span>
                     </label>
-                    <input type="text" class="form-control" id="node_search" name="search" value="{{request('search')}}">
+                    <input type="text" class="form-control" id="node_search" name="search" value="{{$search}}">
                     <div class="mt-2 text-primary">Example Search Format: {{$search_placeholder}}</div>
 
                 </div>

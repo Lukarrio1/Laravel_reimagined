@@ -2,8 +2,9 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header"><?php echo e(__('Confirm Password')); ?></div>
+            <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+
+                <div class="card-header text-center bg-white h3"><?php echo e(__('Confirm Password')); ?></div>
 
                 <div class="card-body">
                     <?php echo e(__('Please confirm your password before continuing.')); ?>
@@ -41,7 +42,7 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
+                            <div class="col-md-8 offset-md-4 text-center">
                                 <button type="submit" class="btn btn-primary">
                                     <?php echo e(__('Confirm Password')); ?>
 

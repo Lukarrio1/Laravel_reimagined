@@ -12,7 +12,7 @@
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="<?php echo e(route($route_name).'?page='.request()->get('page')+1); ?>" aria-label="Next">
+            <a class="page-link" href="<?php echo e(route($route_name,['page'=>request()->get('page')+1,'search'=>request('search')])); ?>" aria-label="Next">
                 <span aria-hidden="true">Next &raquo;</span>
             </a>
         </li>

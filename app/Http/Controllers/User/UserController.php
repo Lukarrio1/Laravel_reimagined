@@ -79,7 +79,7 @@ class UserController extends Controller
                 }
             })
         );
-        $users_count = User::all()->count();
+        $users_count = $users->count();
         $max_amount_of_pages = $users_count / 5;
         \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
         $users = $users->latest('updated_at')->customPaginate(5, \request('page'))->get();
