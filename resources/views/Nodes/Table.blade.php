@@ -3,12 +3,11 @@
         <div class="card-header bg-white">
             <form action="{{route('viewNodes')}}" action="get">
                 <div class="mb-3">
-                    <label for="search" class="form-label">
-                        Nodes:<span class="badge text-bg-secondary">({{$nodes_count}})</span>
+                    <label for="search" class="form-label h3">
+                        <span class="badge text-bg-secondary"> Nodes: ({{!empty($search)?$nodes_count.'/'.$nodes_count_overall:$nodes_count}})</span>
                     </label>
-                    <input type="text" class="form-control" id="node_search" name="search" value="{{$search}}">
-                    <div class="mt-2 text-primary">Example Search Format: {{$search_placeholder}}</div>
-
+                    <input type="text" class="form-control" id="node_search" name="search" value="{{$search}}" placeholder="Search...">
+                    <div class="mt-2 text-primary">Example Search Format: {{$search_placeholder}}, press enter to search</div>
                 </div>
             </form>
         </div>
@@ -16,22 +15,21 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th scope="col" class="text-center h4 ">Name</th>
 
-                        <th scope="col" class="text-center h4">Node Name</th>
+                        <th scope="col" class="text-center h4">Description</th>
 
-                        <th scope="col" class="text-center h4">Node Description</th>
+                        <th scope="col" class="text-center h4">Authentication Level</th>
 
-                        <th scope="col" class="text-center h4">Node Authentication Level</th>
+                        <th scope="col" class="text-center h4">Type</th>
 
-                        <th scope="col" class="text-center h4">Node Type</th>
+                        <th scope="col" class="text-center h4">Status</th>
 
-                        <th scope="col" class="text-center h4">Node Status</th>
+                        <th scope="col" class="text-center h4">Permission</th>
 
-                        <th scope="col" class="text-center h4">Node Permission</th>
+                        <th scope="col" class="text-center h4">UUID</th>
 
-                        <th scope="col" class="text-center h4">Node UUID</th>
-
-                        <th scope="col" class="text-center h4">Node Properties</th>
+                        <th scope="col" class="text-center h4">Properties</th>
 
                         <th scope="col" class="text-center h4">Action</th>
 

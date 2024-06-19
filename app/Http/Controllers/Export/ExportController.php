@@ -73,7 +73,9 @@ class ExportController extends Controller
             'table_data' => $table_data,
             'selected_table_columns' => $selected_table_columns,
             'table_error' => !empty($table) ?: "Please select a valid table .",
-            'searchPlaceholder' => $searchPlaceholder
+            'searchPlaceholder' => $searchPlaceholder,
+            'table_data_count_overall' => $export->getTableData($table, ['*'], \collect([]))->count(),
+            'search' => request()->get('search')
         ]);
     }
 

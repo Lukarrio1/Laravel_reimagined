@@ -6,7 +6,7 @@
         <div class="card-body">
             <form>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Users :<span class="badge text-bg-secondary">(<?php echo e($users_count); ?>)</span></label>
+                    <label for="exampleInputEmail1" class="form-label h4"><span class="badge text-bg-secondary">Users: (<?php echo e(!empty($search)?$users_count.'/'.$users_count_overall:$users_count); ?>)</span></label>
 
                     <input type="text" class="form-control" name="search" value="<?php echo e(request()->get('search')); ?>">
                     <div id="" class="form-text">

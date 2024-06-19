@@ -78,7 +78,7 @@ class Export extends Model
 
     public function filterTable($query, $searchParams)
     {
-        if (empty($searchParams)) {
+        if (empty($searchParams) || $searchParams->count() == 0) {
             return $query;
         }
         $searchParams->when(

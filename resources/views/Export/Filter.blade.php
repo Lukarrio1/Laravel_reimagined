@@ -32,9 +32,11 @@
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Advanced {{ucfirst(request('table'))}} Search ({{count($table_data)}})
+                    <label for="exampleInputEmail1" class="form-label h5">
+                        <span class="badge text-bg-secondary">Advanced {{ucfirst(request('table'))}} Search ({{!empty($search)?count($table_data).'/'.$table_data_count_overall:count($table_data)}})</span>
+
                     </label>
-                    <input type="text" class="form-control" name="search" value="{{request()->get('search')}}">
+                    <input type="text" class="form-control" name="search" value="{{$search}}">
                     <div id="" class="form-text">
                         <div class="mt-2 text-primary">Example Search Format: {{$searchPlaceholder}}</div>
                     </div>

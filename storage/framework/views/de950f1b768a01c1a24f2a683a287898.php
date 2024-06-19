@@ -1,7 +1,16 @@
 <div class="col-sm-8 offset-sm-2 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-header bg-white h6">
-            Roles:<span class="badge text-bg-secondary">(<?php echo e($roles_count); ?>)</span>
+            <form action="<?php echo e(route('viewRoles')); ?>" action="get">
+                <div class="mb-3">
+                    <label for="search" class="form-label h3">
+                        <span class="badge text-bg-secondary"> Roles: (<?php echo e(!empty($search)?$roles_count.'/'.$roles_count_overall:$roles_count); ?>)</span>
+                    </label>
+                    <input type="text" class="form-control" name="search" value="<?php echo e($search); ?>" placeholder="Search...">
+                    <div class="mt-2 text-primary">Example Search Format:<?php echo e($searchPlaceholder); ?></div>
+                </div>
+            </form>
+
         </div>
         <div class="card-body">
             <table class="table">
@@ -21,7 +30,9 @@
                         <td class="text-center">
                             <ul class="list-group-flush">
                                 <?php $__currentLoopData = $Role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <li class="list-group-item"><bold><?php echo e($name); ?></bold></li>
+                                <li class="list-group-item">
+                                    <bold><?php echo e($name); ?></bold>
+                                </li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
                         </td>

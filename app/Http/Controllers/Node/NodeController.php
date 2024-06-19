@@ -62,6 +62,7 @@ class NodeController extends Controller
 
         // Query for Nodes and apply filters based on search parameters
         $nodes = Node::query();
+        $nodes_count_overall = $nodes->count();
 
         $searchParams->when(
             $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
@@ -101,7 +102,8 @@ class NodeController extends Controller
             'permissions' => Permission::all(),
             'search_placeholder' => $searchPlaceholder,
             'page_count' => \ceil($max_amount_of_pages),
-            'search' => request()->get('search')
+            'search' => request()->get('search'),
+            'nodes_count_overall'=> $nodes_count_overall
         ]);
     }
 

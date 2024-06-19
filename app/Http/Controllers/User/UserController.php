@@ -94,7 +94,9 @@ class UserController extends Controller
             'roles' => $roles,
             'search_placeholder' => $searchPlaceholder,
             'users_count' => $users_count,
-            'page_count' => \ceil($max_amount_of_pages)
+            'page_count' => \ceil($max_amount_of_pages),
+            'users_count_overall'=>User::query()->count(),
+            'search'=>\request('search')
         ]);
     }
 

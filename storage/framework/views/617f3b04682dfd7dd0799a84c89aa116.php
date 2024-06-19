@@ -1,8 +1,18 @@
 <div class="col-sm-8 offset-sm-2 mt-5">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-        <div class="bg-white card-header">
-            Permissions:<span class="badge text-bg-secondary">(<?php echo e($permissions_count); ?>)</span>
-        </div>
+  <div class="card-header bg-white h6">
+      <form action="<?php echo e(route('viewPermissions')); ?>" action="get">
+          <div class="mb-3">
+              <label for="search" class="form-label h3">
+                  <span class="badge text-bg-secondary"> Permissions: (<?php echo e(!empty($search)?$permissions_count.'/'.$permissions_count_overall:$permissions_count); ?>)</span>
+              </label>
+              <input type="text" class="form-control" name="search" value="<?php echo e($search); ?>" placeholder="Search...">
+              <div class="mt-2 text-primary">Example Search Format:<?php echo e($searchPlaceholder); ?></div>
+          </div>
+      </form>
+
+  </div>
+
         <div class="card-body">
             <table class="table">
                 <thead>

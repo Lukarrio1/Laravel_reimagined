@@ -34,6 +34,13 @@ $multi_tenancy =(int)optional(collect(Cache::get('settings'))->where('key','mult
         }
 
     </style>
+    <style>
+        body {
+            font-family: Garamond, serif;
+        }
+
+    </style>
+
 
     <!-- Scripts -->
     <?php echo app('Illuminate\Foundation\Vite')(['resources/sass/app.scss', 'resources/js/app.js']); ?>

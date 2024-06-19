@@ -39,9 +39,11 @@ endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Advanced <?php echo e(ucfirst(request('table'))); ?> Search (<?php echo e(count($table_data)); ?>)
+                    <label for="exampleInputEmail1" class="form-label h5">
+                        <span class="badge text-bg-secondary">Advanced <?php echo e(ucfirst(request('table'))); ?> Search (<?php echo e(!empty($search)?count($table_data).'/'.$table_data_count_overall:count($table_data)); ?>)</span>
+
                     </label>
-                    <input type="text" class="form-control" name="search" value="<?php echo e(request()->get('search')); ?>">
+                    <input type="text" class="form-control" name="search" value="<?php echo e($search); ?>">
                     <div id="" class="form-text">
                         <div class="mt-2 text-primary">Example Search Format: <?php echo e($searchPlaceholder); ?></div>
                     </div>

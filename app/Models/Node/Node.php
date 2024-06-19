@@ -30,10 +30,10 @@ class Node extends Model
 
     public const Authentication_Levels = [
         1 => 'Authenticated',
-        0 => 'Un Authenticated',
+        0 => 'Unauthenticated',
         2 => 'Public',
     ];
-    public const NODE_STATUS = [1 => 'Active', 0 => 'In Active'];
+    public const NODE_STATUS = [1 => 'Enabled', 0 => 'Disabled'];
 
     public const NODE_TYPE = [1 => 'Route', 2 => 'Link', 3 => 'Page', 4 => 'Component'];
 
