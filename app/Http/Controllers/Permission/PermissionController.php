@@ -17,11 +17,11 @@ class PermissionController extends Controller
     public function index($permission = null)
     {
         $permissions_count = Permission::all()->count();
-        $max_amount_of_pages = $permissions_count / 6;
+        $max_amount_of_pages = $permissions_count /12;
         \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
         $permissions = Permission::latest()
-            ->skip((int) 6 * (int)  \request('page') - (int) 6)
-            ->take((int) 6)->get();
+            ->skip((int)12 * (int)  \request('page') - (int)12)
+            ->take((int)12)->get();
         return view('Permission.View', ['permissions' => $permissions, 'permissions_count' => $permissions_count, 'permission' => $permission, 'page_count' => \ceil($max_amount_of_pages)]);
     }
 

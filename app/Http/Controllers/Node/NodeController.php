@@ -38,7 +38,7 @@ class NodeController extends Controller
         $translateExamples = [
             'name' => 'Link 1',
             'description' => 'link to the home page',
-            'type' => 'Link',
+            'type' => 'link',
             "uuid" => 'asdalsdlada'
         ];
 
@@ -84,7 +84,6 @@ class NodeController extends Controller
         $node_count = $nodes->count();
         $max_amount_of_pages
             = $nodes->get()->count() / 8;
-        // take(\request('load_more'))
         \request()->merge([
             'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
             'search' =>  request()->get('search')

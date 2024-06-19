@@ -1,4 +1,4 @@
-id,key,properties,tenant_id,allowed_for_api_use,created_at,updated_at
+id,key,properties,tenant_id,allowed_for_api_use
 72,admin_role,"Super Admin_1",,0,,
 75,mail_host,sandbox.smtp.mailtrap.io,,0,,
 76,mail_port,2525,,0,,
@@ -8,9 +8,9 @@ id,key,properties,tenant_id,allowed_for_api_use,created_at,updated_at
 80,mail_from_address,laravel_reimagined@noreply.com,,0,,
 81,mail_from_name,"Laravel Re Imagined",,0,,
 82,app_url,http://localhost:8000,,0,,
-83,app_animation,w3-animate-opacity_w3-animate-opacity,,1,,"2024-06-08 17:11:04"
+83,app_animation,w3-animate-left_w3-animate-left,,1,,"2024-06-18 20:51:35"
 84,app_auditing,true_1,,0,,"2024-06-07 21:44:19"
-85,app_version,1.99,,1,,"2024-06-08 15:56:57"
+85,app_version,0.9,,1,,"2024-06-17 15:12:29"
 86,allowed_login_roles,Authenticated--User_2|Admin_3,,0,,
 87,delete_inactive_users,6,,0,,
 88,site_email_address,laravelreimagined@gmail.com,,1,,
@@ -19,4 +19,5 @@ id,key,properties,tenant_id,allowed_for_api_use,created_at,updated_at
 91,redirect_to_after_logout,Login_/login,,1,,"2024-06-08 16:29:31"
 92,multi_tenancy,0_false,,0,,
 93,registration_role,"Authenticated User_2",,0,"2024-06-07 21:29:02","2024-06-07 21:33:57"
-94,app_name,"Laravel Re Imagined  V1.99",,1,"2024-06-07 21:31:57","2024-06-07 21:31:57"
+94,app_name,"Laravel Re-Imagined",,1,"2024-06-07 21:31:57","2024-06-17 15:13:03"
+95,mail_mailer,smtp,,0,"2024-06-11 17:05:37","2024-06-11 17:05:37"
