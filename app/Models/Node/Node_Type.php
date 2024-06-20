@@ -52,10 +52,17 @@ class Node_Type extends Model
                 }
                 return false;
             })->join('/');
+        // creates a string that has node layouts as option
+        $layouts = '';
+        Node::where('node_type', 5)->get()->each(function ($layout) use (&$layouts, $filler) {
+            $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->layout_id == $layout->id ? "selected" : '';
+            $layouts .= "<option value='" . $layout->id . "'$selected>" . $layout->name . "</option>";
+        });
         $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
         $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
         $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;
         $actual_component = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->actual_component;
+        $layout_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->layout_name;
         $link_page_node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
         $is_auditing_on = (int) optional(collect(Cache::get('settings'))
             ->where('key', 'app_auditing')->first())
@@ -139,22 +146,51 @@ class Node_Type extends Model
                 'rules' => [],
                 'handle' => [
                     'page_link' => ['location' => 'properties'],
-                    'actual_component' => ['location' => 'properties']
+                    'actual_component' => ['location' => 'properties'],
+                    'layout_id' => ['location' => 'properties'],
+                    'layout_name' => ['location' => 'properties']
                 ],
                 'extra_html' => "<div><input
                     type='hidden' name='page_link'
                     id='page_link'
                      value='" . $page_link . "'>
+                     <input
+                    type='hidden' name='layout_name'
+                    id='layout_name'
+                     value='" . $layout_name . "'>
                      <div class='mb-3'>
                     <label for='route ' class='form-label'>Actual Framework Component Name (react)</small></label>
                     <input
                     type='text' class='form-control'
                      id='actual_component' aria-describedby='actual_component' name='actual_component'
                      value='" . $actual_component . "' required>
-                </div>
+                     </div>
+                     <div class='mb-3'>
+                      <label for='layouts' class='form-label'>Layouts</label>
+                      <select id='layouts' class='form-select' name='layout_id'>
+                      <option value=''>Select a layout..</option>
+                      $layouts
+                      </select>
+                     </div>
                      </div>",
             ],
             'component' => ['id' => 4, 'rules' => [], 'handle' => []],
+            'layout' => [
+                'id' => 5,
+                'rules' => [],
+                'handle' => [
+                    'actual_component' => ['location' => 'properties']
+                ],
+                'extra_html' => "<div>
+                     <div class='mb-3'>
+                    <label for='' class='form-label'>Actual Framework Layout Name (react)</small></label>
+                    <input
+                    type='text' class='form-control'
+                     id='actual_component' aria-describedby='actual_component' name='actual_component'
+                     value='" . $actual_component . "' required>
+                     </div>
+                     </div>",
+            ],
         ]);
     }
 

@@ -35,7 +35,7 @@ class Node extends Model
     ];
     public const NODE_STATUS = [1 => 'Enabled', 0 => 'Disabled'];
 
-    public const NODE_TYPE = [1 => 'Route', 2 => 'Link', 3 => 'Page', 4 => 'Component'];
+    public const NODE_TYPE = [1 => 'Route', 2 => 'Link', 3 => 'Page', 4 => 'Component', 5 => 'Layout'];
 
     public function getAllControllerClasses()
     {
@@ -155,18 +155,40 @@ class Node extends Model
     {
         if (\optional($this->node_type)['value'] == 2 && !empty(\optional(optional($this->properties)['value'])->node_page)) {
             $page =   Node::find((int) $this->properties['value']->node_page);
+
             // \dd(collect($page->properties['value'])->toArray());
             // dd($page->toArray(),$this->toArray());
             $page->update([
                 'properties' => \json_encode([
                     'page_link' => $this->name,
-                    'actual_component' => $page->properties['value']->actual_component
+                    'actual_component' => $page->properties['value']->actual_component,
                 ]),
                 'permission_id' => $this->permission_id,
             ]);
         }
         return $this;
     }
+
+    public function updatePageLayoutName()
+    {
+        if (\optional($this->node_type)['value'] == 3) {
+            $layout = !empty(\optional(optional($this->properties)['value'])->layout_id) ?
+                Node::find((int) $this->properties['value']->layout_id) : null;
+            $this->update([
+                'properties' => \json_encode([
+                    'page_link'
+                    => $this->properties['value']->page_link,
+                    'actual_component' => $this->properties['value']->actual_component,
+                    'layout_id' => !empty(\optional(optional($this->properties)['value'])->layout_id) ? $this->properties['value']->layout_id : '',
+                    'layout_name' => !empty(\optional(optional($this->properties)['value'])->layout_id) ? $layout->name : ''
+                ]),
+                'permission_id' => $this->permission_id,
+            ]);
+        }
+        return $this;
+    }
+
+
 
     public function permission()
     {

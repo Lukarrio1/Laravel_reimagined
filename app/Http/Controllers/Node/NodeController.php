@@ -54,7 +54,7 @@ class NodeController extends Controller
         })->join('|');
 
         // Parse the search parameter from the request and create key-value pairs
-        $searchParams = collect(explode('|', request()->get('search')))
+        $searchParams = empty(request()->get('search')) ? \collect([]) : collect(explode('|', request()->get('search')))
             ->filter(fn ($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
@@ -94,7 +94,7 @@ class NodeController extends Controller
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
-            'nodes_count' =>$node_count,
+            'nodes_count' => $node_count,
             'nodes' => $nodes->latest("updated_at")->customPaginate(8, (int)\request()->get('page'))->get()
                 ->when($node, fn ($collection) => [$node, ...$collection->filter(fn ($item) => \optional($item)->id != $node->id)]),
             'node' => $node,
@@ -103,7 +103,7 @@ class NodeController extends Controller
             'search_placeholder' => $searchPlaceholder,
             'page_count' => \ceil($max_amount_of_pages),
             'search' => request()->get('search'),
-            'nodes_count_overall'=> $nodes_count_overall
+            'nodes_count_overall' => $nodes_count_overall
         ]);
     }
 
@@ -132,7 +132,9 @@ class NodeController extends Controller
             'properties' => (new Node_Type())->handler($current_node_type['handle'], $request->all()),
             'uuid' => !empty($current_node->uuid) ? $current_node->uuid : Str::random(50),
         ])
-            ->updatePageLink();
+            ->updatePageLink()
+            ->updatePageLayoutName();
+
 
         return \redirect()->route('viewNodes');
     }

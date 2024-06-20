@@ -5,9 +5,6 @@
                 <div class="mb-3">
                     <label for="search" class="form-label h3">
                         <span class="badge text-bg-secondary"> Nodes: (<?php echo e(!empty($search)?$nodes_count.'/'.$nodes_count_overall:$nodes_count); ?>)</span>
-
-
-
                     </label>
                     <input type="text" class="form-control" id="node_search" name="search" value="<?php echo e($search); ?>" placeholder="Search...">
                     <div class="mt-2 text-primary">Example Search Format: <?php echo e($search_placeholder); ?>, press enter to search</div>
@@ -15,7 +12,8 @@
             </form>
         </div>
         <div class="card-body scrollable-div">
-            <table class="table">
+            <table class="table table-striped">
+
                 <thead>
                     <tr>
                         <th scope="col" class="text-center h4 ">Name</th>
@@ -50,7 +48,7 @@
                         <td><?php echo e($Node->uuid); ?></td>
                         <td><?php echo $Node->properties['html_value']; ?></td>
                         <td>
-                            <ul class="list-group list-group-flush">
+                            <ul class="list-group list-group-flush pt-2">
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view nodes edit button', auth()->user())): ?>
                                 <li class="list-group-item text-center">
                                     <a href="<?php echo e(route('viewNode',['node'=>$Node])); ?>" class="btn btn-warning btn-sm m-2 h4" title="edit node">

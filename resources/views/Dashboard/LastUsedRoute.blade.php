@@ -4,7 +4,8 @@
         <div class="card-body">
             <ul class="list-group list-group-flush">
                 @foreach ($last_used_routes as $route )
-                <li class="list-group-item text-center h6">{{$route->name}} was used at {{$route->created_at->diffForHumans()}}</li>
+                <li class="list-group-item text-center h6">{{$route->name}} was used at {{optional($route->created_at)->diffForHumans()}}</li>
+
                 @endforeach
             </ul>
         </div>

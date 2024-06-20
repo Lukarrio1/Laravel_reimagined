@@ -12,7 +12,8 @@
             </form>
         </div>
         <div class="card-body scrollable-div">
-            <table class="table">
+            <table class="table table-striped">
+
                 <thead>
                     <tr>
                         <th scope="col" class="text-center h4 ">Name</th>
@@ -47,7 +48,7 @@
                         <td>{{$Node->uuid}}</td>
                         <td>{!!$Node->properties['html_value']!!}</td>
                         <td>
-                            <ul class="list-group list-group-flush">
+                            <ul class="list-group list-group-flush pt-2">
                                 @can('can view nodes edit button', auth()->user())
                                 <li class="list-group-item text-center">
                                     <a href="{{route('viewNode',['node'=>$Node])}}" class="btn btn-warning btn-sm m-2 h4" title="edit node">
