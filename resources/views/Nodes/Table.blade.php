@@ -12,7 +12,7 @@
             </form>
         </div>
         <div class="card-body scrollable-div">
-            <table class="table table-striped">
+            <table class="table table-white table-hover">
 
                 <thead>
                     <tr>
@@ -27,6 +27,8 @@
                         <th scope="col" class="text-center h4">Status</th>
 
                         <th scope="col" class="text-center h4">Permission</th>
+
+                        <th scope="col" class="text-center h4">Verbiage</th>
 
                         <th scope="col" class="text-center h4">UUID</th>
 
@@ -45,6 +47,15 @@
                         <td>{{$Node->node_type['human_value']}}</td>
                         <td>{{$Node->node_status['human_value']}}</td>
                         <td>{{optional(optional($Node)->permission)->name}}</td>
+                        <td>
+                            <ul class="list-group list-group-flush pt-2">
+                                @foreach (collect($Node->verbiage['human_value'])->keys() as $key )
+                                <li class="list-group-item text-center">
+                                    {{$key.": ".$Node->verbiage['human_value'][$key]}}
+                                </li>
+                                @endforeach
+                            </ul>
+                        </td>
                         <td>{{$Node->uuid}}</td>
                         <td>{!!$Node->properties['html_value']!!}</td>
                         <td>

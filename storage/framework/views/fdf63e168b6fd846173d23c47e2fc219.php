@@ -12,7 +12,7 @@
             </form>
         </div>
         <div class="card-body scrollable-div">
-            <table class="table table-striped">
+            <table class="table table-white table-hover">
 
                 <thead>
                     <tr>
@@ -27,6 +27,8 @@
                         <th scope="col" class="text-center h4">Status</th>
 
                         <th scope="col" class="text-center h4">Permission</th>
+
+                        <th scope="col" class="text-center h4">Verbiage</th>
 
                         <th scope="col" class="text-center h4">UUID</th>
 
@@ -45,6 +47,16 @@
                         <td><?php echo e($Node->node_type['human_value']); ?></td>
                         <td><?php echo e($Node->node_status['human_value']); ?></td>
                         <td><?php echo e(optional(optional($Node)->permission)->name); ?></td>
+                        <td>
+                            <ul class="list-group list-group-flush pt-2">
+                                <?php $__currentLoopData = collect($Node->verbiage['human_value'])->keys(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li class="list-group-item text-center">
+                                    <?php echo e($key.": ".$Node->verbiage['human_value'][$key]); ?>
+
+                                </li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                        </td>
                         <td><?php echo e($Node->uuid); ?></td>
                         <td><?php echo $Node->properties['html_value']; ?></td>
                         <td>

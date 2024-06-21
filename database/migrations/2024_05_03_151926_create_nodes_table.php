@@ -21,6 +21,7 @@ return new class () extends Migration {
             $table->integer('permission_id')->default(0);
             $table->longText('uuid')->nullable();
             $table->string('tenant_id')->nullable();
+            $table->longText('verbiage')->nullable();
             $table->timestamps();
         });
     }

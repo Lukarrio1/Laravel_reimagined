@@ -151,6 +151,16 @@ class Node extends Model
         return ['value' => $value, 'human_value' => self::NODE_STATUS[$value]];
     }
 
+
+    public function getVerbiageAttribute($value)
+    {
+        $verbiage = collect([]);
+        collect(\explode('||', $value))->map(function ($item) use ($verbiage) {
+            $segments = collect(\explode(':', $item));
+            $verbiage->put($segments->first(), \str_replace('"', '', $segments->last()));
+        });
+        return ['value' => $value, 'human_value' => $verbiage];
+    }
     public function updatePageLink()
     {
         if (\optional($this->node_type)['value'] == 2 && !empty(\optional(optional($this->properties)['value'])->node_page)) {
@@ -177,8 +187,8 @@ class Node extends Model
             $this->update([
                 'properties' => \json_encode([
                     'page_link'
-                    => $this->properties['value']->page_link,
-                    'actual_component' => $this->properties['value']->actual_component,
+                    =>\optional($this->properties['value'])->page_link,
+                    'actual_component' => \optional($this->properties['value'])->actual_component,
                     'layout_id' => !empty(\optional(optional($this->properties)['value'])->layout_id) ? $this->properties['value']->layout_id : '',
                     'layout_name' => !empty(\optional(optional($this->properties)['value'])->layout_id) ? $layout->name : ''
                 ]),
