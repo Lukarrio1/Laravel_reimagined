@@ -1,7 +1,7 @@
 <?php $__env->startSection('content'); ?>
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-        <div class="card-header text-center bg-white h4">
+        <div class="card-header text-center bg-white  h3 fw-bold">
             Settings
         </div>
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings edit or create form', auth()->user())): ?>
@@ -55,7 +55,6 @@ unset($__errorArgs, $__bag); ?>
                             <?php $__currentLoopData = ['Yes'=>1,'No'=>0]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($value); ?>" <?php echo e($allowed_for_api_use==$value?'selected':''); ?>><?php echo e($key); ?></option>
 
-
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
@@ -78,28 +77,36 @@ unset($__errorArgs, $__bag); ?>
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Settings key</th>
-                        <th scope="col">Settings Value</th>
-                        <th scope="col">Allowed For Api Use</th>
-                        <th scope="col">Action</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Settings key</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Settings Value</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Allowed For Api Use</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $__currentLoopData = $settings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $setting): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td><?php echo e($setting->getAllSettingKeys($setting->key)); ?></td>
-                        <td><?php echo $setting->getSettingValue('first'); ?></td>
-                        <td><?php echo e($setting->allowed_for_api_use?"Yes":"No"); ?></td>
                         <td>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings delete button',auth()->user())): ?>
-                            <form action="<?php echo e(route('deleteSetting',['setting_key'=>$setting->key])); ?>" method="post">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('delete'); ?>
-                                <button class="btn btn-sm btn-danger" type="submit">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                            </form>
-                            <?php endif; ?>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo e($setting->getAllSettingKeys($setting->key)); ?></div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo $setting->getSettingValue('first'); ?></div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo e($setting->allowed_for_api_use?"Yes":"No"); ?></div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold">
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings delete button',auth()->user())): ?>
+                                <form action="<?php echo e(route('deleteSetting',['setting_key'=>$setting->key])); ?>" method="post">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('delete'); ?>
+                                    <button class="btn btn-sm btn-danger" type="submit">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

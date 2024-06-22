@@ -2,7 +2,7 @@
 @section('content')
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-        <div class="card-header text-center bg-white h4">
+        <div class="card-header text-center bg-white  h3 fw-bold">
             Settings
         </div>
         @can('can view settings edit or create form', auth()->user())
@@ -41,7 +41,6 @@
                             @foreach (['Yes'=>1,'No'=>0] as $key=>$value )
                             <option value="{{$value}}" {{$allowed_for_api_use==$value?'selected':''}}>{{$key}}</option>
 
-
                             @endforeach
                         </select>
                     </div>
@@ -64,28 +63,36 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Settings key</th>
-                        <th scope="col">Settings Value</th>
-                        <th scope="col">Allowed For Api Use</th>
-                        <th scope="col">Action</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Settings key</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Settings Value</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Allowed For Api Use</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($settings as $setting )
                     <tr>
-                        <td>{{$setting->getAllSettingKeys($setting->key)}}</td>
-                        <td>{!!$setting->getSettingValue('first')!!}</td>
-                        <td>{{$setting->allowed_for_api_use?"Yes":"No"}}</td>
                         <td>
-                            @can('can view settings delete button',auth()->user())
-                            <form action="{{route('deleteSetting',['setting_key'=>$setting->key])}}" method="post">
-                                @csrf
-                                @method('delete')
-                                <button class="btn btn-sm btn-danger" type="submit">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                            </form>
-                            @endcan
+                            <div class="text-bg-light text-center p-3 fw-semibold">{{$setting->getAllSettingKeys($setting->key)}}</div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold">{!!$setting->getSettingValue('first')!!}</div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold">{{$setting->allowed_for_api_use?"Yes":"No"}}</div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold">
+                                @can('can view settings delete button',auth()->user())
+                                <form action="{{route('deleteSetting',['setting_key'=>$setting->key])}}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                    <button class="btn btn-sm btn-danger" type="submit">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                                @endcan
+                            </div>
                         </td>
                     </tr>
                     @endforeach

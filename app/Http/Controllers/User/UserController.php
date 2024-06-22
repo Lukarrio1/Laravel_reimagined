@@ -19,6 +19,7 @@ class UserController extends Controller
         $this->middleware('can:can crud users');
     }
 
+
     public function index()
     {
         $translate = [
@@ -95,8 +96,8 @@ class UserController extends Controller
             'search_placeholder' => $searchPlaceholder,
             'users_count' => $users_count,
             'page_count' => \ceil($max_amount_of_pages),
-            'users_count_overall'=>User::query()->count(),
-            'search'=>\request('search')
+            'users_count_overall' => User::query()->count(),
+            'search' => \request('search')
         ]);
     }
 

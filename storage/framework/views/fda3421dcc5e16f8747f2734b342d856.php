@@ -1,42 +1,55 @@
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Fullname</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Role</th>
-                        <th scope="col" class="text-center">Action</th>
+                        
+                        <th scope="col" class="h4 fw-bold text-center">Fullname</th>
+
+                        <th scope="col" class="h4 fw-bold text-center">Email</th>
+
+                        <th scope="col" class="h4 fw-bold text-center">Role</th>
+
+                        <th scope="col" class="h4 fw-bold text-center">Action</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <th scope="row"><?php echo e($key); ?></th>
-                        <td><?php echo e($user->name); ?></td>
-                        <td><?php echo e($user->email); ?></td>
-                        <td><?php echo e($user->role_name); ?></td>
-                        <td class="text-center">
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view users assign roles button', auth()->user())): ?>
-                            <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#assignRoleModal<?php echo e($user->id); ?>" title="assign role to user">
-                                <i class="fas fa-user-plus"></i>
-                            </button>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view users edit button', auth()->user())): ?>
-                            <button type="button" class="btn btn-warning m-1 user_edit_button" data-bs-toggle="modal" data-bs-target="#editUserModal" title="edit user" data-user-id="<?php echo e($user->id); ?>">
-                                <i class="fa fa-wrench" aria-hidden="true"></i>
-                            </button>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view users delete button', auth()->user())): ?>
-                            <form action="<?php echo e(route('deleteUser',['user'=>$user])); ?>" method="post">
-                                <?php echo method_field('delete'); ?>
-                                <?php echo csrf_field(); ?>
-                                <button type="submit" class="btn btn-sm btn-danger m-1" title="delete user"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                            </form>
-                            <?php endif; ?>
+                        
+                        <td>
+                            <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e($user->name); ?></div>
 
+                        </td>
+                        <td>
+                            <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e($user->email); ?></div>
+
+                        </td>
+                        <td>
+                            <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e($user->role_name); ?></div>
+
+                        </td>
+                        <td class="text-center">
+                            <div class="text-bg-light p-3 fw-semibold">
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view users assign roles button', auth()->user())): ?>
+                                <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#assignRoleModal<?php echo e($user->id); ?>" title="assign role to user">
+                                    <i class="fas fa-user-plus"></i>
+                                </button>
+                                <?php endif; ?>
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view users edit button', auth()->user())): ?>
+                                <button type="button" class="btn btn-warning m-1 user_edit_button" data-bs-toggle="modal" data-bs-target="#editUserModal" title="edit user" data-user-id="<?php echo e($user->id); ?>">
+                                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                                </button>
+                                <?php endif; ?>
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view users delete button', auth()->user())): ?>
+                                <form action="<?php echo e(route('deleteUser',['user'=>$user])); ?>" method="post">
+                                    <?php echo method_field('delete'); ?>
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="btn btn-sm btn-danger m-1" title="delete user"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                </form>
+                                <?php endif; ?></div>
                         </td>
                     </tr>
                     <div class="modal fade" id="assignRoleModal<?php echo e($user->id); ?>" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">

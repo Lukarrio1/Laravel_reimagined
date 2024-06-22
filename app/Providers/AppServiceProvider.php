@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -38,5 +39,6 @@ class AppServiceProvider extends ServiceProvider
             'mail_url' =>  \optional($setting->where('key', 'mail_url')->first())->properties,
         ];
         Config::set('mail', $mail_config);
+        (new User())->deleteInactiveUsers();
     }
 }

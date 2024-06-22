@@ -13,51 +13,62 @@
 
         </div>
         <div class="card-body">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center">Role Name</th>
-                        <th scope="col" class="text-center">Role Priority</th>
-                        <th scope="col" class="text-center">Role Permissions</th>
-                        <th scope="col" class="text-center">Action</th>
+                        <th scope="col" class="text-center  h4 fw-bold">Role Name</th>
+
+                        <th scope="col" class="text-center  h4 fw-bold">Role Priority</th>
+
+                        <th scope="col" class="text-center  h4 fw-bold">Role Permissions</th>
+
+                        <th scope="col" class="text-center  h4 fw-bold">Action</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($roles as $Role )
                     <tr>
-                        <td class="text-center">{{$Role['name']}}</td>
-                        <td class="text-center">{{$Role['priority']}}</td>
                         <td class="text-center">
-                            <ul class="list-group-flush">
-                                @foreach ($Role['permission_name'] as $name )
-                                <li class="list-group-item">
-                                    <bold>{{$name}}</bold>
-                                </li>
-                                @endforeach
-                            </ul>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Role['name']}}</div>
                         </td>
                         <td class="text-center">
-
-                            @can('can view roles edit button', auth()->user())
-                            <a href="{{route('editRole',['role'=>$Role['id']])}}" class="btn btn-sm btn-warning m-2">
-                                @if(optional($role)->id==$Role['id'])
-                                <i class="fa fa-spinner" aria-hidden="true"></i>
-                                @else
-                                <i class="fa fa-wrench" aria-hidden="true"></i>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Role['priority']}}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="text-bg-light p-3 fw-semibold">
+                                <ul class="list-group-flush">
+                                    @foreach ($Role['permission_name'] as $name )
+                                    <li class="list-group-item">
+                                        <bold>{{$name}}</bold>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="text-bg-light p-3 fw-semibold">
+                                @can('can view roles edit button', auth()->user())
+                                <a href="{{route('editRole',['role'=>$Role['id']])}}" class="btn btn-sm btn-warning m-2">
+                                    @if(optional($role)->id==$Role['id'])
+                                    <i class="fa fa-spinner" aria-hidden="true"></i>
+                                    @else
+                                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                                    @endif
+                                </a>
+                                @endcan
+                                @if($Role['core']!=1)
+                                @can('can view roles delete button', auth()->user())
+                                <form action="{{route('deleteRole',['role'=>$Role['id']])}}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                    <button class="btn btn-sm btn-danger" type="submit">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                                @endcan
                                 @endif
-                            </a>
-                            @endcan
-                            @if($Role['core']!=1)
-                            @can('can view roles delete button', auth()->user())
-                            <form action="{{route('deleteRole',['role'=>$Role['id']])}}" method="post">
-                                @csrf
-                                @method('delete')
-                                <button class="btn btn-sm btn-danger" type="submit">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                            </form>
-                            @endcan
-                            @endif
+                            </div>
                         </td>
                     </tr>
                     @endforeach

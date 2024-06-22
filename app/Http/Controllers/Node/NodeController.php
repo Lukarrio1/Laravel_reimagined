@@ -132,8 +132,9 @@ class NodeController extends Controller
             'properties' => (new Node_Type())->handler($current_node_type['handle'], $request->all()),
             'uuid' => !empty($current_node->uuid) ? $current_node->uuid : Str::random(50),
         ])
+            ->updatePageLayoutName()
             ->updatePageLink()
-            ->updatePageLayoutName();
+           ;
 
 
         return \redirect()->route('viewNodes');

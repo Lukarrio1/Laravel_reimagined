@@ -16,37 +16,52 @@
 
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center h4 ">Name</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Name</th>
 
-                        <th scope="col" class="text-center h4">Description</th>
+                        <th scope="col" class="text-center h4 fw-bold">Description</th>
 
-                        <th scope="col" class="text-center h4">Authentication Level</th>
+                        <th scope="col" class="text-center h4 fw-bold">Authentication Level</th>
 
-                        <th scope="col" class="text-center h4">Type</th>
+                        <th scope="col" class="text-center h4 fw-bold">Type</th>
 
-                        <th scope="col" class="text-center h4">Status</th>
+                        <th scope="col" class="text-center h4 fw-bold">Status</th>
 
-                        <th scope="col" class="text-center h4">Permission</th>
+                        <th scope="col" class="text-center h4 fw-bold">Permission</th>
 
-                        <th scope="col" class="text-center h4">Verbiage</th>
+                        <th scope="col" class="text-center h4 fw-bold">Verbiage</th>
 
-                        <th scope="col" class="text-center h4">UUID</th>
+                        <th scope="col" class="text-center h4 fw-bold">UUID</th>
 
-                        <th scope="col" class="text-center h4">Properties</th>
+                        <th scope="col" class="text-center h4 fw-bold">Properties</th>
 
-                        <th scope="col" class="text-center h4">Action</th>
+                        <th scope="col" class="text-center h4 fw-bold">Action</th>
 
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($nodes as $Node )
                     <tr>
-                        <td><strong>{{$Node->name}}</strong></td>
-                        <td>{{$Node->small_description}}</td>
-                        <td>{{$Node->authentication_level['human_value']}}</td>
-                        <td>{{$Node->node_type['human_value']}}</td>
-                        <td>{{$Node->node_status['human_value']}}</td>
-                        <td>{{optional(optional($Node)->permission)->name}}</td>
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold"><strong>{{$Node->name}}</strong></div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Node->small_description}}</div>
+                        </td>
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Node->authentication_level['human_value']}}</div>
+                        </td>
+
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Node->node_type['human_value']}}</div>
+                        </td>
+
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Node->node_status['human_value']}}</div>
+                        </td>
+
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold">{{optional(optional($Node)->permission)->name}}</div>
+                        </td>
                         <td>
                             <ul class="list-group list-group-flush pt-2">
                                 @foreach (collect($Node->verbiage['human_value'])->keys() as $key )
@@ -56,7 +71,9 @@
                                 @endforeach
                             </ul>
                         </td>
-                        <td>{{$Node->uuid}}</td>
+                        <td>
+                            <div class="text-bg-light p-3 fw-semibold">{{$Node->uuid}}</div>
+                        </td>
                         <td>{!!$Node->properties['html_value']!!}</td>
                         <td>
                             <ul class="list-group list-group-flush pt-2">
@@ -90,8 +107,6 @@
                     @endforeach
                 </tbody>
             </table>
-
-
         </div>
         <div class="card-footer bg-white">
             <div class="text-center">

@@ -13,51 +13,62 @@
 
         </div>
         <div class="card-body">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center">Role Name</th>
-                        <th scope="col" class="text-center">Role Priority</th>
-                        <th scope="col" class="text-center">Role Permissions</th>
-                        <th scope="col" class="text-center">Action</th>
+                        <th scope="col" class="text-center  h4 fw-bold">Role Name</th>
+
+                        <th scope="col" class="text-center  h4 fw-bold">Role Priority</th>
+
+                        <th scope="col" class="text-center  h4 fw-bold">Role Permissions</th>
+
+                        <th scope="col" class="text-center  h4 fw-bold">Action</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $Role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td class="text-center"><?php echo e($Role['name']); ?></td>
-                        <td class="text-center"><?php echo e($Role['priority']); ?></td>
                         <td class="text-center">
-                            <ul class="list-group-flush">
-                                <?php $__currentLoopData = $Role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <li class="list-group-item">
-                                    <bold><?php echo e($name); ?></bold>
-                                </li>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </ul>
+                            <div class="text-bg-light p-3 fw-semibold"><?php echo e($Role['name']); ?></div>
                         </td>
                         <td class="text-center">
-
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view roles edit button', auth()->user())): ?>
-                            <a href="<?php echo e(route('editRole',['role'=>$Role['id']])); ?>" class="btn btn-sm btn-warning m-2">
-                                <?php if(optional($role)->id==$Role['id']): ?>
-                                <i class="fa fa-spinner" aria-hidden="true"></i>
-                                <?php else: ?>
-                                <i class="fa fa-wrench" aria-hidden="true"></i>
+                            <div class="text-bg-light p-3 fw-semibold"><?php echo e($Role['priority']); ?></div>
+                        </td>
+                        <td class="text-center">
+                            <div class="text-bg-light p-3 fw-semibold">
+                                <ul class="list-group-flush">
+                                    <?php $__currentLoopData = $Role['permission_name']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li class="list-group-item">
+                                        <bold><?php echo e($name); ?></bold>
+                                    </li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="text-bg-light p-3 fw-semibold">
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view roles edit button', auth()->user())): ?>
+                                <a href="<?php echo e(route('editRole',['role'=>$Role['id']])); ?>" class="btn btn-sm btn-warning m-2">
+                                    <?php if(optional($role)->id==$Role['id']): ?>
+                                    <i class="fa fa-spinner" aria-hidden="true"></i>
+                                    <?php else: ?>
+                                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                                    <?php endif; ?>
+                                </a>
                                 <?php endif; ?>
-                            </a>
-                            <?php endif; ?>
-                            <?php if($Role['core']!=1): ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view roles delete button', auth()->user())): ?>
-                            <form action="<?php echo e(route('deleteRole',['role'=>$Role['id']])); ?>" method="post">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('delete'); ?>
-                                <button class="btn btn-sm btn-danger" type="submit">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                            </form>
-                            <?php endif; ?>
-                            <?php endif; ?>
+                                <?php if($Role['core']!=1): ?>
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view roles delete button', auth()->user())): ?>
+                                <form action="<?php echo e(route('deleteRole',['role'=>$Role['id']])); ?>" method="post">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('delete'); ?>
+                                    <button class="btn btn-sm btn-danger" type="submit">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                                <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

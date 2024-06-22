@@ -22,7 +22,7 @@ class AuthController extends Controller
         $setting = \optional(Setting::where('key', 'registration_role')->first())
             ->getSettingValue();
         $role = !empty($setting) ? Role::find($setting) : null;
-        $user = User::create($request->except('password') + ['password' => Hash::make($request->password), 'password_reset_token' => $token]);
+        $user = User::create($request->except('password') + ['last_login_at' => Carbon::now(), 'password' => Hash::make($request->password), 'password_reset_token' => $token]);
         if (!empty($role)) {
             $user->assignRole($role);
         }
@@ -63,6 +63,7 @@ class AuthController extends Controller
         if (!empty($user)) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
+                User::find($user->id)->update(['last_login_at' => Carbon::now()]);
                 return \response()->json(['token' => $token, 'user' => $user]);
             }
         }
@@ -78,5 +79,4 @@ class AuthController extends Controller
         }
         return \response()->json(['message' => "A mail was sent to the provided email address"]);
     }
-
 }

@@ -1,6 +1,6 @@
 <div class="col-sm-8 offset-sm-2 mt-5">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-        <div class="card-header text-center bg-white h4">
+        <div class="card-header text-center bg-white h3 fw-bold">
             Permission Management
         </div>
         <div class="card-body">

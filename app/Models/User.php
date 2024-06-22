@@ -4,12 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use Carbon\Carbon;
 use App\TenantTrait;
 use App\TracksUserLogin;
 use App\HasCustomPagination;
 use App\Models\Tenant\Tenant;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Scopes\TenantScope;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,7 +44,8 @@ class User extends Authenticatable
         'email',
         'password',
         'password_reset_token',
-        'tenant_id'
+        'tenant_id',
+        'last_login_at'
     ];
     // protected $encryptable = ['name','email'];
 
@@ -130,5 +133,20 @@ class User extends Authenticatable
     public function land()
     {
         return $this->hasOne(Tenant::class, 'owner_id', 'id');
+    }
+
+    public function deleteInactiveUsers()
+    {
+        $delete_inactive_users_after = (int) optional(collect(Cache::get('settings'))->where('key', 'delete_inactive_users')->first())
+            ->getSettingValue('last');
+        if ($delete_inactive_users_after == 0) {
+            return false;
+        }
+        $date_for_deletion = Carbon::now()->addMonths($delete_inactive_users_after);
+        $users = User::select('id', 'last_login_at')
+            ->get()->filter(function ($user) use ($date_for_deletion) {
+                return !empty($user->last_login_at) && Carbon::parse($user->last_login_at)->isAfter($date_for_deletion) ? true : false;
+            });
+        User::whereIn('id', $users->pluck('id'))->delete();
     }
 }

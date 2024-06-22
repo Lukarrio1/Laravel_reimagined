@@ -157,23 +157,22 @@ class Node extends Model
         $verbiage = collect([]);
         collect(\explode('||', $value))->map(function ($item) use ($verbiage) {
             $segments = collect(\explode(':', $item));
-            $verbiage->put($segments->first(), \str_replace('"', '', $segments->last()));
+            $verbiage->put($segments->first(), \str_replace('"', '', $segments->filter(fn ($_, $idx) => $idx > 0)->join(':')));
         });
         return ['value' => $value, 'human_value' => $verbiage];
     }
+
     public function updatePageLink()
     {
         if (\optional($this->node_type)['value'] == 2 && !empty(\optional(optional($this->properties)['value'])->node_page)) {
-            $page =   Node::find((int) $this->properties['value']->node_page);
-
-            // \dd(collect($page->properties['value'])->toArray());
-            // dd($page->toArray(),$this->toArray());
+            $page = Node::find((int) $this->properties['value']->node_page);
             $page->update([
                 'properties' => \json_encode([
                     'page_link' => $this->name,
                     'actual_component' => $page->properties['value']->actual_component,
+                    'layout_id' => !empty(\optional(optional($page->properties)['value'])->layout_id) ? $page->properties['value']->layout_id : '',
+                    'layout_name' => !empty(\optional(optional($page->properties)['value'])->layout_name) ? \optional(optional($page->properties)['value'])->layout_name : ''
                 ]),
-                'permission_id' => $this->permission_id,
             ]);
         }
         return $this;
@@ -187,12 +186,11 @@ class Node extends Model
             $this->update([
                 'properties' => \json_encode([
                     'page_link'
-                    =>\optional($this->properties['value'])->page_link,
+                    => \optional($this->properties['value'])->page_link,
                     'actual_component' => \optional($this->properties['value'])->actual_component,
                     'layout_id' => !empty(\optional(optional($this->properties)['value'])->layout_id) ? $this->properties['value']->layout_id : '',
                     'layout_name' => !empty(\optional(optional($this->properties)['value'])->layout_id) ? $layout->name : ''
                 ]),
-                'permission_id' => $this->permission_id,
             ]);
         }
         return $this;
