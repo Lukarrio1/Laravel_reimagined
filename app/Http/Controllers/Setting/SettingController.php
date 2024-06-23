@@ -26,22 +26,14 @@ class SettingController extends Controller
     public function index($setting_key = 'admin_role')
     {
         $setting = new Setting();
-
         $setting_key = empty(\request()->get('setting_key')) ? $setting_key : \request()->get('setting_key');
-        $multi_tenancy_role_id = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
-        $role_for_checking = !empty($setting) ? Role::find((int)$multi_tenancy_role_id) : null;
         $field_value = optional(collect(Cache::get('settings')));
-
         return view('Setting.View', [
             'keys' => $setting->getAllSettingKeys(),
             'key_value' => $setting->SETTING_KEYS($setting_key, $field_value)['field'],
-            'allowed_for_api_use' => \collect(Setting::query()->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
+            'allowed_for_api_use' => \collect(Cache::get('settings')->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
             'setting_key' => $setting_key,
             'settings' => $setting->query()
-                ->when(
-                    !empty(\auth()->user()) && !empty($role_for_checking) && \auth()->user()->hasRole($role_for_checking),
-                    fn ($q) => $q->where('tenant_id', \auth()->user()->tenant_id)
-                )
                 ->latest('updated_at')
                 ->get(),
         ]);

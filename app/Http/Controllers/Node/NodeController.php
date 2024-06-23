@@ -82,9 +82,11 @@ class NodeController extends Controller
                 $nodes->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
             })
         );
+
         $node_count = $nodes->count();
         $max_amount_of_pages
-            = $nodes->get()->count() / 8;
+            = $node_count / 8;
+
         \request()->merge([
             'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
             'search' =>  request()->get('search')
@@ -95,7 +97,7 @@ class NodeController extends Controller
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $node_count,
-            'nodes' => $nodes->latest("updated_at")->customPaginate(8, (int)\request()->get('page'))->get()
+            'nodes' => $nodes->latest("updated_at")->with('permission')->customPaginate(8, (int)\request()->get('page'))->get()
                 ->when($node, fn ($collection) => [$node, ...$collection->filter(fn ($item) => \optional($item)->id != $node->id)]),
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
@@ -133,8 +135,7 @@ class NodeController extends Controller
             'uuid' => !empty($current_node->uuid) ? $current_node->uuid : Str::random(50),
         ])
             ->updatePageLayoutName()
-            ->updatePageLink()
-           ;
+            ->updatePageLink();
 
 
         return \redirect()->route('viewNodes');

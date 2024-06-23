@@ -23,23 +23,6 @@ Auth::routes();
 
 
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
-
-    if (!Cache::has('settings')) {
-        Cache::add('settings', Setting::where('tenant_id', auth()->user()->tenant_id)->get());
-    }
-    if (!Cache::has('redirect_to_options')) {
-        $links =  Node::query()->where('node_type', 2)->get()->map(function ($item) {
-            $temp = \collect([]);
-            $temp->put('name', $item->name);
-            $temp->put('route', $item->properties['value']->node_route);
-            return $temp->toArray();
-        })->pluck('route', 'name');
-        Cache::add('redirect_to_options', $links);
-    }
-
-
-
-
     Route::get('/nodes', [NodeController::class, 'index'])->name('viewNodes');
     Route::post('/node', [NodeController::class, 'save'])->name('saveNode');
     Route::get('/node/{node}', [NodeController::class, 'node'])->name('viewNode');

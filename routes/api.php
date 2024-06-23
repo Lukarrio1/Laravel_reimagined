@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Models\Setting;
 use App\Models\Node\Node;
 use App\Models\Tenant\Tenant;
@@ -9,22 +10,10 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Middleware\AuthMiddleware;
 
 // Ensure routes are cached
-if (!Cache::has('routes')) {
-    $nodes = Node::where('node_status', 1)
-        ->where('node_type', 1)
-        ->get();
 
-    // Add routes to cache
-    Cache::add('routes', $nodes); // Cache with expiration (optional)
-}
 
-if (!Cache::has('settings')) {
-    Cache::add('settings', Setting::all());
-}
 
-if (!Cache::has('tenants')) {
-    Cache::add('tenants', Tenant::all());
-}
+
 
 
 if (!Cache::has('nodes')) {
@@ -33,8 +22,10 @@ if (!Cache::has('nodes')) {
         ->get());
 }
 
+
 // Retrieve cached routes
-$routes = Cache::get('routes');
+$routes = Cache::get('routes', collect([]));
+(new User())->deleteInactiveUsers();
 
 $routes->each(function ($route) {
     $properties = $route->properties['value'];
@@ -60,4 +51,3 @@ $routes->each(function ($route) {
     Route::$method($node_route, [$controller, $methodName])
         ->middleware(AuthMiddleware::class);
 });
-

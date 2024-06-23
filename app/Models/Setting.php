@@ -105,7 +105,7 @@ class Setting extends Model
     // }
     public function SETTING_KEYS($key, $field_value)
     {
-        $roles = Role::all()->pluck('id', 'name');
+        $roles = Cache::get('roles');
         $keys = collect([
             'admin_role' => [
                 'field' => $this->SETTING_OPTIONS('drop_down', $roles, $key, $field_value),
@@ -192,17 +192,22 @@ class Setting extends Model
                 'handle' => ['action' => '', 'value' => ''],
             ],
             'redirect_to_after_login' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options',[]), $key, $field_value),
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options', []), $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'redirect_to_after_register' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options',[]), $key, $field_value),
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options', []), $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'redirect_to_after_logout' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options',[]), $key, $field_value),
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options', []), $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
+            'cache_driver' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', ['File Storage' => 'file', 'Database Storage' => 'database'], $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
+
             // delete_inactive_users
             // 'not_exportable_tables' => [
             //     'field' => $this->SETTING_OPTIONS('multi_select', \collect(array_flip(\collect((new Export())->getAllTables())->toArray())), $key, Cache::get('not_exportable_tables', [])),
@@ -241,8 +246,9 @@ class Setting extends Model
     public function getAllSettingKeys($key = "")
     {
 
-        $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
-            ->getSettingValue('first');
+        // $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
+        //     ->getSettingValue('first');
+
         $keys = \collect([
             'admin_role' => "Super Admin Role",
             'registration_role' => 'Api Registration Role',
@@ -250,16 +256,17 @@ class Setting extends Model
             'app_name' => 'Application Name',
             'app_url' => 'Application URL',
             'app_version' => 'Application Version',
+            'cache_driver' => 'Cache Driver',
             "site_email_address" => "Site Email Address",
             'app_animation' => 'Application Animation',
-            'multi_tenancy' => 'Api Multi Tenancy',
-            "multi_tenancy_role" => "Api Multi Tenancy Role",
+            // 'multi_tenancy' => 'Api Multi Tenancy',
+            // "multi_tenancy_role" => "Api Multi Tenancy Role",
             "app_auditing" => "Application Auditing",
             "redirect_to_after_login" => "React router redirect to after login",
             "redirect_to_after_register" => "React router redirect to after register",
             "redirect_to_after_logout" => "React router redirect to after logout",
             // 'not_exportable_tables' => 'Not Exportable Tables',
-            "delete_inactive_users" => "Delete Inactive Users (months)",
+            "delete_inactive_users" => "Delete Inactive Users after some (months)",
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
             \strtolower('MAIL_PORT') => 'Mail Port',
@@ -269,11 +276,12 @@ class Setting extends Model
             \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
             \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
             'mail_url' => "Mail Url",
-        ])->when($multi_tenancy == 0, function ($collection) {
-            return $collection->filter((function ($item, $key) {
-                return $key != "multi_tenancy_role";
-            }));
-        });
+        ]);
+        // ->when($multi_tenancy == 0, function ($collection) {
+        //     return $collection->filter((function ($item, $key) {
+        //         return $key != "multi_tenancy_role";
+        //     }));
+        // });
         return $key ? $keys->get($key) : $keys->toArray();
     }
 }

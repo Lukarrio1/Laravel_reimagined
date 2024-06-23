@@ -24,7 +24,7 @@ class Node extends Model
 
     public function __construct()
     {
-        $this->initializeTenancy();
+        // $this->initializeTenancy();
     }
     protected $guarded = ['id'];
 
@@ -134,12 +134,9 @@ class Node extends Model
     public function addAppUrlToNodeRoute($value)
     {
         $value = \collect($value);
-        // $setting = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
-        // // $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
         if (\in_array($this->node_type['value'], [1])) {
             $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
-            // dd(\request()->user(),Auth::user());
-            $seg = $this->node_type['value'] == 2 ? '/' : '/api/' . (!empty($this->owner) ? "tenant/{tenant}/" : '');
+            $seg = $this->node_type['value'] == 2 ? '/' : '/api/';
             $value = $value->put('node_route', $app_url . $seg . $value->get('node_route'));
         }
 
