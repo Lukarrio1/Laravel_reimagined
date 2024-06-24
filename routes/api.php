@@ -16,11 +16,7 @@ use App\Http\Middleware\AuthMiddleware;
 
 
 
-if (!Cache::has('nodes')) {
-    Cache::add('nodes', Node::where('node_status', 1)
-        ->where('node_type', '>', 1)
-        ->get());
-}
+
 
 
 // Retrieve cached routes

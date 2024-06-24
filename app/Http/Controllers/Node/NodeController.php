@@ -74,7 +74,7 @@ class NodeController extends Controller
                 }
                 // Convert 'type' value to its corresponding node type ID
                 if ($translate[$key] === 'node_type') {
-                    $convertedValue = array_search(ucfirst($value), Node::NODE_TYPE);
+                    $convertedValue = array_search(\strtoupper($value), Node::NODE_TYPE);
                 } else {
                     $convertedValue = $value;
                 }

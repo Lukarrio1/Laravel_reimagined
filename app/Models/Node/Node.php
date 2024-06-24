@@ -29,13 +29,13 @@ class Node extends Model
     protected $guarded = ['id'];
 
     public const Authentication_Levels = [
-        1 => 'Authenticated',
-        0 => 'Unauthenticated',
-        2 => 'Public',
+        1 => 'AUTHENTICATED',
+        0 => 'UNAUTHENTICATED',
+        2 => 'PUBLIC',
     ];
-    public const NODE_STATUS = [1 => 'Enabled', 0 => 'Disabled'];
+    public const NODE_STATUS = [1 => 'ENABLED', 0 => 'DISABLED'];
 
-    public const NODE_TYPE = [1 => 'Route', 2 => 'Link', 3 => 'Page', 4 => 'Component', 5 => 'Layout'];
+    public const NODE_TYPE = [1 => 'ROUTE', 2 => 'LINK', 3 => 'PAGE', 4 => 'COMPONENT', 5 => 'LAYOUT'];
 
     public function getAllControllerClasses()
     {

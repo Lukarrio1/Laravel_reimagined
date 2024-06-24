@@ -61,9 +61,10 @@ class AppServiceProvider extends ServiceProvider
 
         Config::set('mail', $mail_config);
 
-        if (Cache::has('settings')) {
-            Config::set('cache.default', \optional($setting->where('key', 'cache_driver')->first())->getSettingValue('last'));
-        }
+
+        Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
+            ->getSettingValue('last'));
+
         if (!Cache::has('setting_allowed_login_roles')) {
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
             Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());

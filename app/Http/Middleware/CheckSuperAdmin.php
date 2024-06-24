@@ -22,8 +22,8 @@ class CheckSuperAdmin
     public function handle(Request $request, Closure $next)
     {
         $user = request()->user();
-        $setting = \optional(Cache::get('settings')->where('key', 'admin_role')->first())->getSettingValue();
-        $allowed_login_roles = \optional(Cache::get('settings')->where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
+        $setting = \optional(Cache::get('settings',\collect(Setting::all()))->where('key', 'admin_role')->first())->getSettingValue();
+        $allowed_login_roles = \optional(Cache::get('settings', \collect(Setting::all()))->where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
         $role = !empty($setting) ? Role::find((int)$setting) : null;
         // Check if the user is authenticated and has the "Super Admin" role
         if (
