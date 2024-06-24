@@ -21,7 +21,6 @@ use App\Http\Middleware\AuthMiddleware;
 
 // Retrieve cached routes
 $routes = Cache::get('routes', collect([]));
-(new User())->deleteInactiveUsers();
 
 $routes->each(function ($route) {
     $properties = $route->properties['value'];

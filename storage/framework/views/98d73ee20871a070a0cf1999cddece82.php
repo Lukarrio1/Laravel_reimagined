@@ -87,7 +87,7 @@ unset($__errorArgs, $__bag); ?>
                     <?php $__currentLoopData = $settings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $setting): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
                         <td>
-                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo e($setting->getAllSettingKeys($setting->key)); ?></div>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo e($setting->getAllSettingKeys($setting->key)); ?> <span class="fw-bold">(<?php echo e($setting->key); ?>)</span></div>
                         </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold"><?php echo $setting->getSettingValue('first'); ?></div>

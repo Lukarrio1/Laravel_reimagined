@@ -73,7 +73,7 @@
                     @foreach ($settings as $setting )
                     <tr>
                         <td>
-                            <div class="text-bg-light text-center p-3 fw-semibold">{{$setting->getAllSettingKeys($setting->key)}}</div>
+                            <div class="text-bg-light text-center p-3 fw-semibold">{{$setting->getAllSettingKeys($setting->key)}} <span class="fw-bold">({{$setting->key}})</span></div>
                         </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold">{!!$setting->getSettingValue('first')!!}</div>

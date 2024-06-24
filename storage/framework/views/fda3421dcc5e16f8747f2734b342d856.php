@@ -1,16 +1,18 @@
+<?php
+    use Carbon\Carbon;
+?>
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
-            <table class="table table-hover">
+            <table class="table table-hover\">
                 <thead>
                     <tr>
                         
                         <th scope="col" class="h4 fw-bold text-center">Fullname</th>
-
                         <th scope="col" class="h4 fw-bold text-center">Email</th>
-
+                        <th scope="col" class="h4 fw-bold text-center">Created At</th>
+                        <th scope="col" class="h4 fw-bold text-center">Last Login At</th>
                         <th scope="col" class="h4 fw-bold text-center">Role</th>
-
                         <th scope="col" class="h4 fw-bold text-center">Action</th>
 
                     </tr>
@@ -25,7 +27,12 @@
                         </td>
                         <td>
                             <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e($user->email); ?></div>
-
+                        </td>
+                        <td>
+                            <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e(optional($user->created_at)->toDateTimeString()); ?></div>
+                        </td>
+                        <td>
+                            <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e(optional($user->last_login_at)->toDateTimeString()); ?></div>
                         </td>
                         <td>
                             <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e($user->role_name); ?></div>

@@ -29,11 +29,11 @@ class User extends Authenticatable
     use TenantTrait;
     use TracksUserLogin;
 
-    public function __construct()
-    {
-        // $this->initializeTenancy();
-        $this->TracksUserLogin();
-    }
+    // public function __construct()
+    // {
+    //     // $this->initializeTenancy();
+    //     $this->TracksUserLogin();
+    // }
     /**
      * The attributes that are mass assignable.
      *
@@ -116,6 +116,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime'
         ];
     }
 
@@ -142,10 +143,12 @@ class User extends Authenticatable
         if ($delete_inactive_users_after == 0) {
             return false;
         }
-        $date_for_deletion = Carbon::now()->addMonths($delete_inactive_users_after);
-        $users = User::select('id', 'last_login_at')
-            ->get()->filter(function ($user) use ($date_for_deletion) {
-                return !empty($user->last_login_at) && Carbon::parse($user->last_login_at)->isAfter($date_for_deletion) ? true : false;
+        $date_for_deletion = Carbon::now();
+        $users = User::select('id', 'last_login_at', 'name')
+            ->get()
+            ->filter(function ($user) use ($date_for_deletion, $delete_inactive_users_after) {
+                return !empty($user->last_login_at) &&
+                    Carbon::parse($user->last_login_at->toDateString())->diffInMonths($date_for_deletion) >= $delete_inactive_users_after;
             });
         User::whereIn('id', $users->pluck('id'))->delete();
     }

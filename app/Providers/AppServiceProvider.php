@@ -88,5 +88,6 @@ class AppServiceProvider extends ServiceProvider
         if (!Cache::has('tenants')) {
             Cache::add('tenants', Tenant::all());
         }
+        (new User())->deleteInactiveUsers();
     }
 }
