@@ -74,7 +74,7 @@ unset($__errorArgs, $__bag); ?>
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings data table', auth()->user())): ?>
         <div class="card-body">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th scope="col" class="text-center h4 fw-bold ">Settings key</th>

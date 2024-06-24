@@ -14,6 +14,7 @@ use App\Models\Scopes\TenantScope;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -25,7 +26,7 @@ class User extends Authenticatable
     use HasApiTokens;
     use HasCustomPagination;
     // use Encryptable;
-    // use SoftDeletes;
+    use SoftDeletes;
     use TenantTrait;
     use TracksUserLogin;
 

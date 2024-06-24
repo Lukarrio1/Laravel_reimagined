@@ -4,10 +4,9 @@
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
-            <table class="table table-hover\">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        {{-- <th scope="col">#</th> --}}
                         <th scope="col" class="h4 fw-bold text-center">Fullname</th>
                         <th scope="col" class="h4 fw-bold text-center">Email</th>
                         <th scope="col" class="h4 fw-bold text-center">Created At</th>
@@ -20,7 +19,6 @@
                 <tbody>
                     @foreach ($users as $key=>$user )
                     <tr>
-                        {{-- <th scope="row">{{$key}}</th> --}}
                         <td>
                             <div class="text-center text-bg-light p-3 fw-semibold">{{$user->name}}</div>
 

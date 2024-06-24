@@ -4,10 +4,9 @@
 <div class="col-sm-8 offset-sm-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
-            <table class="table table-hover\">
+            <table class="table table-hover">
                 <thead>
                     <tr>
-                        
                         <th scope="col" class="h4 fw-bold text-center">Fullname</th>
                         <th scope="col" class="h4 fw-bold text-center">Email</th>
                         <th scope="col" class="h4 fw-bold text-center">Created At</th>
@@ -20,7 +19,6 @@
                 <tbody>
                     <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        
                         <td>
                             <div class="text-center text-bg-light p-3 fw-semibold"><?php echo e($user->name); ?></div>
 
