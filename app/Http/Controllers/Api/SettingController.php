@@ -18,9 +18,13 @@ class SettingController extends Controller
         $settings =
             // Cache::get('settings')->whereIn('id',[3,11]);
             Setting::select('key', 'properties', 'id', 'allowed_for_api_use')
-            ->where('allowed_for_api_use', 1)->get()
+            ->get()
             ->map(function ($item) {
-                $item->properties =['key'=> $item->getSettingValue('first'),'value' => $item->getSettingValue('last')];
+                $item->properties = $item->allowed_for_api_use == 1 ?
+                    ['key' => $item->getSettingValue('first'), 'value' => $item->getSettingValue('last')] :
+                    ['key' => '', 'value' => null];
+                unset($item->allowed_for_api_use);
+                unset($item->id);
                 return $item;
             });
         return \response()->json(['settings' => $settings]);

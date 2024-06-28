@@ -63,8 +63,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center h4 fw-bold ">Settings key</th>
-                        <th scope="col" class="text-center h4 fw-bold ">Settings Value</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Setting</th>
+                        <th scope="col" class="text-center h4 fw-bold ">key</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Value</th>
                         <th scope="col" class="text-center h4 fw-bold ">Allowed For Api Use</th>
                         <th scope="col" class="text-center h4 fw-bold ">Action</th>
                     </tr>
@@ -73,7 +74,11 @@
                     @foreach ($settings as $setting )
                     <tr>
                         <td>
-                            <div class="text-bg-light text-center p-3 fw-semibold">{{$setting->getAllSettingKeys($setting->key)}} <span class="fw-bold">({{$setting->key}})</span></div>
+                            <div class="text-bg-light text-center p-3 fw-semibold">{{$setting->getAllSettingKeys($setting->key)}}</div>
+                        </td>
+
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><span class="fw-bold">{{$setting->key}}</span></div>
                         </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold">{!!$setting->getSettingValue('first')!!}</div>
@@ -83,6 +88,19 @@
                         </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold">
+                                @can('can view settings edit or create form',auth()->user())
+                                <form class="mb-2">
+                                    <input type="hidden" value="{{$setting->key}}" name="setting_key"></input>
+                                    <button class=" btn btn-sm btn-warning" type="submit">
+                                        @if(request('setting_key')==$setting->key)
+                                        <i class="fa fa-spinner" aria-hidden="true"></i>
+                                        @else
+                                        <i class="fa fa-wrench" aria-hidden="true"></i>
+                                        @endif
+
+                                    </button>
+                                </form>
+                                @endcan
                                 @can('can view settings delete button',auth()->user())
                                 <form action="{{route('deleteSetting',['setting_key'=>$setting->key])}}" method="post">
                                     @csrf
@@ -92,6 +110,7 @@
                                     </button>
                                 </form>
                                 @endcan
+
                             </div>
                         </td>
                     </tr>

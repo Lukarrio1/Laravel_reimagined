@@ -102,7 +102,8 @@ class Node_Type extends Model
                 </div>
                  <div class='mb-3'>
                       <label for='node_page' class='form-label'>Node Page</label>
-                      <select id='node_page' class='form-select' name='node_page' required>
+                      <select id='node_page' class='form-select' name='node_page'>
+                      <option value=''>Select a page</option>
                        $node_pages_options
                       </select>
                   </div>

@@ -55,17 +55,9 @@
              <ul class="navbar-nav ms-auto">
                  <!-- Authentication Links -->
                  <?php if(auth()->guard()->guest()): ?>
-                 <?php if(Route::has('login')): ?>
-                 <li class="nav-item">
-                     <a class="nav-link" href="<?php echo e(route('login')); ?>"><?php echo e(__('Login')); ?></a>
-                 </li>
-                 <?php endif; ?>
+                 
 
-                 <?php if(Route::has('register')): ?>
-                 <li class="nav-item">
-                     <a class="nav-link" href="<?php echo e(route('register')); ?>"><?php echo e(__('Register')); ?></a>
-                 </li>
-                 <?php endif; ?>
+                 
                  <?php else: ?>
                  <li class="nav-item dropdown">
                      <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

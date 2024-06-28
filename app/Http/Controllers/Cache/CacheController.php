@@ -38,7 +38,7 @@ class CacheController extends Controller
             $cache_to_clear->each(fn ($key) => Artisan::call($this->cacheOptions[$key]));
         } else {
             Artisan::call('cache:clear');
-            Artisan::call('optimize');
+            Artisan::call('optimize:clear');
         }
         Session::flash('message', 'The system cache was refreshed successfully.');
         Session::flash('alert-class', 'alert-success');

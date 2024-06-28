@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Node;
 
+use PSpell\Config;
 use App\Models\User;
 use App\Models\Node\Node;
 use Illuminate\Http\Request;
@@ -10,6 +11,16 @@ use Illuminate\Support\Facades\Cache;
 
 class NodeController extends Controller
 {
+    public $exception_property_value_keys = ['route_function', 'node_audit_message'];
+
+    public function removeKeys($properties)
+    {
+        $keys = collect($properties)->keys();
+        $object = collect([]);
+        $keys->each(fn ($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
+        return $object->toArray();
+    }
+
     public function node($uuid)
     {
         return ['node' => Node::where('uuid', $uuid)->first()];
@@ -32,14 +43,14 @@ class NodeController extends Controller
             Cache::set('auth_user_permissions_' . $id, $permission_ids);
         }
 
-
         $nodes = Node::where('node_status', 1)
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid','verbiage')
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->with(['permission'])
             ->get()
-            ->map(function ($node) use ($permission_ids) {
+            ->map(function ($node) {
                 $node->hasAccess = $node->authentication_level['value'] == 0 ||
                     !empty($node->permission) && !\auth()->user()->hasPermissionTo(\optional($node->permission)->name) ? false : true;
+                $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
                 return $node;
             });
         return ['nodes' => $nodes];
@@ -47,13 +58,13 @@ class NodeController extends Controller
 
     public function guest_nodes()
     {
-
         $nodes = Node::where('node_status', 1)
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->with(['permission'])
             ->get()
             ->map(function ($node) {
                 $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
+                $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
                 return $node;
             });
         return ['nodes' => $nodes];
@@ -71,6 +82,7 @@ class NodeController extends Controller
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->get()->map(function ($node) {
                 $node->hasAccess = true;
+                $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
                 return $node;
             });
 

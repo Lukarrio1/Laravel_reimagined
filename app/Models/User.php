@@ -5,14 +5,17 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Carbon\Carbon;
+use PSpell\Config;
 use App\TenantTrait;
 use App\TracksUserLogin;
 use App\HasCustomPagination;
 use App\Models\Tenant\Tenant;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Scopes\TenantScope;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Traits\HasRoles;
+use App\Mail\Api\Auth\EmailVerification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,7 +49,8 @@ class User extends Authenticatable
         'password',
         'password_reset_token',
         'tenant_id',
-        'last_login_at'
+        'last_login_at',
+        'email_verification_token'
     ];
     // protected $encryptable = ['name','email'];
 
@@ -152,5 +156,12 @@ class User extends Authenticatable
                     Carbon::parse($user->last_login_at->toDateString())->diffInMonths($date_for_deletion) >= $delete_inactive_users_after;
             });
         User::whereIn('id', $users->pluck('id'))->delete();
+    }
+
+    public function sendVerificationEmail()
+    {
+        if ($this->email_verified_at == null) {
+            Mail::to($this->email)->send(new EmailVerification());
+        }
     }
 }

@@ -66,43 +66,7 @@ class Setting extends Model
 
         return $html;
     }
-    // deprecated
-    // public function SETTING_OPTIONS($type, $options, $settingKey)
-    // {
-    //     $html = '';
-    //     $fieldValue = optional(collect(Cache::get('settings'))->firstWhere('key', $settingKey))->properties;
 
-    //     $options = collect($options);
-
-    //     switch ($type) {
-    //         case 'drop_down':
-    //             $htmlOptions = $options->map(function ($optionValue, $optionKey) use ($fieldValue) {
-    //                 $selected = $fieldValue == $optionValue . "_" . $optionKey ? "selected" : '';
-    //                 return "<option value='{$optionValue}_{$optionKey}' {$selected}>{$optionValue}</option>";
-    //             })->implode('');
-
-    //             $html = "<select class='form-select' name='value'>{$htmlOptions}</select>";
-    //             break;
-
-    //         case 'multi_select':
-    //             $allowedRoles = Cache::get('setting_allowed_login_roles', []);
-    //             $htmlOptions = $options->map(function ($optionValue, $optionKey) use ($allowedRoles) {
-    //                 $selected = in_array($optionKey, $allowedRoles) ? "selected" : '';
-    //                 return "<option value='{$optionValue}_{$optionKey}' {$selected}>{$optionValue}</option>";
-    //             })->implode('');
-    //             $html = "<select class='form-select' name='value[]' multiple>{$htmlOptions}</select>";
-    //             break;
-    //         case 'input':
-    //             $html = "<input class='form-control' name='value' value='{$fieldValue}'>";
-    //             break;
-
-    //         default:
-    //             // Handle any other cases if necessary
-    //             break;
-    //     }
-
-    //     return $html;
-    // }
     public function SETTING_KEYS($key, $field_value)
     {
         $roles = Cache::get('roles');
@@ -167,6 +131,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'client_app_url' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
             'app_version' => [
                 'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
@@ -205,6 +173,10 @@ class Setting extends Model
             ],
             'cache_driver' => [
                 'field' => $this->SETTING_OPTIONS('drop_down', ['File Storage' => 'file', 'Database Storage' => 'database'], $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
+            'api_email_verification' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
 
@@ -252,13 +224,15 @@ class Setting extends Model
         $keys = \collect([
             'admin_role' => "Super Admin Role",
             'registration_role' => 'Api Registration Role',
-            'allowed_login_roles' => "Allowed Login Roles",
+            'allowed_login_roles' => "Roles that are allowed to login",
             'app_name' => 'Application Name',
-            'app_url' => 'Application URL',
+            'app_url' => 'Server Side URL',
+            'client_app_url'=>'Client Side URl',
             'app_version' => 'Application Version',
             'cache_driver' => 'Cache Driver',
             "site_email_address" => "Site Email Address",
             'app_animation' => 'Application Animation',
+            "api_email_verification" => "Api User Email Verification",
             // 'multi_tenancy' => 'Api Multi Tenancy',
             // "multi_tenancy_role" => "Api Multi Tenancy Role",
             "app_auditing" => "Application Auditing",

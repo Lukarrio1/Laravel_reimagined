@@ -77,8 +77,9 @@ unset($__errorArgs, $__bag); ?>
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center h4 fw-bold ">Settings key</th>
-                        <th scope="col" class="text-center h4 fw-bold ">Settings Value</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Setting</th>
+                        <th scope="col" class="text-center h4 fw-bold ">key</th>
+                        <th scope="col" class="text-center h4 fw-bold ">Value</th>
                         <th scope="col" class="text-center h4 fw-bold ">Allowed For Api Use</th>
                         <th scope="col" class="text-center h4 fw-bold ">Action</th>
                     </tr>
@@ -87,7 +88,11 @@ unset($__errorArgs, $__bag); ?>
                     <?php $__currentLoopData = $settings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $setting): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
                         <td>
-                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo e($setting->getAllSettingKeys($setting->key)); ?> <span class="fw-bold">(<?php echo e($setting->key); ?>)</span></div>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><?php echo e($setting->getAllSettingKeys($setting->key)); ?></div>
+                        </td>
+
+                        <td>
+                            <div class="text-bg-light text-center p-3 fw-semibold"><span class="fw-bold"><?php echo e($setting->key); ?></span></div>
                         </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold"><?php echo $setting->getSettingValue('first'); ?></div>
@@ -97,6 +102,19 @@ unset($__errorArgs, $__bag); ?>
                         </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold">
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings edit or create form',auth()->user())): ?>
+                                <form class="mb-2">
+                                    <input type="hidden" value="<?php echo e($setting->key); ?>" name="setting_key"></input>
+                                    <button class=" btn btn-sm btn-warning" type="submit">
+                                        <?php if(request('setting_key')==$setting->key): ?>
+                                        <i class="fa fa-spinner" aria-hidden="true"></i>
+                                        <?php else: ?>
+                                        <i class="fa fa-wrench" aria-hidden="true"></i>
+                                        <?php endif; ?>
+
+                                    </button>
+                                </form>
+                                <?php endif; ?>
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings delete button',auth()->user())): ?>
                                 <form action="<?php echo e(route('deleteSetting',['setting_key'=>$setting->key])); ?>" method="post">
                                     <?php echo csrf_field(); ?>
@@ -106,6 +124,7 @@ unset($__errorArgs, $__bag); ?>
                                     </button>
                                 </form>
                                 <?php endif; ?>
+
                             </div>
                         </td>
                     </tr>

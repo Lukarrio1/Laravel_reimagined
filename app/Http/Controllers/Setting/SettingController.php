@@ -26,16 +26,23 @@ class SettingController extends Controller
     public function index($setting_key = 'admin_role')
     {
         $setting = new Setting();
-        $setting_key = empty(\request()->get('setting_key')) ? $setting_key : \request()->get('setting_key');
+        $settings_for_display
+            = $setting->query()
+            ->latest('updated_at');
+        $keys
+            = collect($setting->getAllSettingKeys())
+            ->filter(fn ($key, $idx) =>  \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->get()->pluck('key')->toArray()));
+
+        $setting_key = empty(\request()->get('setting_key')) ? $keys->keys()->first() : \request()->get('setting_key');
         $field_value = optional(collect(Cache::get('settings')));
+
         return view('Setting.View', [
-            'keys' => $setting->getAllSettingKeys(),
+            'keys' => $keys,
             'key_value' => $setting->SETTING_KEYS($setting_key, $field_value)['field'],
-            'allowed_for_api_use' => \collect(Cache::get('settings', \collect(Setting::all()))->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
+            'allowed_for_api_use' => \collect(Cache::get('settings', \collect(Setting::all()))
+                ->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
             'setting_key' => $setting_key,
-            'settings' => $setting->query()
-                ->latest('updated_at')
-                ->get(),
+            'settings' => [...$settings_for_display->get()],
         ]);
     }
 
