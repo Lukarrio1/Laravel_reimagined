@@ -66,7 +66,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="<?php echo e(route('assignRole',['user'=>$user])); ?>" method="post">
+                                    <form action="<?php echo e(route('assignRole',['user'=>$user,'page'=>request('page')])); ?>" method="post">
                                         <?php echo csrf_field(); ?>
                                         <div class="mb-3">
                                             <label for="role_name" class="form-label">Role</label>
@@ -113,7 +113,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="<?php echo e(route('updateUser',['user'=>1])); ?>" method="post">
+                        <form action="<?php echo e(route('updateUser',['user'=>1,'page'=>request('page')])); ?>" method="post">
                             <?php echo csrf_field(); ?>
                             <div id="custom_input_user_fields"></div>
                             <div class="mt-2 text-center">

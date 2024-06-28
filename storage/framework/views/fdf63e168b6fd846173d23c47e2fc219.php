@@ -80,7 +80,7 @@
                             <ul class="list-group list-group-flush pt-2">
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view nodes edit button', auth()->user())): ?>
                                 <li class="list-group-item text-center">
-                                    <a href="<?php echo e(route('viewNode',['node'=>$Node])); ?>" class="btn btn-warning btn-sm m-2 h4" title="edit node">
+                                    <a href="<?php echo e(route('viewNode',['node'=>$Node,'page'=>request('page')])); ?>" class="btn btn-warning btn-sm m-2 h4" title="edit node">
                                         <?php if(optional($node)->id==$Node->id): ?>
                                         <i class="fa fa-spinner" aria-hidden="true"></i>
                                         <?php else: ?>

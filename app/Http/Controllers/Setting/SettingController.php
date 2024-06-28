@@ -28,10 +28,10 @@ class SettingController extends Controller
         $setting = new Setting();
         $settings_for_display
             = $setting->query()
-            ->latest('updated_at');
+            ->latest('updated_at')->get();
         $keys
             = collect($setting->getAllSettingKeys())
-            ->filter(fn ($key, $idx) =>  \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->get()->pluck('key')->toArray()));
+            ->filter(fn ($key, $idx) =>  \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
 
         $setting_key = empty(\request()->get('setting_key')) ? $keys->keys()->first() : \request()->get('setting_key');
         $field_value = optional(collect(Cache::get('settings')));
@@ -42,7 +42,7 @@ class SettingController extends Controller
             'allowed_for_api_use' => \collect(Cache::get('settings', \collect(Setting::all()))
                 ->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
             'setting_key' => $setting_key,
-            'settings' => [...$settings_for_display->get()],
+            'settings' => [...$settings_for_display],
         ]);
     }
 
@@ -66,15 +66,11 @@ class SettingController extends Controller
         );
         Cache::forget('settings');
         Cache::forget('setting_allowed_login_roles');
-        Cache::forget('not_exportable_tables');
-        // exportable_tables
         Cache::set('settings', Setting::latest()->get());
         $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
-        Cache::set('not_exportable_tables', \optional(Setting::where('key', 'not_exportable_tables')->first())->getSettingValue('last'));
         Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
         Session::flash('message', 'The setting value was saved successfully.');
         Session::flash('alert-class', 'alert-success');
-        // (new CacheController())->clearCache();
         return \redirect()->route('viewSettings');
     }
 

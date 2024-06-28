@@ -229,7 +229,7 @@ class Setting extends Model
             'app_url' => 'Server Side URL',
             'client_app_url'=>'Client Side URl',
             'app_version' => 'Application Version',
-            'cache_driver' => 'Cache Driver',
+            'cache_driver' => 'Cache Driver (avoid changing this)',
             "site_email_address" => "Site Email Address",
             'app_animation' => 'Application Animation',
             "api_email_verification" => "Api User Email Verification",

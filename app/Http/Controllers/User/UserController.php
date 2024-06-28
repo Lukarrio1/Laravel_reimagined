@@ -112,8 +112,7 @@ class UserController extends Controller
         }
         Session::flash('message', 'The role was assigned successfully.');
         Session::flash('alert-class', 'alert-success');
-
-        return \redirect()->route('viewUsers');
+        return \redirect()->route('viewUsers', ['page' => \request('page')]);
     }
 
     public function update(UserUpdateRequest $request)
@@ -122,7 +121,7 @@ class UserController extends Controller
         Session::flash('message', 'The user was saved successfully.');
         Session::flash('alert-class', 'alert-success');
 
-        return \redirect()->route('viewUsers');
+        return \redirect()->route('viewUsers', ['page' => \request('page')]);
     }
 
     public function delete(User $user)

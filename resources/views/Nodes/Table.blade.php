@@ -79,7 +79,7 @@
                             <ul class="list-group list-group-flush pt-2">
                                 @can('can view nodes edit button', auth()->user())
                                 <li class="list-group-item text-center">
-                                    <a href="{{route('viewNode',['node'=>$Node])}}" class="btn btn-warning btn-sm m-2 h4" title="edit node">
+                                    <a href="{{route('viewNode',['node'=>$Node,'page'=>request('page')])}}" class="btn btn-warning btn-sm m-2 h4" title="edit node">
                                         @if(optional($node)->id==$Node->id)
                                         <i class="fa fa-spinner" aria-hidden="true"></i>
                                         @else
