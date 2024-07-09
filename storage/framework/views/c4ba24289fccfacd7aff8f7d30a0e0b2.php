@@ -4,7 +4,8 @@
         <div class="card-header text-center bg-white  h3 fw-bold">
             Cache Managment
         </div>
-        <div class="card-body">
+        <div class="card-body  bg-white">
+
             <div class="">
                 <form action="<?php echo e(route('clearCache')); ?>">
 

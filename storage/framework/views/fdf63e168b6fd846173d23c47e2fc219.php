@@ -66,8 +66,10 @@
                             <ul class="list-group list-group-flush pt-2">
                                 <?php $__currentLoopData = collect($Node->verbiage['human_value'])->keys(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li class="list-group-item text-center">
-                                    <?php echo e($key.": ".$Node->verbiage['human_value'][$key]); ?>
+                                    <strong>
+                                        <?php echo e($key.": ".$Node->verbiage['human_value'][$key]); ?>
 
+                                    </strong>
                                 </li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
@@ -75,7 +77,12 @@
                         <td>
                             <div class="text-bg-light p-3 fw-semibold"><?php echo e($Node->uuid); ?></div>
                         </td>
-                        <td><?php echo $Node->properties['html_value']; ?></td>
+                        <td>
+                        <strong>
+                                <?php echo $Node->properties['html_value']; ?>
+
+                            </strong>
+                            </td>
                         <td>
                             <ul class="list-group list-group-flush pt-2">
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view nodes edit button', auth()->user())): ?>

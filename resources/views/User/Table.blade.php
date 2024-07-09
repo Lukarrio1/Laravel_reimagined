@@ -1,7 +1,7 @@
 @php
     use Carbon\Carbon;
 @endphp
-<div class="col-sm-8 offset-sm-2">
+<div class="col-sm-10 offset-sm-1">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-body">
             <table class="table table-hover">

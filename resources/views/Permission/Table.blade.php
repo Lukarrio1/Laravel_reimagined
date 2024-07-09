@@ -1,4 +1,4 @@
-<div class="col-sm-8 offset-sm-2 mt-5">
+<div class="col-sm-10 offset-sm-1 mt-2">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-header bg-white h6">
             <form action="{{route('viewPermissions')}}" action="get">

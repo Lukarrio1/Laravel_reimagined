@@ -66,7 +66,9 @@
                             <ul class="list-group list-group-flush pt-2">
                                 @foreach (collect($Node->verbiage['human_value'])->keys() as $key )
                                 <li class="list-group-item text-center">
-                                    {{$key.": ".$Node->verbiage['human_value'][$key]}}
+                                    <strong>
+                                        {{$key.": ".$Node->verbiage['human_value'][$key]}}
+                                    </strong>
                                 </li>
                                 @endforeach
                             </ul>
@@ -74,7 +76,11 @@
                         <td>
                             <div class="text-bg-light p-3 fw-semibold">{{$Node->uuid}}</div>
                         </td>
-                        <td>{!!$Node->properties['html_value']!!}</td>
+                        <td>
+                        <strong>
+                                {!!$Node->properties['html_value']!!}
+                            </strong>
+                            </td>
                         <td>
                             <ul class="list-group list-group-flush pt-2">
                                 @can('can view nodes edit button', auth()->user())
