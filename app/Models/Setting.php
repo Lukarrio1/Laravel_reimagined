@@ -59,6 +59,11 @@ class Setting extends Model
             case 'input_email':
                 $html = "<input class='form-control' type='email' name='value' value='" . $field_value . "'>";
                 break;
+            case 'magic_string':
+                $html = "eg: profile_image|bio|teacher
+                        <textarea class='form-control' name='value'>$field_value</textarea>
+                  ";
+                break;
             default:
                 # code...
                 break;
@@ -179,6 +184,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
+            'reference_types' => [
+                'field' => $this->SETTING_OPTIONS('magic_string', [], $key, $field_value),
+                'handle' => ['action' => 'magic_split', 'value' => 'last'],
+            ],
 
             // delete_inactive_users
             // 'not_exportable_tables' => [
@@ -206,7 +215,11 @@ class Setting extends Model
                     ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
                     collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
                         ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
-
+                break;
+            case "magic_split":
+                $value = !empty($value) ? $value : $key['value'];
+                $value =$value =="first"? "<ul class='list-group list-group-flush'>".collect(\explode('|', $this->properties))
+                ->map(fn($val)=> "<li class='list-group-item'>".$val."</li>")->join('') ."</ul>": \explode('|', $this->properties);
                 break;
             default:
                 $value = $this->properties;
@@ -227,7 +240,7 @@ class Setting extends Model
             'allowed_login_roles' => "Roles that are allowed to login",
             'app_name' => 'Application Name',
             'app_url' => 'Server Side URL',
-            'client_app_url'=>'Client Side URl',
+            'client_app_url' => 'Client Side URl',
             'app_version' => 'Application Version',
             'cache_driver' => 'Cache Driver (avoid changing this)',
             "site_email_address" => "Site Email Address",
@@ -250,6 +263,7 @@ class Setting extends Model
             \strtolower('MAIL_FROM_ADDRESS') => 'Mail Form Address',
             \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
             'mail_url' => "Mail Url",
+            'reference_types' => "Reference Types",
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

@@ -1,0 +1,1 @@
+<?php /**PATH /Users/niritechuser15/Documents/Development/laravel-reimagined/resources/views/Reference/Table.blade.php ENDPATH**/ ?>

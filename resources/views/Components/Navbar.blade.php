@@ -37,6 +37,9 @@
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewTenants'))? 'red' : 'black' }}" href="{{route('viewTenants')}}">Multi Tenancy</a>
          @endif
          @endcan
+         {{-- @can('', auth()->user()) --}}
+         <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewReferences'))? 'red' : 'black' }}" href="{{route('viewReferences')}}">References</a>
+         {{-- @endcan --}}
          @can('can crud settings', auth()->user())
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewSettings'))? 'red' : 'black' }}" href="{{route('viewSettings')}}">Settings</a>
          @endcan

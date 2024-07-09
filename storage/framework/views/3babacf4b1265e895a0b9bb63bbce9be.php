@@ -38,6 +38,9 @@
          <a class="navbar-brand" style="color:<?php echo e(request()->url()==URL::to(route('viewTenants'))? 'red' : 'black'); ?>" href="<?php echo e(route('viewTenants')); ?>">Multi Tenancy</a>
          <?php endif; ?>
          <?php endif; ?>
+         
+         <a class="navbar-brand" style="color:<?php echo e(request()->url()==URL::to(route('viewReferences'))? 'red' : 'black'); ?>" href="<?php echo e(route('viewReferences')); ?>">References</a>
+         
          <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can crud settings', auth()->user())): ?>
          <a class="navbar-brand" style="color:<?php echo e(request()->url()==URL::to(route('viewSettings'))? 'red' : 'black'); ?>" href="<?php echo e(route('viewSettings')); ?>">Settings</a>
          <?php endif; ?>

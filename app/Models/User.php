@@ -33,11 +33,12 @@ class User extends Authenticatable
     use TenantTrait;
     use TracksUserLogin;
 
-    // public function __construct()
-    // {
-    //     // $this->initializeTenancy();
-    //     $this->TracksUserLogin();
-    // }
+    protected $table = "users";
+    public $table_name;
+    public function __construct()
+    {
+        $this->table_name = $this->table;
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -153,7 +154,7 @@ class User extends Authenticatable
             ->get()
             ->filter(function ($user) use ($date_for_deletion, $delete_inactive_users_after) {
                 return !empty($user->last_login_at) &&
-                    Carbon::parse($user->last_login_at->toDateString())->diffInMonths($date_for_deletion) >= $delete_inactive_users_after;
+                    Carbon::parse(Carbon::parse($user->last_login_at)->toDateString())->diffInMonths($date_for_deletion) >= $delete_inactive_users_after;
             });
         User::whereIn('id', $users->pluck('id'))->delete();
     }

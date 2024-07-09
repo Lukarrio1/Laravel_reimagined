@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckSuperAdmin;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Node\NodeController;
+use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Cache\CacheController;
@@ -57,6 +58,8 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::get('/import', [ImportController::class, 'index'])->name('importView');
     Route::post('/import/data', [ImportController::class, 'import'])->name('importData');
+
+    Route::get('/references',[ReferenceController::class,'index'])->name('viewReferences');
 
     $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
         ->getSettingValue('first');

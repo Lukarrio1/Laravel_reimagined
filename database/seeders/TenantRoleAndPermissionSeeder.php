@@ -52,6 +52,8 @@ class TenantRoleAndPermissionSeeder extends Seeder
             ['core' => true, 'name' => 'can view audit history dashboard component',],
             ['core' => true, 'name' => 'can view new users dashboard component',],
             ['core' => true, 'name' => 'can view last update api route dashboard component',],
+            ['core' => true, 'name' => 'can create or update references',],
+            ['core' => true, 'name' => 'can view references',],
         ];
 
         // $role = ' api owner';
