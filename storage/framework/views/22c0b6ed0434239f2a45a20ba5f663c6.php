@@ -1,1 +1,0 @@
-hello there<?php /**PATH /Users/niritechuser15/Documents/Development/laravel-reimagined/resources/views/Email/Password/PasswordEmail.blade.php ENDPATH**/ ?>

@@ -12,6 +12,7 @@ use App\HasCustomPagination;
 use App\Models\Tenant\Tenant;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Scopes\TenantScope;
+use App\Models\Reference\Reference;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Traits\HasRoles;
@@ -39,6 +40,8 @@ class User extends Authenticatable
     {
         $this->table_name = $this->table;
     }
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -101,7 +104,10 @@ class User extends Authenticatable
                 </div>",
         ];
     }
-
+    public function references()
+    {
+        return $this->hasMany(Reference::class, 'owner_id', 'id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

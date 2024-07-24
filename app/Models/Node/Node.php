@@ -6,6 +6,7 @@ use App\TenantTrait;
 use ReflectionClass;
 use ReflectionMethod;
 use App\Models\Setting;
+use App\Models\BaseModel;
 use App\HasCustomPagination;
 use App\Models\Tenant\Tenant;
 use Spatie\Permission\Models\Role;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Node extends Model
+class Node extends BaseModel
 {
     use HasFactory;
     use HasCustomPagination;

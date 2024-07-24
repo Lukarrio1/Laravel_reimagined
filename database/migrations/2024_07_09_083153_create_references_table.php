@@ -15,8 +15,10 @@ return new class () extends Migration {
             $table->integer('owner_id')->nullable();
             $table->integer('owned_id')->nullable();
             $table->string('owner_model')->nullable();
-            $table->integer('owned_model')->nullable();
-            $table->integer('type')->nullable();
+            $table->string('owned_model')->nullable();
+            $table->boolean('has_many')->default(false);
+            $table->string('type')->nullable();
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }

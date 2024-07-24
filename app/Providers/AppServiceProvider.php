@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Models\Node\Node;
 use App\Models\Tenant\Tenant;
 use Spatie\Permission\Models\Role;
+use App\Models\Reference\Reference;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -61,25 +62,13 @@ class AppServiceProvider extends ServiceProvider
             Cache::set('roles', Role::all()->pluck('id', 'name'));
         }
 
-
-
-
-        Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-            ->getSettingValue('last'));
+        // Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
+        //     ->getSettingValue('last'));
 
         if (!Cache::has('setting_allowed_login_roles')) {
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
             Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
         }
-        // if (!Cache::has('not_exportable_tables')) {
-        //     Cache::add(
-        //         'not_exportable_tables',
-        //         \collect(\explode('|', \optional(Setting::where('key', 'not_exportable_tables')->first())->properties))
-        //             ->map(fn ($item_1) => \collect(\explode('_', $item_1))
-        //                 ->filter(fn ($item_2, $idx) => $idx < (count(\explode('_', $item_1))) - 1)->join("_")) ?? \collect([])
-        //     );
-        // }
-
         if (!Cache::has('routes')) {
             $nodes = Node::where('node_status', 1)
                 ->where('node_type', 1)
@@ -90,6 +79,31 @@ class AppServiceProvider extends ServiceProvider
         if (!Cache::has('tenants')) {
             Cache::add('tenants', Tenant::all());
         }
+        if (!Cache::has('references')) {
+            Cache::add('references', Reference::query()
+                ->whereIn('type', optional(collect(Cache::get('settings'))
+                    ->where('key', 'reference_types')->first())->getSettingValue())
+                ->distinct('type')
+                ->get());
+        }
+
+        \collect(optional(collect(Cache::get('settings'))
+            ->where('key', 'reference_types')->first())->getSettingValue())->each(function ($ref) {
+            $rel_type = collect(\explode('_', $ref));
+            $ref = Cache::get('references')->where('type', $ref)->first();
+            if ($rel_type->count() > 1) {
+                $owned_model = $ref->owned_model;
+                $owner_model = $ref->owner_model;
+                $has_many = (int) $rel_type->last() == 1 ? "hasManyThrough" : "hasOneThrough";
+                $owner_model::resolveRelationUsing($rel_type->first(), function ($owner_model) use ($owned_model, $has_many, $ref) {
+                    return $owner_model->$has_many($owned_model, Reference::class, 'owner_id', 'id', 'id', 'owned_id')
+                        ->where('references.type', $ref->type);
+                });
+            }
+        });
+
+        // dd(Reference::all()->toArray());
+        // ;
         (new User())->deleteInactiveUsers();
     }
 }

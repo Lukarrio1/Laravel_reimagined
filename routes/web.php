@@ -59,7 +59,10 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::get('/import', [ImportController::class, 'index'])->name('importView');
     Route::post('/import/data', [ImportController::class, 'import'])->name('importData');
 
-    Route::get('/references',[ReferenceController::class,'index'])->name('viewReferences');
+    Route::get('/references', [ReferenceController::class, 'index'])->name('viewReferences');
+    Route::post('/reference', [ReferenceController::class, 'save'])->name('saveReference');
+    Route::get('/references_ajax',[ReferenceController::class, 'index2']);
+    Route::delete('/reference/{reference}', [ReferenceController::class, 'delete']);
 
     $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
         ->getSettingValue('first');
