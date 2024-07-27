@@ -15,4 +15,6 @@ class BaseModel extends Model
     {
         return $this->hasMany(Reference::class, 'owner_id', 'id');
     }
+
+
 }

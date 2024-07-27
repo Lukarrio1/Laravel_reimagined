@@ -7,11 +7,13 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Tenant\Tenant;
 use App\Models\Node\Node_Type;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Api\DataBusController;
 use App\Http\Controllers\Cache\CacheController;
 
 class NodeController extends Controller
@@ -111,6 +113,7 @@ class NodeController extends Controller
 
     public function save(Request $request)
     {
+        // dd($request->all());
         $main_rules = [
             'name' => 'required',
             'small_description' => 'required',
@@ -145,6 +148,32 @@ class NodeController extends Controller
     {
         return $this->index($node);
     }
+
+    public function databusData()
+    {
+        $database = \request('database');
+        $table = \request('table');
+        $display_aid = \request('display_aid');
+        // getColumnListing
+        $tables = $database != "null" ? collect(DB::connection($database)->select('SHOW TABLES'))
+            ->map(fn ($value) => \array_values((array) $value))
+            ->flatten()  : [];
+        $columns = $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
+        $node = Node::find(\request('node_id'));
+        $table_items = $database != "null" && $table != "null"  ? DB::connection($database)->table($table)->get() : [];
+        return [
+            'node' => $node,
+            "tables" => $tables,
+            "columns" => $columns,
+            "table_items" => $table_items,
+            "orderByTypes" => (new DataBusController())->orderByTypes,
+            "databases" => collect(Cache::get('settings'))
+                ->where('key', 'database_configuration')->first()
+                ->getSettingValue()->keys()
+        ];
+    }
+
+
 
     public function delete(Node $node)
     {

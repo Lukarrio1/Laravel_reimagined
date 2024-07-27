@@ -117,8 +117,29 @@ class Node_Type extends Model
                     'route_function' => ['location' => 'properties'],
                     'route_method' => ['location' => 'properties'],
                     'node_audit_message' => $node_message_auditing_rules,
+                    'node_database' => ['location' => 'properties'],
+                    'node_table' => ['location' => 'properties'],
+                    'node_table_columns' => ['location' => 'properties'],
+                    "node_item" => ['location' => 'properties'],
+                    "node_many_data" => ['location' => 'properties'],
+                    "node_data_limit" => ['location' => 'properties'],
+                    "node_order_by_field" => ['location' => 'properties'],
+                    "node_order_by_type" => ['location' => 'properties']
                 ],
-                'rules' => ['node_route' => 'required', 'route_function' => 'required', 'route_method' => 'required', 'node_audit_message' => ''],
+                'rules' => [
+                    'node_route' => 'required',
+                    'route_function' => '',
+                    'route_method' => 'required',
+                    'node_audit_message' => '',
+                    'node_table' => '',
+                    'node_table_columns' => '',
+                    'node_database' => '',
+                    'node_item' => '',
+                    "node_many_data" => '',
+                    "node_data_limit" => '',
+                    "node_order_by_field" => '',
+                    "node_order_by_type" => ''
+                ],
                 'extra_html' => "<div>
                  <div class='mb-3'>
                     <label for='route ' class='form-label'>Node route <small>(you can add parameters to the route eg. test/{param}/{param1})</small></label>
@@ -130,7 +151,8 @@ class Node_Type extends Model
                  $app_auditing
                   <div class='mb-3'>
                       <label for='route_function' class='form-label'>Route Function</label>
-                      <select id='route_function' class='form-select' name='route_function' required>
+                      <select id='route_function' class='form-select' name='route_function'>
+                      <option value=''>USE DATA BUS</option>
                         $options
                       </select>
                   </div>

@@ -60,10 +60,20 @@ class Setting extends Model
                 $html = "<input class='form-control' type='email' name='value' value='" . $field_value . "'>";
                 break;
             case 'magic_string':
-                $html = "eg: profile_image|bio|teacher
+                $html = "eg: profile_image_0|bio_0|teachers_1
                         <textarea class='form-control' name='value'>$field_value</textarea>
                   ";
                 break;
+            case "config_string":
+                $html = "eg: example_db:'DB_CONNECTION=mysql|
+                             DB_HOST=127.0.0.1|
+                             DB_PORT=3306|
+                             DB_DATABASE=laravel_reimagined|
+                             DB_USERNAME=root|
+                             DB_PASSWORD=root_user',
+                        <textarea class='form-control' name='value'>$field_value</textarea>
+                  ";
+                // no break
             default:
                 # code...
                 break;
@@ -188,6 +198,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('magic_string', [], $key, $field_value),
                 'handle' => ['action' => 'magic_split', 'value' => 'last'],
             ],
+            'database_configuration' => [
+                'field' => $this->SETTING_OPTIONS('config_string', [], $key, $field_value),
+                'handle' => ['action' => 'config_split', 'value' => 'last'],
+            ],
 
             // delete_inactive_users
             // 'not_exportable_tables' => [
@@ -198,7 +212,7 @@ class Setting extends Model
         return $keys->get($key);
     }
 
-    public function getSettingValue($value = '')
+    public function getSettingValue($value = '', $internal_use = true)
     {
 
         $key = $this->SETTING_KEYS($this->key, optional(collect(Cache::get('settings'))))['handle'];
@@ -218,8 +232,26 @@ class Setting extends Model
                 break;
             case "magic_split":
                 $value = !empty($value) ? $value : $key['value'];
-                $value =$value =="first"? "<ul class='list-group list-group-flush'>".collect(\explode('|', $this->properties))
-                ->map(fn($val)=> "<li class='list-group-item'>".$val."</li>")->join('') ."</ul>": \explode('|', $this->properties);
+                $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
+                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
+                break;
+            case "config_split":
+                $value = !empty($value) ? $value : $key['value'];
+                $else_val
+                    = collect(explode(',', $this->properties))
+                    ->mapWithKeys(function ($item) {
+                        $itemParts = explode(':', $item);
+                        $outerKey = str_replace(["\r", "\n"], '', trim($itemParts[0]));
+                        $innerParts = $itemParts[1];
+                        $innerArray = collect(explode('|', $innerParts))->mapWithKeys(function ($val) {
+                            $keyValue = explode('=', $val);
+                            return [trim($keyValue[0]) => $keyValue[1]];
+                        });
+                        return [$outerKey => $innerArray];
+                    });
+                $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode(',', $this->properties))
+                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
+                    $else_val;
                 break;
             default:
                 $value = $this->properties;
@@ -264,6 +296,7 @@ class Setting extends Model
             \strtolower('MAIL_FROM_NAME') => 'Mail From Name',
             'mail_url' => "Mail Url",
             'reference_types' => "Reference Types",
+            'database_configuration' => "Database Configurations",
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

@@ -9,7 +9,7 @@
             <form method="post" action="{{route('saveNode')}}">
                 @csrf
                 @if(isset($node))
-                <input type="hidden" value="{{$node->id}}" name='id'>
+                <input type="hidden" value="{{$node->id}}" name='id' id="node_id">
                 @endif
                 <div class="mb-3">
                     <label for="name" class="form-label">Node Name</label>
@@ -22,7 +22,6 @@
                 <div class="mb-3">
                     <label for="node_description" class="form-label">Node Small Description</label>
                     <input type="text" class="form-control" id="node_description" name="small_description" value="{{optional($node)->small_description}}">
-
                     @error('small_description')
                     <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                     @enderror
@@ -74,6 +73,7 @@
 
 
                 <div id="extra_fields"></div>
+                <div id="data_bus_fields"></div>
                 <div class="mb-3">
                     <label for="permission" class="form-label">Node Permission</label>
                     <select id="permission" class="form-select" name="permission_id">

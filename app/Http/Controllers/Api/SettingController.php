@@ -14,6 +14,7 @@ class SettingController extends Controller
 
     public function settings()
     {
+        // if(Cache::has('[a'))
 
         $settings =
             // Cache::get('settings')->whereIn('id',[3,11]);

@@ -183,7 +183,6 @@
                             <th scope="col" class="text-center h4 fw-bold ">Owned Model</th>
                             <th scope="col" class="text-center h4 fw-bold ">Description</th>
                             <th scope="col" class="text-center h4 fw-bold ">Type</th>
-                             <th scope="col" class="text-center h4 fw-bold ">References greater than 1</th>
                             <th scope="col" class="text-center h4 fw-bold ">Action</th>
                         </tr>
                     </thead>
@@ -202,9 +201,6 @@
                          <td>
                              <div class="text-bg-light text-center p-3 fw-semibold">{ref.type}</div>
                          </td>
-                        <td>
-                            <div class="text-bg-light text-center p-3 fw-semibold">{ref.has_many?"TRUE":"FALSE"}</div>
-                        </td>
                         <td>
                             <div class="text-bg-light text-center p-3 fw-semibold">
                             <button onClick={()=>deleteRef(ref.id)} class="btn btn-danger btn-sm h4" title="delete node">

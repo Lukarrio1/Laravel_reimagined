@@ -25,6 +25,7 @@ Auth::routes();
 
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::get('/nodes', [NodeController::class, 'index'])->name('viewNodes');
+    Route::get('/node/databus', [NodeController::class, 'databusData']);
     Route::post('/node', [NodeController::class, 'save'])->name('saveNode');
     Route::get('/node/{node}', [NodeController::class, 'node'])->name('viewNode');
     Route::delete('/node/delete/{node}', [NodeController::class, 'delete'])->name('deleteNode');
@@ -63,7 +64,6 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::post('/reference', [ReferenceController::class, 'save'])->name('saveReference');
     Route::get('/references_ajax',[ReferenceController::class, 'index2']);
     Route::delete('/reference/{reference}', [ReferenceController::class, 'delete']);
-
     $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
         ->getSettingValue('first');
     if ($multi_tenancy == 1) {
