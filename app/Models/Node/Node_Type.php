@@ -24,7 +24,8 @@ class Node_Type extends Model
                 collect($controller)
                     ->each(function ($method) use ($location, &$options, $filler) {
                         $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
-                        $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $location . "::" . $method . "</option>";
+                        $display_location = \collect(\explode('\\', $location))->last();
+                        $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $display_location . "::" . $method . "</option>";
                     });
             });
         $node_pages_options = '';
@@ -154,7 +155,7 @@ class Node_Type extends Model
                   <div class='mb-3'>
                       <label for='route_function' class='form-label'>Route Function</label>
                       <select id='route_function' class='form-select' name='route_function'>
-                      <option value=''>USE DATA BUS</option>
+                      <option value=''>Select a method</option>
                         $options
                       </select>
                   </div>

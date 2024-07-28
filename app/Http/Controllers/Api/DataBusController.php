@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Route;
 
 class DataBusController extends Controller
 {
-
     public $orderByTypes = [
         "asc",
         'desc'
@@ -36,11 +35,14 @@ class DataBusController extends Controller
                 ->select($node_table_columns);
             if (isset($currentRouteNode->properties['value']->node_item)) {
                 $item->where('id', $currentRouteNode->properties['value']->node_item);
-            } else
+            } else {
                 $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
+            }
             // \dd($item->toSql());
             $item = $item->first();
-        } else $item = [];
+        } else {
+            $item = [];
+        }
 
         return ["item" => $item];
     }
@@ -68,7 +70,9 @@ class DataBusController extends Controller
             return ["items" => []];
         }
 
-        $query = DB::connection($database)->table($table)->select($columns);
+        $query = DB::connection($database)
+            ->table($table)
+            ->select($columns);
 
         if ($limit > 0) {
             $query->limit($limit);

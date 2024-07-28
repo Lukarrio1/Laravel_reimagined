@@ -81,6 +81,8 @@ function App() {
         setRouteFunctionValue(route_function?.value);
         setDataLimit(node?.properties?.value?.node_data_limit);
         setNodeDisplayAid(node?.properties?.value?.node_item_display_aid);
+                setLaunch(false);
+        setLaunch(true)
     }, [node]);
 
     React.useEffect(() => {
