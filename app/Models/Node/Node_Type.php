@@ -124,7 +124,8 @@ class Node_Type extends Model
                     "node_many_data" => ['location' => 'properties'],
                     "node_data_limit" => ['location' => 'properties'],
                     "node_order_by_field" => ['location' => 'properties'],
-                    "node_order_by_type" => ['location' => 'properties']
+                    "node_order_by_type" => ['location' => 'properties'],
+                    "node_item_display_aid" => ['location' => 'properties']
                 ],
                 'rules' => [
                     'node_route' => 'required',
@@ -138,11 +139,12 @@ class Node_Type extends Model
                     "node_many_data" => '',
                     "node_data_limit" => '',
                     "node_order_by_field" => '',
-                    "node_order_by_type" => ''
+                    "node_order_by_type" => '',
+                    "node_item_display_aid" => ''
                 ],
                 'extra_html' => "<div>
                  <div class='mb-3'>
-                    <label for='route ' class='form-label'>Node route <small>(you can add parameters to the route eg. test/{param}/{param1})</small></label>
+                    <label for='route ' class='form-label' id='node_route_label'>Node route <small>(you can add parameters to the route eg. test/{param}/{param1})</small></label>
                     <input
                     type='text' class='form-control'
                      id='node_route' aria-describedby='node_name' name='node_route'

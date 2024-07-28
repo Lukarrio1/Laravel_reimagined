@@ -20,20 +20,27 @@ class DataBusController extends Controller
 
     public function oneRecord()
     {
+
         $currentRoute = join('::', explode('@', Route::currentRouteAction()));
         $currentRouteNode = Cache::get('routes')
             ->where('properties.value.route_function', $currentRoute)
             ->first();
+        $route_parameters = \collect(Route::current()->parameters());
         $database = $currentRouteNode->properties['value']->node_database;
         $table = $currentRouteNode->properties['value']->node_table;
-        $item_id = $currentRouteNode->properties['value']->node_item;
         $node_table_columns =
             $currentRouteNode->properties['value']->node_table_columns;
-        $item = $database != null && $table != null  ? DB::connection($database)
-            ->table($table)
-            ->select($node_table_columns)
-            ->where('id', $item_id)
-            ->first() : [];
+        if ($database != null && $table != null) {
+            $item =  DB::connection($database)
+                ->table($table)
+                ->select($node_table_columns);
+            if (isset($currentRouteNode->properties['value']->node_item)) {
+                $item->where('id', $currentRouteNode->properties['value']->node_item);
+            } else
+                $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
+            // \dd($item->toSql());
+            $item = $item->first();
+        } else $item = [];
 
         return ["item" => $item];
     }
@@ -44,7 +51,7 @@ class DataBusController extends Controller
         $currentRouteNode = Cache::get('routes')
             ->where('properties.value.route_function', $currentRoute)
             ->first();
-
+        $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
             return ["items" => []];
         }
@@ -69,6 +76,9 @@ class DataBusController extends Controller
 
         if ($orderByField && $orderByType) {
             $query->orderBy($orderByField, $orderByType);
+        }
+        if ($route_parameters->count() > 0) {
+            $route_parameters->each(fn ($value, $key) => $query->where($key, "LIKE", "%" . $value . "%"));
         }
 
         $items = $query->get();

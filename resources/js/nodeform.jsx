@@ -4,6 +4,7 @@ function App() {
     const node_type = document.querySelector("#node_type");
     const route_function = document.querySelector("#route_function");
     const node_id = document.querySelector("#node_id");
+    const node_route_label = document.querySelector("#node_route_label");
     const [launch, setLaunch] = React.useState(false);
     const [databases, setDatabases] = React.useState([]);
     const [tables, setTables] = React.useState([]);
@@ -79,7 +80,21 @@ function App() {
         setSelectedTable(node?.properties?.value?.node_table);
         setRouteFunctionValue(route_function?.value);
         setDataLimit(node?.properties?.value?.node_data_limit);
+        setNodeDisplayAid(node?.properties?.value?.node_item_display_aid);
     }, [node]);
+
+    React.useEffect(() => {
+        if (!node_route_label) return;
+        if (
+            route_function_value ==
+            "App\\Http\\Controllers\\Api\\DataBusController::oneRecord"
+        )
+            node_route_label.innerHTML =
+                "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
+        else
+            node_route_label.innerHTML =
+                "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
+    }, [route_function_value]);
 
     return (
         launch && (
@@ -151,7 +166,7 @@ function App() {
                         }
                         multiple
                     >
-                        <option>Select A Table Columns</option>
+                        <option value="">Select A Table Columns</option>
                         {columns &&
                             columns.map((column) => {
                                 return (
@@ -185,7 +200,7 @@ function App() {
                                     setNodeDisplayAid(e.target.value)
                                 }
                             >
-                                <option>Select display aid</option>
+                                <option value="">Select display aid</option>
                                 {columns &&
                                     columns.map((column) => {
                                         return (
@@ -213,7 +228,7 @@ function App() {
                                 name="node_item"
                                 onChange={(e) => setNodeItem(e.target.value)}
                             >
-                                <option>Select node item</option>
+                                <option value="">Select node item</option>
                                 {display_aid &&
                                     table_items &&
                                     table_items.map((item) => {
