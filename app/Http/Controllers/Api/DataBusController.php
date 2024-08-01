@@ -14,26 +14,30 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
-    public $methods = ["manyRecords", "oneRecord", "checkRecord"];
+    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord"];
     public function __call($method, $parameters)
     {
-        $method_to_call = \in_array(collect(explode('_', $method))->first(), ["manyRecords", "oneRecord"]) ? collect(explode('_', $method))->first() : $method;
-        if (\in_array(collect(explode('_', $method))->first(), ["manyRecords", "oneRecord"])) {
+        $method_to_call = \in_array(collect(explode('_', $method))->first(), $this->methods)
+            ? collect(explode('_', $method))->first()
+            : $method;
+        if (\in_array(collect(explode('_', $method))->first(), $this->methods)) {
             return $this->$method_to_call($method, $parameters);
         }
-
         return response()->json(['error' => 'Method not found.'], 404);
     }
 
+    public function getCurrentRoute()
+    {
+        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
+        return Cache::get('routes')
+            ->where('properties.value.route_function', $currentRoute)
+            ->first();
+    }
 
 
     public function oneRecord()
     {
-
-        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
-        $currentRouteNode = Cache::get('routes')
-            ->where('properties.value.route_function', $currentRoute)
-            ->first();
+        $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         $database = $currentRouteNode->properties['value']->node_database;
         $table = $currentRouteNode->properties['value']->node_table;
@@ -48,23 +52,16 @@ class DataBusController extends Controller
             } else {
                 $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
             }
-            // \dd($item->toSql());
             $item = $item->first();
         } else {
             $item = [];
         }
-
-        return ["item" => $item];
+        return \response()->json(["item" => $item], 200);
     }
 
     public function manyRecords()
     {
-        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
-
-        $currentRouteNode = Cache::get('routes')
-            ->where('properties.value.route_function', $currentRoute)
-            ->first();
-
+        $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
             return ["items" => []];
@@ -99,15 +96,12 @@ class DataBusController extends Controller
 
         $items = $query->get();
 
-        return ["items" => $items];
+        return \response()->json(["items" => $items], 200);
     }
 
     public function checkRecord()
     {
-        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
-        $currentRouteNode = Cache::get('routes')
-            ->where('properties.value.route_function', $currentRoute)
-            ->first();
+        $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         $database = $currentRouteNode->properties['value']->node_database;
         $table = $currentRouteNode->properties['value']->node_table;
@@ -122,12 +116,29 @@ class DataBusController extends Controller
             } else {
                 $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
             }
-            // \dd($item->toSql());
             $item = $item->first();
         } else {
             $item = [];
         }
 
-        return ["item" => !empty($item)];
+        return \response()->json(["exist" => !empty($item)], 200);
+    }
+
+    public function deleteRecord()
+    {
+        $currentRouteNode = $this->getCurrentRoute();
+        $route_parameters = \collect(Route::current()->parameters());
+        $database = $currentRouteNode->properties['value']->node_database;
+        $table = $currentRouteNode->properties['value']->node_table;
+        if ($database != null && $table != null) {
+            $item =  DB::connection($database)
+                ->table($table);
+            $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
+            $item->delete();
+        } else {
+            $item = null;
+        }
+
+        return \response()->json(["item" => true], 204);
     }
 }

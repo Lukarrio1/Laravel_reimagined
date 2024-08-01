@@ -66,6 +66,7 @@ function App() {
                         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
                         "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
+                        "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
                     ].includes(e.target.value.split("_")[0]) == true
                 );
             });
@@ -97,6 +98,7 @@ function App() {
         else
             node_route_label.innerHTML =
                 "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
+        console.log(route_function_value, "route_function_value");
     }, [route_function_value]);
 
     return (
@@ -156,37 +158,44 @@ function App() {
                             })}
                     </select>
                 </div>
-                <div class="mb-3">
-                    <label for="node_table" class="form-label">
-                        Node Table Columns
-                    </label>
-                    <select
-                        id="node_table_columns"
-                        class="form-select"
-                        name="node_table_columns[]"
-                        onChange={(e) =>
-                            setSelectedTableColumns(e.target.value)
-                        }
-                        multiple
-                    >
-                        <option value="">Select A Table Columns</option>
-                        {columns &&
-                            columns.map((column) => {
-                                return (
-                                    <option
-                                        selected={node?.properties?.value?.node_table_columns?.includes(
-                                            column
-                                        )}
-                                        value={column}
-                                    >
-                                        {column}
-                                    </option>
-                                );
-                            })}
-                    </select>
-                </div>
+                {"App\\Http\\Controllers\\Api\\DataBusController::deleteRecord" !=
+                    route_function_value?.split("_")[0] && (
+                    <div class="mb-3">
+                        <label for="node_table" class="form-label">
+                            Node Table Columns
+                        </label>
+                        <select
+                            id="node_table_columns"
+                            class="form-select"
+                            name="node_table_columns[]"
+                            onChange={(e) =>
+                                setSelectedTableColumns(e.target.value)
+                            }
+                            multiple
+                            disabled={[
+                                "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
+                                "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
+                            ]?.includes(route_function_value?.split("_")[0])}
+                        >
+                            <option value="">Select A Table Columns</option>
+                            {columns &&
+                                columns.map((column) => {
+                                    return (
+                                        <option
+                                            selected={node?.properties?.value?.node_table_columns?.includes(
+                                                column
+                                            )}
+                                            value={column}
+                                        >
+                                            {column}
+                                        </option>
+                                    );
+                                })}
+                        </select>
+                    </div>
+                )}
                 {"App\\Http\\Controllers\\Api\\DataBusController::oneRecord" ==
-                    route_function_value && (
+                    route_function_value?.split("_")[0] && (
                     <>
                         <div class="mb-3">
                             <label

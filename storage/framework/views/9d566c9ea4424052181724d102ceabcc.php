@@ -17,7 +17,7 @@ $multi_tenancy =(int)optional(collect(Cache::get('settings'))->where('key','mult
     <!-- CSRF Token -->
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <title><?php echo e(config('app.name')); ?></title>
+    <title><?php echo e($app_name); ?></title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
