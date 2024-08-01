@@ -402,7 +402,7 @@ function App() {
                     </>
                 )}
                 {"App\\Http\\Controllers\\Api\\DataBusController::manyRecords" ==
-                    route_function_value && (
+                    route_function_value?.split("_")[0] && (
                     <>
                         <div class="mb-3">
                             <label for="name" class="form-label">
