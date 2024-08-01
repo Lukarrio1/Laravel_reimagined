@@ -113,7 +113,19 @@ class NodeController extends Controller
 
     public function save(Request $request)
     {
-        // dd($request->all());
+        $extra_rules = [];
+        $extra_handler = [];
+        $node_endpoint_length = (int)$request->node_endpoint_length;
+
+        if ($node_endpoint_length > 0) {
+            $columns = \json_decode($request->node_endpoint_columns);
+            $request->merge(["node_table_columns" => $columns]);
+            for ($i = 0; $i < $node_endpoint_length; $i++) {
+                $extra_rules["node_endpoint_field_" . $columns[$i]] = '';
+                $extra_handler["node_endpoint_field_" . $columns[$i]] = ['location' => 'properties'];
+                $request->merge(["node_endpoint_field_" . $columns[$i] => $request->get("node_endpoint_field_" . $i)]);
+            }
+        }
         $main_rules = [
             'name' => 'required',
             'small_description' => 'required',
@@ -130,11 +142,12 @@ class NodeController extends Controller
         $request->merge([
             'permission_id' => empty($request->permission_id) ? 0 : $request->permission_id,
         ] + $this->tenancy->addTenantIdToCurrentItem(\optional(\auth()->user()->land)->id));
+
         Node::updateOrCreate(['id' => $request->id], $request->except(
             isset($current_node_type['rules']) ? \collect($current_node_type['rules'])
-                ->keys()->toArray() : []
+                ->keys()->toArray() + $extra_rules : []
         ) + [
-            'properties' => (new Node_Type())->handler($current_node_type['handle'], $request->all()),
+            'properties' => (new Node_Type())->handler($current_node_type['handle'] + $extra_handler, $request->all()),
             'uuid' => !empty($current_node->uuid) ? $current_node->uuid : Str::random(50),
         ])
             ->updatePageLayoutName()
@@ -162,6 +175,7 @@ class NodeController extends Controller
         $node = Node::find(\request('node_id'));
         $table_items = $database != "null" && $table != "null"  ? DB::connection($database)->table($table)->get() : [];
         return [
+            "validation_rules" => $this->getValidationRules(),
             'node' => $node,
             "tables" => $tables,
             "columns" => $columns,

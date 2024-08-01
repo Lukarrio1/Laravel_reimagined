@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -14,7 +15,7 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
-    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord"];
+    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord"];
     public function __call($method, $parameters)
     {
         $method_to_call = \in_array(collect(explode('_', $method))->first(), $this->methods)
@@ -26,13 +27,7 @@ class DataBusController extends Controller
         return response()->json(['error' => 'Method not found.'], 404);
     }
 
-    public function getCurrentRoute()
-    {
-        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
-        return Cache::get('routes')
-            ->where('properties.value.route_function', $currentRoute)
-            ->first();
-    }
+
 
 
     public function oneRecord()
@@ -59,8 +54,9 @@ class DataBusController extends Controller
         return \response()->json(["item" => $item], 200);
     }
 
-    public function manyRecords()
+    public function manyRecords(): JsonResponse
     {
+        dd($this->getValidationRules());
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
@@ -99,7 +95,7 @@ class DataBusController extends Controller
         return \response()->json(["items" => $items], 200);
     }
 
-    public function checkRecord()
+    public function checkRecord(): JsonResponse
     {
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
@@ -124,7 +120,7 @@ class DataBusController extends Controller
         return \response()->json(["exist" => !empty($item)], 200);
     }
 
-    public function deleteRecord()
+    public function deleteRecord(): JsonResponse
     {
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
@@ -140,5 +136,10 @@ class DataBusController extends Controller
         }
 
         return \response()->json(["item" => true], 204);
+    }
+
+    public function saveRecord(): JsonResponse
+    {
+        return \response()->json([], 200);
     }
 }

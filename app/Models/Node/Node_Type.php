@@ -242,13 +242,15 @@ class Node_Type extends Model
           document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
           const node_page_name = document.querySelector('#node_page_name');
+          if(node_page_name){
           const node_page = document.querySelector('#node_page');
-          const selectedOption = node_page.options[node_page.selectedIndex];
-          node_page_name.value = selectedOption.innerHTML;
+          const selectedOption = node_page?.options[node_page?.selectedIndex];
+          node_page_name.value = selectedOption.innerHTML??'';
           node_page.addEventListener('change',(event)=>{
             const selectedOption = node_page.options[node_page.selectedIndex];
             node_page_name.value = selectedOption.innerHTML;
           })
+        }
        }, 1000);
             });
        </script>",

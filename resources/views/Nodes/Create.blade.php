@@ -129,7 +129,7 @@
         node_type.addEventListener('change', function(event) {
             // Get the selected option
             if (node_type.options == null) return
-            const selectedOption = node_type.options[node_type.selectedIndex];
+            const selectedOption = node_type?.options[node_type?.selectedIndex];
             // Access the data attributes
             const customValue = selectedOption.getAttribute('data-node-type');
             const selected = customValue
