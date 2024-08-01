@@ -1,6 +1,9 @@
-import { MultiSelect } from "react-multi-select-component";
-
 function App() {
+    function getUniqueElements(array) {
+        return array.filter(
+            (value, index, self) => self.indexOf(value) === index
+        );
+    }
     const node_type = document.querySelector("#node_type");
     const route_function = document.querySelector("#route_function");
     const node_id = document.querySelector("#node_id");
@@ -95,7 +98,12 @@ function App() {
         setDataLimit(node?.properties?.value?.node_data_limit);
         setNodeDisplayAid(node?.properties?.value?.node_item_display_aid);
         // setSelectedTableColumns(node?.properties?.value?.node_table_columns);
-        setColumnsToSave(node?.properties?.value?.node_table_columns);
+        setColumnsToSave((pre) =>
+            getUniqueElements([
+                ...pre,
+                ...node?.properties?.value?.node_table_columns,
+            ])
+        );
         setLaunch(false);
         setLaunch(true);
     }, [node]);
@@ -210,26 +218,30 @@ function App() {
                         >
                             <option value="">Select A Table Columns</option>
                             {columns &&
-                                columns.map((column) => {
-                                    return (
-                                        <option
-                                            selected={node?.properties?.value?.node_table_columns?.includes(
-                                                column
-                                            )}
-                                            // onClick={() =>
-                                            //     setColumnsToSave((pre) => [
-                                            //         ...pre?.filter(
-                                            //             (c) => c != column
-                                            //         ),
-                                            //         column,
-                                            //     ])
-                                            // }
-                                            value={column}
-                                        >
-                                            {column}
-                                        </option>
-                                    );
-                                })}
+                                columns
+                                    ?.filter(
+                                        (c) => !columns_to_save.includes(c)
+                                    )
+                                    ?.map((column) => {
+                                        return (
+                                            <option
+                                                selected={node?.properties?.value?.node_table_columns?.includes(
+                                                    column
+                                                )}
+                                                // onClick={() =>
+                                                //     setColumnsToSave((pre) => [
+                                                //         ...pre?.filter(
+                                                //             (c) => c != column
+                                                //         ),
+                                                //         column,
+                                                //     ])
+                                                // }
+                                                value={column}
+                                            >
+                                                {column}
+                                            </option>
+                                        );
+                                    })}
                         </select>
                     </div>
                 )}
