@@ -2,9 +2,11 @@
 
 namespace App\Models\Node;
 
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Controllers\Api\DataBusController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Node_Type extends Model
@@ -23,9 +25,11 @@ class Node_Type extends Model
             ->each(function ($controller, $location) use (&$options, $filler) {
                 collect($controller)
                     ->each(function ($method) use ($location, &$options, $filler) {
+                        $method_updated = \in_array($method, (new DataBusController())->methods) ? $method . "_" . Str::random(10) : $method;
                         $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
+                        $selected = !empty($filler) && \collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))->first() == $location . '::' . $method ? "selected" : '';
                         $display_location = \collect(\explode('\\', $location))->last();
-                        $options .= "<option value='" . $location . '::' . $method . "' $selected>" . $display_location . "::" . $method . "</option>";
+                        $options .= "<option value='" . $location . '::' . $method_updated . "' $selected>" . $display_location . "::" . $method . "</option>";
                     });
             });
         $node_pages_options = '';

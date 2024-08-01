@@ -14,6 +14,16 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
+    public $methods = ["manyRecords", "oneRecord"];
+    public function __call($method, $parameters)
+    {
+        $method_to_call = \in_array(collect(explode('_', $method))->first(), ["manyRecords", "oneRecord"]) ? collect(explode('_', $method))->first() : $method;
+        if (\in_array(collect(explode('_', $method))->first(), ["manyRecords", "oneRecord"])) {
+            return $this->$method_to_call($method, $parameters);
+        }
+
+        return response()->json(['error' => 'Method not found.'], 404);
+    }
 
 
 
@@ -50,9 +60,11 @@ class DataBusController extends Controller
     public function manyRecords()
     {
         $currentRoute = join('::', explode('@', Route::currentRouteAction()));
+
         $currentRouteNode = Cache::get('routes')
             ->where('properties.value.route_function', $currentRoute)
             ->first();
+
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
             return ["items" => []];

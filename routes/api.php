@@ -43,6 +43,7 @@ $routes->each(function ($route) {
 
     list($controller, $methodName) = $routeFunctionParts;
 
+
     Route::$method($node_route, [$controller, $methodName])
         ->middleware(AuthMiddleware::class);
 });

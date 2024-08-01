@@ -65,7 +65,7 @@ function App() {
                     [
                         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
-                    ].includes(e.target.value) == true
+                    ].includes(e.target.value.split("_")[0]) == true
                 );
             });
     }, [launch]);
@@ -81,8 +81,8 @@ function App() {
         setRouteFunctionValue(route_function?.value);
         setDataLimit(node?.properties?.value?.node_data_limit);
         setNodeDisplayAid(node?.properties?.value?.node_item_display_aid);
-                setLaunch(false);
-        setLaunch(true)
+        setLaunch(false);
+        setLaunch(true);
     }, [node]);
 
     React.useEffect(() => {
@@ -138,7 +138,7 @@ function App() {
                         name="node_table"
                         onChange={(e) => setSelectedTable(e.target.value)}
                     >
-                        <option>Select A Table</option>
+                        <option value="">Select A Table</option>
                         {tables &&
                             tables.map((table) => {
                                 return (
