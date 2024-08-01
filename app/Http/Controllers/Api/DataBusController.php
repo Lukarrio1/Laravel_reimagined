@@ -14,7 +14,7 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
-    public $methods = ["manyRecords", "oneRecord"];
+    public $methods = ["manyRecords", "oneRecord", "checkRecord"];
     public function __call($method, $parameters)
     {
         $method_to_call = \in_array(collect(explode('_', $method))->first(), ["manyRecords", "oneRecord"]) ? collect(explode('_', $method))->first() : $method;
@@ -100,5 +100,34 @@ class DataBusController extends Controller
         $items = $query->get();
 
         return ["items" => $items];
+    }
+
+    public function checkRecord()
+    {
+        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
+        $currentRouteNode = Cache::get('routes')
+            ->where('properties.value.route_function', $currentRoute)
+            ->first();
+        $route_parameters = \collect(Route::current()->parameters());
+        $database = $currentRouteNode->properties['value']->node_database;
+        $table = $currentRouteNode->properties['value']->node_table;
+        $node_table_columns =
+            $currentRouteNode->properties['value']->node_table_columns;
+        if ($database != null && $table != null) {
+            $item =  DB::connection($database)
+                ->table($table)
+                ->select($node_table_columns);
+            if (isset($currentRouteNode->properties['value']->node_item)) {
+                $item->where('id', $currentRouteNode->properties['value']->node_item);
+            } else {
+                $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
+            }
+            // \dd($item->toSql());
+            $item = $item->first();
+        } else {
+            $item = [];
+        }
+
+        return ["item" => !empty($item)];
     }
 }

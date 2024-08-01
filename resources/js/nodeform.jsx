@@ -65,6 +65,7 @@ function App() {
                     [
                         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
+                        "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
                     ].includes(e.target.value.split("_")[0]) == true
                 );
             });
