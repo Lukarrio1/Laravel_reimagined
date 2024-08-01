@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 
 class DataBusController extends Controller
 {
@@ -56,7 +56,6 @@ class DataBusController extends Controller
 
     public function manyRecords(): JsonResponse
     {
-        dd($this->getValidationRules());
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
@@ -140,6 +139,36 @@ class DataBusController extends Controller
 
     public function saveRecord(): JsonResponse
     {
-        return \response()->json([], 200);
+        $currentRouteNode = $this->getCurrentRoute();
+        $database = $currentRouteNode->properties['value']->node_database;
+        $table = $currentRouteNode->properties['value']->node_table;
+        $node_table_columns =
+            $currentRouteNode->properties['value']->node_table_columns;
+        $rules = [];
+        for ($i = 0; $i < \count($node_table_columns); $i++) {
+            $rules[$node_table_columns[$i]] = collect($currentRouteNode->properties['value']->{'node_endpoint_field_' . $node_table_columns[$i]})
+                ->join(',');
+        }
+        $data = \request()->all();
+        $validator = Validator::make($data, $rules);
+        if ($validator->fails()) {
+            return  \response()->json(['errors' => $validator->errors()]);
+        }
+        if ($database != null && $table != null) {
+            DB::connection($database)
+                ->table($table)
+                ->insert($data);
+            $item =
+                DB::connection($database)
+                ->table($table)
+                ->orderBy('id', 'desc')
+                ->first();
+        } else {
+            $item = [];
+        }
+
+        return \response()->json([
+            "item" => $item,
+        ], 201);
     }
 }

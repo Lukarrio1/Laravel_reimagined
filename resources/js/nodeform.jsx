@@ -88,7 +88,13 @@ function App() {
     React.useEffect(() => {
         getData();
         // setColumnsToSave(selected_columns);
-    }, [selected_database, selected_table, selected_columns, nodeType]);
+    }, [
+        selected_database,
+        selected_table,
+        selected_columns,
+        nodeType,
+        route_function,
+    ]);
 
     React.useEffect(() => {
         if (!node) return;
@@ -219,8 +225,11 @@ function App() {
                             <option value="">Select A Table Columns</option>
                             {columns &&
                                 columns
-                                    ?.filter(
-                                        (c) => !columns_to_save.includes(c)
+                                    ?.filter((c) =>
+                                        "App\\Http\\Controllers\\Api\\DataBusController::saveRecord" ==
+                                        route_function_value?.split("_")[0]
+                                            ? !columns_to_save.includes(c)
+                                            : true
                                     )
                                     ?.map((column) => {
                                         return (

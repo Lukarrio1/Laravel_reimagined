@@ -33,24 +33,7 @@ class Controller extends BaseController
 
     public  function getValidationRules()
     {
-        $rules = ["required","string","integer","min:3", "min:5", "min:10",'sometimes'];
-
-        // Get the reflection class instance of the Validator
-        // $validatorReflection = new ReflectionClass(Validator::class);
-
-        // // Get all methods from the Validator class
-        // $methods = $validatorReflection->getMethods();
-
-        // foreach ($methods as $method) {
-        //     // Look for methods starting with "validate"
-        //     if (strpos($method->name, 'validate') === 0 && $method->isPublic()) {
-        //         // Get the rule name by removing "validate" and converting camelCase to snake_case
-        //         $ruleName = Str::snake(substr($method->name, 8));
-        //         $rules[] = $ruleName;
-        //     }
-        // }
-
-        // Return the list of rules
+        $rules = ["required", "integer", "min:3", "min:5", "min:10", 'sometimes', 'present', "max:3", "max:5", "max:10"];
         return $rules;
     }
 }
