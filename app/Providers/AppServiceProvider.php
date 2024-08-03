@@ -131,6 +131,6 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-        (new User())->deleteInactiveUsers();
+        // (new User())->deleteInactiveUsers();
     }
 }
