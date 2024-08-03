@@ -15,7 +15,7 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
-    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord"];
+    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord","updateRecord"];
     public function __call($method, $parameters)
     {
         $method_to_call = \in_array(collect(explode('_', $method))->first(), $this->methods)
@@ -158,6 +158,42 @@ class DataBusController extends Controller
             DB::connection($database)
                 ->table($table)
                 ->insert($data);
+            $item =
+                DB::connection($database)
+                ->table($table)
+                ->orderBy('id', 'desc')
+                ->first();
+        } else {
+            $item = [];
+        }
+
+        return \response()->json([
+            "item" => $item,
+        ], 201);
+    }
+    public function updateRecord(): JsonResponse
+    {
+        $currentRouteNode = $this->getCurrentRoute();
+        $database = $currentRouteNode->properties['value']->node_database;
+        $route_parameters = \collect(Route::current()->parameters());
+        $table = $currentRouteNode->properties['value']->node_table;
+        $node_table_columns =
+            $currentRouteNode->properties['value']->node_table_columns;
+        $rules = [];
+        for ($i = 0; $i < \count($node_table_columns); $i++) {
+            $rules[$node_table_columns[$i]] = collect($currentRouteNode->properties['value']->{'node_endpoint_field_' . $node_table_columns[$i]})
+                ->join(',');
+        }
+        $data = \request()->all();
+        $validator = Validator::make($data, $rules);
+        if ($validator->fails()) {
+            return  \response()->json(['errors' => $validator->errors()]);
+        }
+        if ($database != null && $table != null) {
+            $query =  DB::connection($database)
+                ->table($table);
+            $route_parameters->each(fn ($value, $key) => $query->where($key, $value));
+            $query->update($data);
             $item =
                 DB::connection($database)
                 ->table($table)

@@ -113,11 +113,12 @@ class NodeController extends Controller
 
     public function save(Request $request)
     {
+        // \dd($request->all());
         $extra_rules = [];
         $extra_handler = [];
         $node_endpoint_length = (int)$request->node_endpoint_length;
 
-        if ($node_endpoint_length > 0) {
+        if (0 < $node_endpoint_length) {
             $columns = \json_decode($request->node_endpoint_columns);
             $request->merge(["node_table_columns" => $columns]);
             for ($i = 0; $i < $node_endpoint_length; $i++) {
@@ -125,7 +126,10 @@ class NodeController extends Controller
                 $extra_handler["node_endpoint_field_" . $columns[$i]] = ['location' => 'properties'];
                 $request->merge(["node_endpoint_field_" . $columns[$i] => $request->get("node_endpoint_field_" . $i)]);
             }
+        } else {
+            $request->merge(["node_table_columns" => $request->node_table_columns]);
         }
+
         $main_rules = [
             'name' => 'required',
             'small_description' => 'required',
@@ -170,10 +174,10 @@ class NodeController extends Controller
         // getColumnListing
         $tables = $database != "null" ? collect(DB::connection($database)->select('SHOW TABLES'))
             ->map(fn ($value) => \array_values((array) $value))
-            ->flatten()  : [];
+            ->flatten() : [];
         $columns = $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
-        $table_items = $database != "null" && $table != "null"  ? DB::connection($database)->table($table)->get() : [];
+        $table_items = $database != "null" && $table != "null" ? DB::connection($database)->table($table)->get() : [];
         return [
             "validation_rules" => $this->getValidationRules(),
             'node' => $node,

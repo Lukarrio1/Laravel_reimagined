@@ -1,4 +1,18 @@
 function App() {
+    const possibleLabel = {
+        "App\\Http\\Controllers\\Api\\DataBusController::oneRecord":
+            " (use route parameters based on columns from the database to filter the data eg. test/{column}/{column1})",
+        "App\\Http\\Controllers\\Api\\DataBusController::manyRecords":
+            " (use route parameters based on columns from the database to filter the data eg. test/{column}/{column1})",
+        "App\\Http\\Controllers\\Api\\DataBusController::saveRecord":
+            " (route parameters are not required for this route eg. save/route)",
+        "App\\Http\\Controllers\\Api\\DataBusController::checkRecord":
+            " (use route parameters based on columns from the database to filter the data eg. test/{column}/{column1})",
+        "App\\Http\\Controllers\\Api\\DataBusController::updateRecord":
+            " (use route parameters based on columns from the database to find the record(s) that requires an update eg. test/{column}/{column1}))",
+        "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord":
+            " (use route parameters based on columns from the database to filter the record(s) that you want to delete eg. test/{column}/{column1}))",
+    };
     function getUniqueElements(array) {
         return array.filter(
             (value, index, self) => self.indexOf(value) === index
@@ -76,6 +90,7 @@ function App() {
                         "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                        "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
                     ].includes(e.target.value.split("_")[0]) == true
                 );
             });
@@ -116,16 +131,10 @@ function App() {
 
     React.useEffect(() => {
         if (!node_route_label) return;
-        if (
-            route_function_value ==
-            "App\\Http\\Controllers\\Api\\DataBusController::oneRecord"
-        )
-            node_route_label.innerHTML =
-                "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
-        else
-            node_route_label.innerHTML =
-                "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
-        console.log(route_function_value, "route_function_value");
+        node_route_label.innerHTML =
+            possibleLabel[route_function_value?.split("_")[0]] != undefined
+                ? possibleLabel[route_function_value?.split("_")[0]]
+                : "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
     }, [route_function_value]);
 
     React.useEffect(() => {
@@ -195,8 +204,10 @@ function App() {
                     <div class="mb-3">
                         <label for="node_table" class="form-label">
                             Node Table Columns{" "}
-                            {"App\\Http\\Controllers\\Api\\DataBusController::saveRecord" ==
-                            route_function_value?.split("_")[0]
+                            {[
+                                "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                                "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                            ]?.includes(route_function_value?.split("_")[0])
                                 ? JSON.stringify(columns_to_save)
                                 : ""}
                         </label>
@@ -206,14 +217,24 @@ function App() {
                             name="node_table_columns[]"
                             onChange={(e) => {
                                 setSelectedTableColumns(e.target.value);
-                                setColumnsToSave([
-                                    ...columns_to_save,
-                                    e.target.value,
-                                ]);
+                                if (
+                                    [
+                                        "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                                        "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                                    ]?.includes(
+                                        route_function_value?.split("_")[0]
+                                    )
+                                )
+                                    setColumnsToSave([
+                                        ...columns_to_save,
+                                        e.target.value,
+                                    ]);
                             }}
                             multiple={
-                                "App\\Http\\Controllers\\Api\\DataBusController::saveRecord" ==
-                                route_function_value?.split("_")[0]
+                                [
+                                    "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                                    "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                                ]?.includes(route_function_value?.split("_")[0])
                                     ? false
                                     : true
                             }
@@ -226,8 +247,12 @@ function App() {
                             {columns &&
                                 columns
                                     ?.filter((c) =>
-                                        "App\\Http\\Controllers\\Api\\DataBusController::saveRecord" ==
-                                        route_function_value?.split("_")[0]
+                                        [
+                                            "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                                            "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                                        ]?.includes(
+                                            route_function_value?.split("_")[0]
+                                        )
                                             ? !columns_to_save.includes(c)
                                             : true
                                     )
@@ -254,9 +279,11 @@ function App() {
                         </select>
                     </div>
                 )}
-                {columns_to_save?.length > 0 && (
+                {[
+                    "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                    "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                ]?.includes(route_function_value?.split("_")[0]) && (
                     <>
-                        {" "}
                         <input
                             type="hidden"
                             value={columns_to_save?.length}
@@ -264,13 +291,19 @@ function App() {
                         ></input>
                         <input
                             type="hidden"
-                            value={JSON.stringify(columns_to_save)}
+                            value={JSON.stringify(
+                                columns_to_save.length > 0
+                                    ? columns_to_save
+                                    : selected_columns
+                            )}
                             name="node_endpoint_columns"
                         ></input>
                     </>
                 )}
-                {"App\\Http\\Controllers\\Api\\DataBusController::saveRecord" ==
-                    route_function_value?.split("_")[0] &&
+                {[
+                    "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                    "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                ]?.includes(route_function_value?.split("_")[0]) &&
                     columns_to_save?.length > 0 &&
                     columns_to_save.map(function (column, idx) {
                         return (
