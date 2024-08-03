@@ -242,10 +242,10 @@ class Setting extends Model
                     ->mapWithKeys(function ($item) {
                         $itemParts = explode(':', $item);
                         $outerKey = str_replace(["\r", "\n"], '', trim($itemParts[0]));
-                        $innerParts = $itemParts[1];
+                        $innerParts = isset($itemParts[1]) ? $itemParts[1] : '';
                         $innerArray = collect(explode('|', $innerParts))->mapWithKeys(function ($val) {
                             $keyValue = explode('=', $val);
-                            return [trim($keyValue[0]) => $keyValue[1]];
+                            return [trim($keyValue[0]) => isset($keyValue[1]) ? $keyValue[1] : ''];
                         });
                         return [$outerKey => $innerArray];
                     });

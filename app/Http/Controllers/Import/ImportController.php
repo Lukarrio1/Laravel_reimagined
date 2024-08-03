@@ -6,6 +6,7 @@ use App\Models\Export;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,11 +21,23 @@ class ImportController extends Controller
 
     public function index()
     {
-        return view('Import.View', ['table_names' => $this->export->getAllTables()]);
+        return view('Import.View', [
+            'table_names' => empty(\request('database')) ? [] : $this->export->getAllTables(\request('database')),
+            'databases' => collect(Cache::get('settings'))
+                ->where('key', 'database_configuration')->first()
+                ->getSettingValue()->keys()
+        ]);
+    }
+    public function index_ajax()
+    {
+        return [
+            'table_names' => empty(\request('database')) ? [] : $this->export->getAllTables(\request('database')),
+        ];
     }
 
     public function import(Request $request)
     {
+
         $export = new Export();
 
         $first_rules = [
@@ -46,7 +59,7 @@ class ImportController extends Controller
         }
         $file_columns = \collect($export->readCSV($request->file('csv_file')))->first();
 
-        $table_columns = $export->getAllTableColumns($request->table_name);
+        $table_columns = $export->getAllTableColumns($request->table_name, $request->database);
 
         $table_validation = \collect(get_object_vars((object)$file_columns))
             ->filter(fn ($key) => \in_array($key, \get_object_vars((object)$table_columns)))->count() <=
@@ -71,7 +84,7 @@ class ImportController extends Controller
         })->toArray();
 
         try {
-            DB::table($request->table_name)->insert($table_data);
+            DB::connection($request->database)->table($request->table_name)->insert($table_data);
         } catch (\Throwable $th) {
             return \redirect()->back()->withInput()->withErrors([
                 'csv_file'

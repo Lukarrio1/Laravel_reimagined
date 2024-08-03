@@ -1,6 +1,5 @@
 key,properties,tenant_id,allowed_for_api_use
 admin_role,"Super Admin_1",,0
-admin_role,"Super Admin_1",,0
 mail_host,sandbox.smtp.mailtrap.io,,0
 mail_port,2525,,0
 mail_username,e1e0f01cad57ee,,0
@@ -20,11 +19,12 @@ redirect_to_after_register,Home_/,,1
 redirect_to_after_logout,Login_/login,,1
 multi_tenancy,0_false,,0
 registration_role,"Authenticated User_2",,0
-app_name,LRT,,1
+app_name,"Api Management Tool (AMT)",,1
 mail_mailer,smtp,,0
 cache_driver,"File Storage_file",,0
 api_email_verification,Disabled_,,0
 client_app_url,http://localhost:3000,,0
 reference_types,friend_0|friends_1,,0
 database_configuration,"agrilinkage:DB_CONNECTION=mysql|DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=agrilinkage|DB_USERNAME=root|DB_PASSWORD=root_user,
-calendar:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=calendar|DB_USERNAME=root|DB_PASSWORD=root_user",,0
+calendar:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=calendar|DB_USERNAME=root|DB_PASSWORD=root_user,
+main_database:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=laravel_reimagined|DB_USERNAME=root|DB_PASSWORD=root_user",,0
