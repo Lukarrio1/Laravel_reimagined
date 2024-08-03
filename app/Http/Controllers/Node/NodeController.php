@@ -113,7 +113,6 @@ class NodeController extends Controller
 
     public function save(Request $request)
     {
-        // \dd($request->all());
         $extra_rules = [];
         $extra_handler = [];
         $node_endpoint_length = (int)$request->node_endpoint_length;

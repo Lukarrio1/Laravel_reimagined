@@ -6,6 +6,19 @@
         <div class="card-body">
             <form action="{{route('exportData')}}" method="get">
                 <div class="mb-3">
+                    <label for="table" class="form-label">Database</label>
+                    <select class="form-select" aria-label="Default select example" name="database">
+                        <option selected value=''>Open this select menu</option>
+                        @foreach ($databases as $database )
+                        <option value="{{$database}}" {{request('database')==$database?"selected":''}}>{{$database}}</option>
+                        @endforeach
+                    </select>
+                    @if($table_error!=1)
+                    <div style="color: red;">{{ $table_error }}</div> <!-- Display the error message -->
+                    @endif
+                </div>
+                @if(request('database')!=null)
+                <div class="mb-3">
                     <label for="table" class="form-label">Table</label>
                     <select class="form-select" aria-label="Default select example" name="table">
                         <option selected value=''>Open this select menu</option>
@@ -16,8 +29,8 @@
                     @if($table_error!=1)
                     <div style="color: red;">{{ $table_error }}</div> <!-- Display the error message -->
                     @endif
-
                 </div>
+                @endif
                 @if(count($table_columns)>0&&request('table')!=null)
                 <div class="mb-3">
                     <label for="table" class="form-label">Table Columns</label>

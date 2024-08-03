@@ -58,6 +58,7 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::get('/export/data', [ExportController::class, 'export'])->name('exportDataNow');
 
     Route::get('/import', [ImportController::class, 'index'])->name('importView');
+    Route::get('/import/ajax', [ImportController::class, 'index_ajax']);
     Route::post('/import/data', [ImportController::class, 'import'])->name('importData');
 
     Route::get('/references', [ReferenceController::class, 'index'])->name('viewReferences');

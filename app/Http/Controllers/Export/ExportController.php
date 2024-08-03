@@ -18,7 +18,12 @@ class ExportController extends Controller
     {
         $export = new Export();
         $table = \request()->get('table');
+        $database = \request()->get('database');
         $selected_table_columns = \request()->get('table_columns', []);
+        $databases =
+            collect(Cache::get('settings'))
+            ->where('key', 'database_configuration')->first()
+            ->getSettingValue()->keys();
         $table_columns = [];
         $table_data = [];
 
@@ -31,8 +36,8 @@ class ExportController extends Controller
             });
 
 
-        if (!empty($table)) {
-            $table_columns = $export->getAllTableColumns($table);
+        if (!empty($table) && !empty($database)) {
+            $table_columns = $export->getAllTableColumns($table, $database);
         }
         if (\count($selected_table_columns) > 0) {
             $table_validation = \collect($selected_table_columns)
@@ -49,9 +54,9 @@ class ExportController extends Controller
             if ($table_validation) {
                 return \redirect()->back()->withErrors(['table_error' => "$table does not contain $failed_keys."]);
             }
-            $table_data = $export->getTableData($table, $selected_table_columns, $searchParams)->get($selected_table_columns);
+            $table_data = $export->getTableData($table, $selected_table_columns, $searchParams, $database)->get($selected_table_columns);
         } else {
-            $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams)->get();
+            $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams, $database)->get();
             $selected_table_columns = $table_columns;
         }
 
@@ -66,17 +71,18 @@ class ExportController extends Controller
                 return $key . ":search here";
             })->join('|');
 
-        Cache::set('current_table_data_for_export', ['selected_columns' => $selected_table_columns, 'table' => $table]);
+        Cache::set('current_table_data_for_export', ['selected_columns' => $selected_table_columns, 'table' => $table, 'database' => $database]);
 
         return \view('Export.View', [
-            'tables' => $export->getAllTables(),
+            'tables' => $export->getAllTables($database),
             'table_columns' => $table_columns,
             'table_data' => $table_data,
             'selected_table_columns' => $selected_table_columns,
             'table_error' => !empty($table) ?: "Please select a valid table .",
             'searchPlaceholder' => $searchPlaceholder,
-            'table_data_count_overall' => $export->getTableData($table, ['*'], \collect([]))->count(),
-            'search' => request()->get('search')
+            'table_data_count_overall' => $export->getTableData($table, ['*'], \collect([]), $database)->count(),
+            'search' => request()->get('search'),
+            'databases' => $databases
         ]);
     }
 
@@ -89,6 +95,6 @@ class ExportController extends Controller
         Session::flash('message', 'The data was export successfully.');
         Session::flash('alert-class', 'alert-success');
 
-        return $export->export($current_export_data['table'], $current_export_data['selected_columns']);
+        return $export->export($current_export_data['table'], $current_export_data['selected_columns'], $current_export_data['database']);
     }
 }
