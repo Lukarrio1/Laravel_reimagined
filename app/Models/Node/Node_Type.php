@@ -78,7 +78,7 @@ class Node_Type extends Model
                     <input
                     type='text' class='form-control'
                      id='node_audit_message' aria-describedby='node_audit_message' name='node_audit_message'
-                     value='" . $node_audit_message . "' required>
+                     value='" . $node_audit_message . "'>
                 </div>" : '';
 
         $node_message_auditing_rules =  $is_auditing_on == 1 ? ['location' => 'properties'] : [];
