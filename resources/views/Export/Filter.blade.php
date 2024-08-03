@@ -13,9 +13,9 @@
                         <option value="{{$database}}" {{request('database')==$database?"selected":''}}>{{$database}}</option>
                         @endforeach
                     </select>
-                    @if($table_error!=1)
+                    {{-- @if($table_error!=1)
                     <div style="color: red;">{{ $table_error }}</div> <!-- Display the error message -->
-                    @endif
+                    @endif --}}
                 </div>
                 @if(request('database')!=null)
                 <div class="mb-3">
