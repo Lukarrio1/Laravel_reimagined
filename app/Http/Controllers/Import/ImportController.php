@@ -16,7 +16,7 @@ class ImportController extends Controller
     public function __construct()
     {
         $this->export = new Export();
-        $this->middleware('can:can crud roles');
+        $this->middleware('can:can import');
     }
 
     public function index()
