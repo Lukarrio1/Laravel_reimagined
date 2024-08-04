@@ -35,4 +35,4 @@ Schedule::call(function () {
 
              });
     }
-})->everyMinute();
+})->weekly();
