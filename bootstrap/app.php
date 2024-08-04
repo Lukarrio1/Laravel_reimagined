@@ -1,4 +1,4 @@
-\<?php
+<?php
 
 use Illuminate\Foundation\Application;
 use App\Console\Commands\DatabaseBackup;
@@ -19,7 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
     })
     ->create();
 

@@ -525,4 +525,5 @@ function App() {
 }
 
 // Render the component to the DOM
-ReactDOM.render(<App />, document.getElementById("data_bus_fields"));
+if (document.getElementById("data_bus_fields"))
+    ReactDOM.render(<App />, document.getElementById("data_bus_fields"));

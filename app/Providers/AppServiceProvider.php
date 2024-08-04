@@ -117,6 +117,45 @@ class AppServiceProvider extends ServiceProvider
                 ->get());
         }
 
+        // \collect(optional(collect(Cache::get('settings'))
+        //     ->where('key', 'reference_types')->first())->getSettingValue())
+        //     ->each(function ($ref) {
+        //         $rel_type = collect(\explode('_', $ref));
+        //         $ref = Cache::get('references')->where('type', $ref)->first();
+        //         if ($rel_type->count() > 1 && !empty($ref)) {
+        //             $owned_model = $ref->owned_model;
+        //             $owner_model = $ref->owner_model;
+        //             $has_many = (int) $rel_type->last() == 1 ? "hasManyThrough" : "hasOneThrough";
+        //             $owner_model::resolveRelationUsing($rel_type->first(), function ($owner_model) use ($owned_model, $has_many, $ref) {
+        //                 return $owner_model->$has_many($owned_model, Reference::class, 'owner_id', 'id', 'id', 'owned_id')
+        //                     ->where('references.type', $ref->type);
+        //             });
+        //         }
+        //     });
+        \collect(
+            optional(collect(Cache::get('settings'))
+                ->where('key', 'database_configuration')->first())
+                ->getSettingValue()
+        )
+            ->each(function ($item, $key) {
+                if (empty($item) || empty($key)) {
+                    return false;
+                }
+                Config::set("database.connections.{$key}", [
+                    'driver'    => $item->get('DB_CONNECTION') ?? "mysql",
+                    'host'      => $item->get('DB_HOST'),
+                    'port'      => $item->get('DB_PORT'),
+                    'database'  => $item->get('DB_DATABASE'),
+                    'username'  => $item->get('DB_USERNAME'),
+                    'password'  => $item->get('DB_PASSWORD'),
+                    'charset'   => 'utf8',
+                    'collation' => 'utf8_unicode_ci',
+                    'prefix'    => '',
+                ]);
+
+                // // Set the default connection to the newly configured one
+                // Config::set('database.default', $connectionName);
+            });
 
 
 
