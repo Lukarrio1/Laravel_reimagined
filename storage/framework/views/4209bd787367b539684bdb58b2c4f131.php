@@ -13,9 +13,7 @@
                         <option value="<?php echo e($database); ?>" <?php echo e(request('database')==$database?"selected":''); ?>><?php echo e($database); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
-                    <?php if($table_error!=1): ?>
-                    <div style="color: red;"><?php echo e($table_error); ?></div> <!-- Display the error message -->
-                    <?php endif; ?>
+                    
                 </div>
                 <?php if(request('database')!=null): ?>
                 <div class="mb-3">

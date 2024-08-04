@@ -12,7 +12,7 @@
             </form>
 
         </div>
-        <div class="card-body">
+        <div class="card-body  scrollable-div">
             <table class="table table-hover">
                 <thead>
                     <tr>

@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Audit extends Model
 {
     use HasFactory;
-    protected $guarded=['id'];
+    protected $guarded = ['id'];
 
-    public function setUpMessage($message){
-        $values =[
-            '{name}' =>\ucfirst(\request()->user()->name),
-            '{at}'=>Carbon::now()->format('l, F jS Y, g:i A'),
+    public function setUpMessage($message)
+    {
+        $values = [
+            '{name}' => \ucfirst(\request()->user()->name),
+            '{at}' => Carbon::now()->format('l, F jS Y, g:i A'),
         ];
-        $message = collect( \explode(' ',$message))->map(fn($word)=>isset($values[$word])?$values[$word]:$word)->join(' ');
+        $message = collect(\explode(' ', $message))->map(fn ($word) => isset($values[$word]) ? $values[$word] : $word)->join(' ');
         return $message;
     }
 }

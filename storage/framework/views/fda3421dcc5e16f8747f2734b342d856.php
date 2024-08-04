@@ -1,9 +1,9 @@
 <?php
-    use Carbon\Carbon;
+use Carbon\Carbon;
 ?>
 <div class="col-sm-10 offset-sm-1">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-        <div class="card-body">
+        <div class="card-body  scrollable-div">
             <table class="table table-hover">
                 <thead>
                     <tr>

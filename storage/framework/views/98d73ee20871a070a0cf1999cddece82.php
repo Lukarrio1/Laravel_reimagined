@@ -73,7 +73,7 @@ unset($__errorArgs, $__bag); ?>
 <div class="col-sm-10 offset-sm-1 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('can view settings data table', auth()->user())): ?>
-        <div class="card-body">
+        <div class="card-body  scrollable-div">
             <table class="table table-hover">
                 <thead>
                     <tr>
