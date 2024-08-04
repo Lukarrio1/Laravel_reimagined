@@ -28,10 +28,10 @@ class SettingController extends Controller
         $setting = new Setting();
         $settings_for_display
             = $setting->query()
-            ->latest('updated_at')->get();
+                ->latest('updated_at')->get();
         $keys
             = collect($setting->getAllSettingKeys())
-            ->filter(fn ($key, $idx) =>  \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
+                ->filter(fn($key, $idx) => \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
 
         $setting_key = empty(\request()->get('setting_key')) ? $keys->keys()->first() : \request()->get('setting_key');
         $field_value = optional(collect(Cache::get('settings')));
@@ -62,7 +62,7 @@ class SettingController extends Controller
             [
                 'key' => $request->setting_key
             ],
-            $request->merge(['properties' => $value])->all()
+            $request->merge(['properties' => gettype($value) != "string" ? json_encode($value) : $value])->all()
         );
         Cache::forget('settings');
         Cache::forget('setting_allowed_login_roles');

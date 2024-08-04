@@ -1,12 +1,10 @@
 <?php
-use Illuminate\Support\Facades\Session;
-
 $app_name =optional(collect(Cache::get('settings'))->where('key','app_name')->first())->properties;
 $app_version =optional(collect(Cache::get('settings'))->where('key','app_version')->first())->properties;
 $app_animation =optional(collect(Cache::get('settings'))->where('key','app_animation')->first())->getSettingValue('last');
 $multi_tenancy =(int)optional(collect(Cache::get('settings'))->where('key','multi_tenancy')->first())->getSettingValue('first');
-
 ?>
+
 
 <!doctype html>
 <html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">

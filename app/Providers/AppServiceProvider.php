@@ -70,6 +70,34 @@ class AppServiceProvider extends ServiceProvider
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
             Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
         }
+
+
+        //   if (!Cache::has('setting_databases_backup_values')) {
+        //     $databases = collect([]);
+        //     \optional(Setting::where('key', 'database_configuration')->first())->getSettingValue("last")->keys()
+        //         ->each(fn($db)=>$databases->put($db,$db)) ?? \collect([]);
+        //     Cache::add('setting_databases_backup_values', $databases->toArray());
+        // }
+
+
+        //  if (!Cache::has('setting_databases')) {
+        //     $databases = collect([]);
+        //     collect(Cache::get('settings'))
+        //         ->where('key', 'database_configuration')->first()
+        //         ->getSettingValue()->keys()
+        //         ->each(fn($db)=>$databases->put($db,$db));
+        //     Cache::add('setting_databases', $databases->toArray());
+        // }
+        //  if (!Cache::has('setting_backup_databases')) {
+        //     $databases = collect([]);
+        //     collect(Cache::get('settings'))
+        //         ->where('key', 'database_configuration')->first()
+        //         ->getSettingValue()->keys()
+        //         ->each(fn($db)=>$databases->put($db,$db));
+        //     Cache::add('setting_backup_databases', $databases->toArray());
+        // }
+
+
         if (!Cache::has('routes')) {
             $nodes = Node::where('node_status', 1)
                 ->where('node_type', 1)
@@ -89,45 +117,6 @@ class AppServiceProvider extends ServiceProvider
                 ->get());
         }
 
-        // \collect(optional(collect(Cache::get('settings'))
-        //     ->where('key', 'reference_types')->first())->getSettingValue())
-        //     ->each(function ($ref) {
-        //         $rel_type = collect(\explode('_', $ref));
-        //         $ref = Cache::get('references')->where('type', $ref)->first();
-        //         if ($rel_type->count() > 1 && !empty($ref)) {
-        //             $owned_model = $ref->owned_model;
-        //             $owner_model = $ref->owner_model;
-        //             $has_many = (int) $rel_type->last() == 1 ? "hasManyThrough" : "hasOneThrough";
-        //             $owner_model::resolveRelationUsing($rel_type->first(), function ($owner_model) use ($owned_model, $has_many, $ref) {
-        //                 return $owner_model->$has_many($owned_model, Reference::class, 'owner_id', 'id', 'id', 'owned_id')
-        //                     ->where('references.type', $ref->type);
-        //             });
-        //         }
-        //     });
-        \collect(
-            optional(collect(Cache::get('settings'))
-                ->where('key', 'database_configuration')->first())
-                ->getSettingValue()
-        )
-            ->each(function ($item, $key) {
-                if (empty($item) || empty($key)) {
-                    return false;
-                }
-                Config::set("database.connections.{$key}", [
-                    'driver'    => $item->get('DB_CONNECTION') ?? "mysql",
-                    'host'      => $item->get('DB_HOST'),
-                    'port'      => $item->get('DB_PORT'),
-                    'database'  => $item->get('DB_DATABASE'),
-                    'username'  => $item->get('DB_USERNAME'),
-                    'password'  => $item->get('DB_PASSWORD'),
-                    'charset'   => 'utf8',
-                    'collation' => 'utf8_unicode_ci',
-                    'prefix'    => '',
-                ]);
-
-                // // Set the default connection to the newly configured one
-                // Config::set('database.default', $connectionName);
-            });
 
 
 
