@@ -12,6 +12,8 @@ function App() {
             " (use route parameters based on columns from the database to find the record(s) that requires an update eg. test/{column}/{column1}))",
         "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord":
             " (use route parameters based on columns from the database to filter the record(s) that you want to delete eg. test/{column}/{column1}))",
+        "App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint":
+            " (use route parameters based on columns from the database to filter the data eg. test/{column}/{column1})",
     };
     function getUniqueElements(array) {
         return array.filter(
@@ -33,6 +35,9 @@ function App() {
     const [node_many_data, setNodeManyData] = React.useState(null);
     const [display_aid, setNodeDisplayAid] = React.useState(null);
     const [table_items, setTableItems] = React.useState([]);
+    const [table_items_display_aids, setTableItemsDisplayAids] = React.useState(
+        []
+    );
     const [node_item, setNodeItem] = React.useState(null);
     const [route_function_value, setRouteFunctionValue] = React.useState(null);
     const [orderByTypes, setOrderByTypes] = React.useState(null);
@@ -42,6 +47,8 @@ function App() {
     const [data_limit, setDataLimit] = React.useState(null);
     const [validation_rules, setValidationRules] = React.useState([]);
     const [columns_to_save, setColumnsToSave] = React.useState([]);
+    const [node_endpoint_to_consume, setNodeEndpointToConsume] =
+        React.useState("");
 
     function createQueryString(params) {
         const queryString = Object.keys(params)
@@ -63,6 +70,8 @@ function App() {
                     node_id: node_id?.value,
                     node_table_columns: selected_columns,
                     node_has_many: node_many_data,
+                    node_url_to_consume: node_endpoint_to_consume,
+                    display_aid: display_aid,
                 })
         );
 
@@ -73,6 +82,11 @@ function App() {
         setOrderByTypes(data?.orderByTypes);
         setTableItems(data?.table_items);
         setValidationRules(data?.validation_rules);
+        setTableItemsDisplayAids(data?.display_aid_columns);
+
+        setNodeDisplayAid(
+            data?.node?.properties?.value?.node_item_display_aid ?? ""
+        );
     };
 
     React.useEffect(() => {
@@ -91,6 +105,7 @@ function App() {
                         "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                        "App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint",
                     ].includes(e.target.value.split("_")[0]) == true
                 );
             });
@@ -109,20 +124,29 @@ function App() {
         selected_columns,
         nodeType,
         route_function,
+        node_endpoint_to_consume,
+        display_aid,
     ]);
 
     React.useEffect(() => {
         if (!node) return;
-        setSelectedDatabases(node?.properties?.value?.node_database);
-        setSelectedTable(node?.properties?.value?.node_table);
+        setSelectedDatabases(node?.properties?.value?.node_database ?? null);
+        setSelectedTable(node?.properties?.value?.node_table ?? null);
         setRouteFunctionValue(route_function?.value);
-        setDataLimit(node?.properties?.value?.node_data_limit);
-        setNodeDisplayAid(node?.properties?.value?.node_item_display_aid);
+        setDataLimit(node?.properties?.value?.node_data_limit ?? null);
+        setNodeEndpointToConsume((pre) =>
+            node_endpoint_to_consume?.length > 0
+                ? node_endpoint_to_consume
+                : node?.properties?.value?.node_endpoint_to_consume
+        );
+        // setNodeDisplayAid(
+        //     node?.properties?.value?.node_item_display_aid ?? null
+        // );
         // setSelectedTableColumns(node?.properties?.value?.node_table_columns);
         setColumnsToSave((pre) =>
             getUniqueElements([
-                ...pre,
-                ...node?.properties?.value?.node_table_columns,
+                ...(pre ?? []),
+                ...(node?.properties?.value?.node_table_columns ?? []),
             ])
         );
         setLaunch(false);
@@ -132,73 +156,205 @@ function App() {
     React.useEffect(() => {
         if (!node_route_label) return;
         node_route_label.innerHTML =
-            possibleLabel[route_function_value?.split("_")[0]] != undefined
-                ? possibleLabel[route_function_value?.split("_")[0]]
-                : "Node route (you can add parameters to the route eg. test/{param}/{param1} which will then filter the data)";
+            possibleLabel[route_function_value?.split("_")[0]];
     }, [route_function_value]);
 
     React.useEffect(() => {
         console.log("this is the selected columns", columns_to_save);
     }, [columns_to_save]);
 
+    // React.useEffect(() => {
+    //     if (!node_endpoint_to_consume || !display_aid) return;
+    //     getData();
+    // }, [node_endpoint_to_consume,]);
+
     return (
         launch &&
         nodeType == 1 && (
             <div>
-                <div class="mb-3">
-                    <label for="node_database" class="form-label">
-                        Node Database
-                    </label>
-                    <select
-                        id="node_database"
-                        class="form-select"
-                        name="node_database"
-                        onChange={(e) => setSelectedDatabases(e.target.value)}
-                    >
-                        <option>Select A Database</option>
-                        {databases &&
-                            databases.map((database) => {
-                                return (
-                                    <option
-                                        selected={
-                                            node?.properties?.value
-                                                ?.node_database == database
-                                        }
-                                        value={database}
-                                    >
-                                        {database}
-                                    </option>
-                                );
-                            })}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="node_table" class="form-label">
-                        Node Table
-                    </label>
-                    <select
-                        id="node_table"
-                        class="form-select"
-                        name="node_table"
-                        onChange={(e) => setSelectedTable(e.target.value)}
-                    >
-                        <option value="">Select A Table</option>
-                        {tables &&
-                            tables.map((table) => {
-                                return (
-                                    <option
-                                        selected={
-                                            node?.properties?.value
-                                                ?.node_table == table
-                                        }
-                                        value={table}
-                                    >
-                                        {table}
-                                    </option>
-                                );
-                            })}
-                    </select>
-                </div>
+                {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" !=
+                    route_function_value?.split("_")[0] && (
+                    <>
+                        <div class="mb-3">
+                            <label for="node_database" class="form-label">
+                                Node Database
+                            </label>
+                            <select
+                                id="node_database"
+                                class="form-select"
+                                name="node_database"
+                                onChange={(e) =>
+                                    setSelectedDatabases(e.target.value)
+                                }
+                            >
+                                <option>Select A Database</option>
+                                {databases &&
+                                    databases.map((database) => {
+                                        return (
+                                            <option
+                                                selected={
+                                                    node?.properties?.value
+                                                        ?.node_database ==
+                                                    database
+                                                }
+                                                value={database}
+                                            >
+                                                {database}
+                                            </option>
+                                        );
+                                    })}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="node_table" class="form-label">
+                                Node Table
+                            </label>
+                            <select
+                                id="node_table"
+                                class="form-select"
+                                name="node_table"
+                                onChange={(e) =>
+                                    setSelectedTable(e.target.value)
+                                }
+                            >
+                                <option value="">Select A Table</option>
+                                {tables &&
+                                    tables.map((table) => {
+                                        return (
+                                            <option
+                                                selected={
+                                                    node?.properties?.value
+                                                        ?.node_table == table
+                                                }
+                                                value={table}
+                                            >
+                                                {table}
+                                            </option>
+                                        );
+                                    })}
+                            </select>
+                        </div>
+                    </>
+                )}
+                {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" ==
+                    route_function_value?.split("_")[0] && (
+                    <>
+                        <div class="mb-3">
+                            <label
+                                for="node_endpoint_to_consume"
+                                class="form-label"
+                            >
+                                Node Endpoint To Consume (Current:{" "}
+                                <span className="text-danger">
+                                    {" "}
+                                    {
+                                        node?.properties?.value
+                                            ?.node_endpoint_to_consume
+                                    }
+                                </span>
+                                )
+                            </label>
+                            <input
+                                type="url"
+                                class="form-control"
+                                id="node_endpoint_to_consume"
+                                aria-describedby="node_name"
+                                name="node_endpoint_to_consume"
+                                onKeyUp={(e) =>
+                                    setTimeout(
+                                        () =>
+                                            setNodeEndpointToConsume(
+                                                e.target.value
+                                            ),
+                                        2000
+                                    )
+                                }
+                            />
+                        </div>
+                        {node_endpoint_to_consume && (
+                            <input
+                                type="hidden"
+                                name="node_endpoint_to_consume"
+                                value={node_endpoint_to_consume}
+                            ></input>
+                        )}
+                    </>
+                )}
+                {[
+                    "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
+                    "App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint",
+                ].includes(route_function_value?.split("_")[0]) && (
+                    <>
+                        <div class="mb-3">
+                            <label
+                                for="node_item_display_aid"
+                                class="form-label"
+                            >
+                                Node Item Display Aid
+                            </label>
+                            <select
+                                id="node_item_display_aid"
+                                class="form-select"
+                                name="node_item_display_aid"
+                                onChange={(e) =>
+                                    setNodeDisplayAid(e.target.value)
+                                }
+                            >
+                                <option value="">Select display aid</option>
+                                {table_items_display_aids &&
+                                    table_items_display_aids.map((column) => {
+                                        return (
+                                            <option
+                                                selected={
+                                                    node?.properties?.value
+                                                        ?.node_item_display_aid ==
+                                                    column
+                                                }
+                                                value={column}
+                                            >
+                                                {column}
+                                            </option>
+                                        );
+                                    })}
+                            </select>
+                        </div>
+                        {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" !=
+                            route_function_value?.split("_")[0] && (
+                            <div class="mb-3">
+                                <label for="node_table" class="form-label">
+                                    Node Item
+                                </label>
+                                <select
+                                    id="node_item"
+                                    class="form-select"
+                                    name="node_item"
+                                    onChange={(e) =>
+                                        setNodeItem(e.target.value)
+                                    }
+                                >
+                                    <option value="">Select node item</option>
+                                    {display_aid &&
+                                        table_items &&
+                                        table_items.map((item) => {
+                                            return (
+                                                <option
+                                                    selected={
+                                                        node?.properties?.value
+                                                            ?.node_item ==
+                                                        item?.id
+                                                    }
+                                                    value={item.id}
+                                                >
+                                                    {item[display_aid]}
+                                                </option>
+                                            );
+                                        })}
+                                </select>
+                            </div>
+                        )}
+                    </>
+                )}
                 {"App\\Http\\Controllers\\Api\\DataBusController::deleteRecord" !=
                     route_function_value?.split("_")[0] && (
                     <div class="mb-3">
@@ -368,74 +524,10 @@ function App() {
                             </div>
                         );
                     })}
-                {"App\\Http\\Controllers\\Api\\DataBusController::oneRecord" ==
-                    route_function_value?.split("_")[0] && (
-                    <>
-                        <div class="mb-3">
-                            <label
-                                for="node_item_display_aid"
-                                class="form-label"
-                            >
-                                Node Item Display Aid
-                            </label>
-                            <select
-                                id="node_item_display_aid"
-                                class="form-select"
-                                name="node_item_display_aid"
-                                onChange={(e) =>
-                                    setNodeDisplayAid(e.target.value)
-                                }
-                            >
-                                <option value="">Select display aid</option>
-                                {columns &&
-                                    columns.map((column) => {
-                                        return (
-                                            <option
-                                                selected={
-                                                    node?.properties?.value
-                                                        ?.node_item_display_aid ==
-                                                    column
-                                                }
-                                                value={column}
-                                            >
-                                                {column}
-                                            </option>
-                                        );
-                                    })}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="node_table" class="form-label">
-                                Node Item
-                            </label>
-                            <select
-                                id="node_item"
-                                class="form-select"
-                                name="node_item"
-                                onChange={(e) => setNodeItem(e.target.value)}
-                            >
-                                <option value="">Select node item</option>
-                                {display_aid &&
-                                    table_items &&
-                                    table_items.map((item) => {
-                                        return (
-                                            <option
-                                                selected={
-                                                    node?.properties?.value
-                                                        ?.node_item == item?.id
-                                                }
-                                                value={item.id}
-                                            >
-                                                {item[display_aid]}
-                                            </option>
-                                        );
-                                    })}
-                            </select>
-                        </div>
-                    </>
-                )}
-                {"App\\Http\\Controllers\\Api\\DataBusController::manyRecords" ==
-                    route_function_value?.split("_")[0] && (
+                {[
+                    "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
+                    "App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint",
+                ]?.includes(route_function_value?.split("_")[0]) && (
                     <>
                         <div class="mb-3">
                             <label for="name" class="form-label">

@@ -23,7 +23,8 @@ class AuthController extends Controller
         $token = Str::random(50);
         $setting = \optional(Cache::get('settings', \collect([]))->where('key', 'registration_role')->first())
             ->getSettingValue();
-        $api_email_verification = \optional(Cache::get('settings', \collect([]))->where('key', 'api_email_verification')->first())
+        $api_email_verification = (int) \optional(Cache::get('settings', \collect([]))
+            ->where('key', 'api_email_verification')->first())
             ->getSettingValue();
         $email_token = '';
         if ($api_email_verification == 1) {
@@ -34,7 +35,11 @@ class AuthController extends Controller
             $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
                 ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
                 ->join('/') . '/' . $email_token;
-            $this->sendEmail($request->email, "Email Verification", "Click <a href='$verification_front_end_link'>here</a> to verify your email address.");
+            $this->sendEmail(
+                $request->email,
+                "Email Verification",
+                "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
+            );
         }
         $role = !empty($setting) ? Role::find($setting) : null;
         $user = User::create($request->except('password') + [
@@ -85,10 +90,18 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $user = User::whereEmail($request->email)->first();
+        $api_email_verification = (int) \optional(Cache::get('settings', \collect([]))
+           ->where('key', 'api_email_verification')->first())
+           ->getSettingValue();
         if (!empty($user)) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
                 User::find($user->id)->update(['last_login_at' => Carbon::now()]);
+                if($api_email_verification == 1) {
+                    return !empty($user->email_verified_at) ?
+                    \response()->json(['token' => $token, 'user' => $user]) :
+                    response()->json(['message' => 'Invalid Credentials'], 401);
+                }
                 return \response()->json(['token' => $token, 'user' => $user]);
             }
         }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
@@ -15,7 +17,7 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
-    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord","updateRecord"];
+    public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord","updateRecord","consumeGetEndPoint"];
     public function __call($method, $parameters)
     {
         $method_to_call = \in_array(collect(explode('_', $method))->first(), $this->methods)
@@ -51,7 +53,7 @@ class DataBusController extends Controller
         } else {
             $item = [];
         }
-        return \response()->json(["item" => $item], 200);
+        return \response()->json($item, 200);
     }
 
     public function manyRecords(): JsonResponse
@@ -59,7 +61,7 @@ class DataBusController extends Controller
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
-            return ["items" => []];
+            return response()->json([]);
         }
 
         $properties = $currentRouteNode->properties['value'];
@@ -71,7 +73,7 @@ class DataBusController extends Controller
         $orderByType = optional($properties)->node_order_by_type;
 
         if (!$database || !$table) {
-            return ["items" => []];
+            return response()->json([]);
         }
 
         $query = DB::connection($database)
@@ -91,7 +93,7 @@ class DataBusController extends Controller
 
         $items = $query->get();
 
-        return \response()->json(["items" => $items], 200);
+        return \response()->json($items, 200);
     }
 
     public function checkRecord(): JsonResponse
@@ -134,7 +136,7 @@ class DataBusController extends Controller
             $item = null;
         }
 
-        return \response()->json(["item" => true], 204);
+        return \response()->json([], 204);
     }
 
     public function saveRecord(): JsonResponse
@@ -167,9 +169,7 @@ class DataBusController extends Controller
             $item = [];
         }
 
-        return \response()->json([
-            "item" => $item,
-        ], 201);
+        return \response()->json($item, 201);
     }
     public function updateRecord(): JsonResponse
     {
@@ -203,8 +203,33 @@ class DataBusController extends Controller
             $item = [];
         }
 
-        return \response()->json([
-            "item" => $item,
-        ], 201);
+        return \response()->json($item, 201);
+    }
+    public function consumeGetEndPoint(): JsonResponse
+    {
+        $currentRouteNode = $this->getCurrentRoute();
+        $route_parameters = \collect(Route::current()->parameters());
+        $node_endpoint_to_consume = $currentRouteNode->properties['value']->node_endpoint_to_consume;
+        $node_item_display_aid = $currentRouteNode->properties['value']->node_item_display_aid;
+        $node_table_columns = $currentRouteNode->properties['value']->node_table_columns;
+        $response = $this->getHttpData($node_endpoint_to_consume);
+        $data = collect(!isset($node_item_display_aid) || !empty($node_item_display_aid) ? $response[$node_item_display_aid] : $response)
+        ->map(function ($item) use ($node_table_columns) {
+            $temp = [];
+            if(count($node_table_columns) > 0) {
+                foreach ($node_table_columns as $column) {
+                    $temp[$column] = $item[$column];
+                }
+            } else {
+                $temp = $item;
+            }
+            return $temp;
+        })->filter(function ($item) use ($route_parameters) {
+            return count($route_parameters) > 0 ? $route_parameters
+            ->filter(fn ($rp, $key) => Str::contains(Str::lower($item[$key]), Str::lower($route_parameters->get($key))))
+            ->count() > 0 : true;
+        })
+        ->all();
+        return response()->json($data, 200);
     }
 }

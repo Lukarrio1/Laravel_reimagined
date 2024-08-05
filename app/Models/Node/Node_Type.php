@@ -130,7 +130,8 @@ class Node_Type extends Model
                     "node_data_limit" => ['location' => 'properties'],
                     "node_order_by_field" => ['location' => 'properties'],
                     "node_order_by_type" => ['location' => 'properties'],
-                    "node_item_display_aid" => ['location' => 'properties']
+                    "node_item_display_aid" => ['location' => 'properties'],
+                    "node_endpoint_to_consume"=>['location' => 'properties']
                 ],
                 'rules' => [
                     'node_route' => 'required',
@@ -145,7 +146,8 @@ class Node_Type extends Model
                     "node_data_limit" => '',
                     "node_order_by_field" => '',
                     "node_order_by_type" => '',
-                    "node_item_display_aid" => ''
+                    "node_item_display_aid" => '',
+                    "node_endpoint_to_consume"=>''
                 ],
                 'extra_html' => "<div>
                  <div class='mb-3'>

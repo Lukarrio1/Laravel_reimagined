@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use ReflectionClass;
 use App\SendEmailTrait;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -59,5 +60,10 @@ class Controller extends BaseController {
         } else {
             throw new \Exception( 'Error creating database backup.' );
         }
+    }
+
+    public function getHttpData($url){
+        return !empty($url)?Http::get($url)->json():[];
+
     }
 }

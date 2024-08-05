@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Node;
 
+use Mockery\Undefined;
 use App\Models\Node\Node;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ class NodeController extends Controller
     }
     public function index($node = null)
     {
+
 
         $translate = [
             'name' => 'name',
@@ -177,11 +179,18 @@ class NodeController extends Controller
         $columns = $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
         $table_items = $database != "null" && $table != "null" ? DB::connection($database)->table($table)->get() : [];
+        $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "undefined" ? null : $this->getHttpData(request('node_url_to_consume'));
+        if(!empty($data_to_consume) && $display_aid != "null") {
+            $data = collect($data_to_consume[$display_aid])->toArray();
+            $columns = gettype($data) == "object" ? array_keys($data) : array_keys($data[0]);
+        }
         return [
             "validation_rules" => $this->getValidationRules(),
             'node' => $node,
             "tables" => $tables,
+            "data_to_consume" => $data_to_consume,
             "columns" => $columns,
+            'display_aid_columns' => collect($data_to_consume)->keys() ?? $columns,
             "table_items" => $table_items,
             "orderByTypes" => (new DataBusController())->orderByTypes,
             "databases" => collect(Cache::get('settings'))
