@@ -179,9 +179,9 @@ class NodeController extends Controller
         $columns = $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
         $table_items = $database != "null" && $table != "null" ? DB::connection($database)->table($table)->get() : [];
-        $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "undefined" ? null : $this->getHttpData(request('node_url_to_consume'));
+        $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "null" ? null : $this->getHttpData(request('node_url_to_consume'));
         if(!empty($data_to_consume) && $display_aid != "null") {
-            $data = collect($data_to_consume[$display_aid])->toArray();
+            $data = isset($data_to_consume[$display_aid]) && gettype($data_to_consume[$display_aid]) != "int" ? collect($data_to_consume[$display_aid])->toArray() : [];
             $columns = gettype($data) == "object" ? array_keys($data) : array_keys($data[0]);
         }
         return [

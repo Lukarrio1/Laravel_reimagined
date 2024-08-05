@@ -56,7 +56,7 @@ function App() {
                 (key) =>
                     encodeURIComponent(key) +
                     "=" +
-                    encodeURIComponent(params[key])
+                    encodeURIComponent(params[key] ? params[key] : null)
             )
             .join("&");
         return queryString;
@@ -83,10 +83,6 @@ function App() {
         setTableItems(data?.table_items);
         setValidationRules(data?.validation_rules);
         setTableItemsDisplayAids(data?.display_aid_columns);
-
-        setNodeDisplayAid(
-            data?.node?.properties?.value?.node_item_display_aid ?? ""
-        );
     };
 
     React.useEffect(() => {
@@ -134,6 +130,9 @@ function App() {
         setSelectedTable(node?.properties?.value?.node_table ?? null);
         setRouteFunctionValue(route_function?.value);
         setDataLimit(node?.properties?.value?.node_data_limit ?? null);
+        setNodeDisplayAid(
+            node?.properties?.value?.node_item_display_aid ?? display_aid
+        );
         setNodeEndpointToConsume((pre) =>
             node_endpoint_to_consume?.length > 0
                 ? node_endpoint_to_consume
