@@ -202,18 +202,18 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('config_string', [], $key, $field_value),
                 'handle' => ['action' => 'config_split', 'value' => 'last'],
             ],
-            'database_backup_configuration' => [
-                'field' => $this->SETTING_OPTIONS('magic_string', [], $key, $field_value),
-                'handle' => ['action' => 'magic_split', 'value' => 'last'],
-            ],
+            // 'database_backup_configuration' => [
+            //     'field' => $this->SETTING_OPTIONS('magic_string', [], $key, $field_value),
+            //     'handle' => ['action' => 'magic_split', 'value' => 'last'],
+            // ],
             'database_backup' => [
                 'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
-            //  'database_backup_configuration' => [
-            //     'field' => $this->SETTING_OPTIONS('multi_select',Cache::get('setting_databases', []), $key,Cache::get('setting_databases_backup_values', [])),
-            //     'handle' => ['action' => 'multi_split', 'value' => 'last'],
-            // ],
+              'database_backup_configuration' => [
+                'field' => $this->SETTING_OPTIONS('multi_select', Cache::get('setting_databases'), $key, Cache::get('setting_backup_databases', [])),
+                'handle' => ['action' => 'multi_split', 'value' => 'last'],
+            ],
 
             // delete_inactive_users
             // 'not_exportable_tables' => [
@@ -221,6 +221,7 @@ class Setting extends Model
             //     'handle' => ['action' => 'multi_split', 'value' => 'last'],
             // ],
         ]);
+        // dd($roles,Cache::get('setting_databases'),Cache::get('setting_backup_databases', []));
         return $keys->get($key);
     }
 
@@ -237,7 +238,8 @@ class Setting extends Model
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
                     ->map(fn ($item) => \collect(\explode('_', $item))
-                        ->filter(fn ($item, $idx) =>  $idx == 0)->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
+                        ->filter(fn ($item, $idx) =>  $idx == 0)
+                        ->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
                     ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
                     collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
                         ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
@@ -309,8 +311,8 @@ class Setting extends Model
             'mail_url' => "Mail Url",
             'reference_types' => "Reference Types",
             'database_configuration' => "Database Configurations",
-            "database_backup_configuration"=>"Database Backup Configurations",
-            "database_backup"=>"Database Backup (Weekly)"
+            "database_backup_configuration" => "Database Backup Configurations",
+            "database_backup" => "Database Backup (Weekly)"
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

@@ -56,8 +56,13 @@ class ExportController extends Controller
             }
             $table_data = $export->getTableData($table, $selected_table_columns, $searchParams, $database)->get($selected_table_columns);
         } else {
-            $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams, $database)->get();
-            $selected_table_columns = $table_columns;
+            try {
+                $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams, $database)->get();
+                $selected_table_columns = $table_columns;
+            } catch (\Throwable $th) {
+                return \redirect()->back()->withErrors(['table_error' => "$database database does not contain the $table table."]);
+            }
+
         }
 
         $searchPlaceholder = \collect($selected_table_columns)

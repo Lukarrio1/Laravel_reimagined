@@ -72,6 +72,7 @@ class Node extends BaseModel
 
     public function getControllerMethods()
     {
+        $excluded_methods = ["__call"];
         $controllerClasses = $this->getAllControllerClasses();
         $controllerMethods = [];
 
@@ -84,7 +85,7 @@ class Node extends BaseModel
 
                 foreach ($methods as $method) {
                     // Skip inherited methods ( like those from parent classes or traits )
-                    if ($method->getDeclaringClass()->getName() === $controllerClass) {
+                    if ($method->getDeclaringClass()->getName() === $controllerClass && !in_array($method->getName(), $excluded_methods)) {
                         $controllerMethods[$controllerClass][] = $method->getName();
                     }
                 }
@@ -126,7 +127,7 @@ class Node extends BaseModel
             'value' => $this->addAppUrlToNodeRoute(\json_decode($value)),
             'html_value' => "<ul class='list-group list-group-flush'>" . \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
                 function ($value, $key) {
-                    $value =gettype($value)=='array'?\json_encode($value):$value;
+                    $value = gettype($value) == 'array' ? \json_encode($value) : $value;
                     return "<li class='list-group-item'>" . collect(\explode('_', $key))->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
                 }
             )->join('') . '</ul>'

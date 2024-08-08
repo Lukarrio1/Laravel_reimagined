@@ -213,7 +213,7 @@ class DataBusController extends Controller
         $node_item_display_aid = $currentRouteNode->properties['value']->node_item_display_aid;
         $node_table_columns = $currentRouteNode->properties['value']->node_table_columns;
         $response = $this->getHttpData($node_endpoint_to_consume);
-        $data = collect(!empty($response)&&isset($node_item_display_aid)?$response[$node_item_display_aid]:$response)
+        $data = collect(!empty($response) && isset($node_item_display_aid) ? $response[$node_item_display_aid] : $response)
         ->map(function ($item) use ($node_table_columns) {
             $temp = [];
             if(count($node_table_columns) > 0) {

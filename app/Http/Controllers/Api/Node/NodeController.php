@@ -8,10 +8,20 @@ use App\Models\Node\Node;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\Api\DataBusController;
 
 class NodeController extends Controller
 {
-    public $exception_property_value_keys = ['route_function', 'node_audit_message'];
+    public $exception_property_value_keys = [
+        'route_function',
+        'node_audit_message',
+        'node_endpoint_to_consume',
+        'node_item_display_aid',
+        'node_order_by_field',
+        'node_order_by_type',
+        'node_table_columns',
+        'node_database'
+    ];
 
     public function removeKeys($properties)
     {
@@ -47,6 +57,15 @@ class NodeController extends Controller
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->with(['permission'])
             ->get()
+            ->filter(function ($node) {
+                if($node->node_type['value'] == 1) {
+                    if(isset($node->properties['value']->node_database)||isset($node->properties['value']->node_endpoint_to_consume)) {
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            })
             ->map(function ($node) {
                 $node->hasAccess = $node->authentication_level['value'] == 0 ||
                     !empty($node->permission) && !\auth()->user()->hasPermissionTo(\optional($node->permission)->name) ? false : true;
@@ -62,6 +81,15 @@ class NodeController extends Controller
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->with(['permission'])
             ->get()
+            ->filter(function ($node) {
+                if($node->node_type['value'] == 1) {
+                    if(isset($node->properties['value']->node_database)||isset($node->properties['value']->node_endpoint_to_consume)) {
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            })
             ->map(function ($node) {
                 $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
                 $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];

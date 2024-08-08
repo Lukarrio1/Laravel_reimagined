@@ -53,11 +53,7 @@ class AuthController extends Controller
             $user->assignRole($role);
         }
 
-
-
-
         $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
-
 
         return ['user' => $user, 'token' => $token];
     }
@@ -72,7 +68,7 @@ class AuthController extends Controller
             $route = "/per/{$token}";
             $this->sendEmail($request->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>");
         }
-        return \response()->json(['message' => "A mail was sent to the provided email address"]);
+        return \response()->json(['message' => "An email was sent to the provided email address"]);
     }
 
     public function resetPassword(PasswordUpdateRequest $request, $param)
@@ -98,9 +94,10 @@ class AuthController extends Controller
                 $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
                 User::find($user->id)->update(['last_login_at' => Carbon::now()]);
                 if($api_email_verification == 1) {
-                    return !empty($user->email_verified_at) ?
+                    return !empty($user->email_verification_token) ?
                     \response()->json(['token' => $token, 'user' => $user]) :
-                    response()->json(['message' => 'Invalid Credentials'], 401);
+                    response()->json(['message' => 'Please verify your email address,
+                    an email was sent to your email address when registered.'], 401);
                 }
                 return \response()->json(['token' => $token, 'user' => $user]);
             }

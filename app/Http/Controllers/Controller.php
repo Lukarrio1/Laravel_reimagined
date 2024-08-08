@@ -14,56 +14,64 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class Controller extends BaseController {
-    use AuthorizesRequests, ValidatesRequests, SendEmailTrait;
+class Controller extends BaseController
+{
+    use AuthorizesRequests;
+    use ValidatesRequests;
+    use SendEmailTrait;
 
-    public function clearCache() {
-        Artisan::call( 'cache:clear' );
-        Artisan::call( 'optimize' );
+    public function clearCache()
+    {
+        Artisan::call('cache:clear');
+        Artisan::call('optimize');
     }
 
-    public function getCurrentRoute() {
-        $currentRoute = join( '::', explode( '@', Route::currentRouteAction() ) );
-        return Cache::get( 'routes' )
-        ->where( 'properties.value.route_function', $currentRoute )
+    public function getCurrentRoute()
+    {
+        $currentRoute = join('::', explode('@', Route::currentRouteAction()));
+        return Cache::get('routes')
+        ->where('properties.value.route_function', $currentRoute)
         ->first();
     }
 
-    public  function getValidationRules() {
+    public function getValidationRules()
+    {
         $rules = [ 'required', 'integer', 'min:3', 'min:5', 'min:10', 'sometimes', 'present', 'max:3', 'max:5', 'max:10' ];
         return $rules;
     }
 
-    public function backupDatabase( $databaseName, $databaseUser, $databasePassword, $databaseHost, $databasePort = 3306 ) {
-        $backupFileName = $databaseName.'-backup-' . date( 'Y-m-d' ) . '.sql';
-        $backupFilePath = storage_path( 'app/backups/' . $backupFileName );
+    public function backupDatabase($databaseName, $databaseUser, $databasePassword, $databaseHost, $databasePort = 3306)
+    {
+        $backupFileName = $databaseName.'-backup-' . date('Y-m-d-h-m-s') . '.sql';
+        $backupFilePath = storage_path('app/backups/'.$databaseName."/" . $backupFileName);
 
         // Ensure the backups directory exists
-        if ( !file_exists( dirname( $backupFilePath ) ) ) {
-            mkdir( dirname( $backupFilePath ), 0755, true );
+        if (!file_exists(dirname($backupFilePath))) {
+            mkdir(dirname($backupFilePath), 0755, true);
         }
 
         $command = sprintf(
             'mysqldump --user=%s --password=%s --host=%s --port=%d %s > %s',
-            escapeshellarg( $databaseUser ),
-            escapeshellarg( $databasePassword ),
-            escapeshellarg( $databaseHost ),
+            escapeshellarg($databaseUser),
+            escapeshellarg($databasePassword),
+            escapeshellarg($databaseHost),
             ( int )$databasePort,
-            escapeshellarg( $databaseName ),
-            escapeshellarg( $backupFilePath )
+            escapeshellarg($databaseName),
+            escapeshellarg($backupFilePath)
         );
 
-        exec( $command, $output, $returnVar );
+        exec($command, $output, $returnVar);
 
-        if ( $returnVar === 0 ) {
+        if ($returnVar === 0) {
             return $backupFileName;
         } else {
-            throw new \Exception( 'Error creating database backup.' );
+            throw new \Exception('Error creating database backup.');
         }
     }
 
-    public function getHttpData($url){
-        return !empty($url)?Http::get($url)->json():[];
+    public function getHttpData($url)
+    {
+        return !empty($url) ? Http::get($url)->json() : [];
 
     }
 }

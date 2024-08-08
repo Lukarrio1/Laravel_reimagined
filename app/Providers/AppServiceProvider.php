@@ -80,23 +80,28 @@ class AppServiceProvider extends ServiceProvider
         // }
 
 
-        //  if (!Cache::has('setting_databases')) {
-        //     $databases = collect([]);
-        //     collect(Cache::get('settings'))
-        //         ->where('key', 'database_configuration')->first()
-        //         ->getSettingValue()->keys()
-        //         ->each(fn($db)=>$databases->put($db,$db));
-        //     Cache::add('setting_databases', $databases->toArray());
-        // }
-        //  if (!Cache::has('setting_backup_databases')) {
-        //     $databases = collect([]);
-        //     collect(Cache::get('settings'))
-        //         ->where('key', 'database_configuration')->first()
-        //         ->getSettingValue()->keys()
-        //         ->each(fn($db)=>$databases->put($db,$db));
-        //     Cache::add('setting_backup_databases', $databases->toArray());
-        // }
+        if (!Cache::has('setting_databases')) {
+            $databases = collect([]);
+            collect(Cache::get('settings'))
+                ->where('key', 'database_configuration')->first()
+                ->getSettingValue()->keys()
+                ->each(fn ($db) => $databases->put($db, $db));
+            Cache::add('setting_databases', $databases);
+        }
+        if (!Cache::has('setting_backup_databases')) {
+            $item =  collect(Cache::get('settings'))
+                ->where('key', 'database_backup_configuration')->first();
+            if(!empty($item)) {
+                $item = $item->getSettingValue();
 
+            }
+
+            Cache::add('setting_backup_databases', $item->toArray());
+        }
+// dd(   optional(collect(Cache::get('settings'))
+//                  ->where('key', 'database_configuration')->first())
+//                  ->getSettingValue('last'), \collect(optional(collect(Cache::get('settings'))
+//         ->where('key', 'database_backup_configuration')->first())->getSettingValue()));
 
         if (!Cache::has('routes')) {
             $nodes = Node::where('node_status', 1)

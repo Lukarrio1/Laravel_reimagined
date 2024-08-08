@@ -13,10 +13,12 @@ class Export extends Model
 {
     use HasFactory;
 
-    public function getAllTables($database)
+    public function getAllTables($database = 'mysql')
     {
-        $excluded_tables = \collect(\explode('|', optional(collect(Cache::get('settings'))->where('key', 'exportable_tables')->first())->properties))
-            ->map(fn ($item_1) => \collect(\explode('_', $item_1))->filter(fn ($item_2, $idx) => $idx < (count(\explode('_', $item_1))) - 1)->join("_")) ?? \collect([]);
+        $excluded_tables = \collect(\explode('|', optional(collect(Cache::get('settings'))
+        ->where('key', 'exportable_tables')->first())->properties))
+            ->map(fn ($item_1) => \collect(\explode('_', $item_1))
+            ->filter(fn ($item_2, $idx) => $idx < (count(\explode('_', $item_1))) - 1)->join("_")) ?? \collect([]);
 
         $tables = collect(DB::connection($database)->select('SHOW TABLES'))
             ->map(fn ($value) => \array_values((array) $value))
@@ -25,22 +27,27 @@ class Export extends Model
         return $tables;
     }
 
-    public function getAllTableColumns($table, $database)
+    public function getAllTableColumns($table, $database = 'mysql')
     {
-        return DB::connection($database)->getSchemaBuilder()->getColumnListing($table);
+        return !empty($table) ? DB::connection($database)
+        ->getSchemaBuilder()
+        ->getColumnListing($table) : [];
     }
 
-    public function getTableData($table, $table_columns, $searchParams, $database)
+    public function getTableData($table, $table_columns, $searchParams, $database = 'mysql')
     {
 
-        $db = DB::connection($database)->table($table)->select($table_columns)
+        $db = DB::connection($database)
+        ->table($table)->select($table_columns)
             ->when(\in_array("created_at", $table_columns), fn ($q) => $q->latest());
         return $this->filterTable($db, $searchParams);
     }
 
-    public function export($table, $selected_columns, $database)
+    public function export($table, $selected_columns, $database = 'mysql')
     {
-        $data = DB::connection($database)->table($table)->get($selected_columns);
+        $data = DB::connection($database)
+        ->table($table)
+        ->get($selected_columns);
         $csv = Writer::createFromString('');
         $csv->insertOne(array_keys((array) $data->first())); // Insert column headers
         foreach ($data as $row) {
