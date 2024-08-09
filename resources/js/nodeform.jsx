@@ -60,10 +60,7 @@ function TableToJoin({
                                     <option
                                         selected={
                                             node?.properties?.value[
-                                                `node_${
-                                                    previousElement?.key ??
-                                                    MainTable
-                                                }_join_column`
+                                                `node_previous_${table}_join_column`
                                             ] == column
                                         }
                                         value={column}
@@ -196,7 +193,7 @@ function JoinTablesForm({
     const getTableData = async () => {
         const { data } = await axios.get(
             "/node/databus/tableData?" +
-                createQueryString({ tables: selectedTables, database })
+                createQueryString({ tables: selectedTables ?? "", database })
         );
         setTablesToJoin(data.tables_with_columns);
         setQueryConditions(data.query_conditions);
@@ -209,6 +206,7 @@ function JoinTablesForm({
 
     React.useEffect(() => {
         if (!node) return;
+        if (!node?.properties?.value?.node_join_tables) return;
         setSelectedTables(
             JSON.parse(node?.properties?.value?.node_join_tables)
         );
@@ -216,7 +214,6 @@ function JoinTablesForm({
 
     return (
         <>
-            {" "}
             <div class="mb-3">
                 <label for="node_join_column" class="form-label">
                     Node Column To Join By
@@ -259,12 +256,14 @@ function JoinTablesForm({
                     class="form-select"
                     // name="node_join_tables"
                     onChange={(e) => {
-                        setSelectedTables([
-                            ...selectedTables?.filter(
-                                (c) => c != e.target.value
-                            ),
-                            e.target.value,
-                        ]);
+                        setSelectedTables(
+                            [
+                                ...selectedTables?.filter(
+                                    (c, idx) => c != e.target.value
+                                ),
+                                e.target.value,
+                            ].filter((c, idx) => idx < 2)
+                        );
                     }}
                 >
                     <option value="">Select table</option>
@@ -899,7 +898,7 @@ function App() {
                     <JoinTablesForm
                         mainColumns={columns}
                         node={node}
-                        database={selected_database}
+                        database={node?.properties?.value?.node_database}
                         mainTables={tables}
                         MainTable={selected_table}
                     ></JoinTablesForm>

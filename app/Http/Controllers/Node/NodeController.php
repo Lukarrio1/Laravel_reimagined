@@ -90,7 +90,7 @@ class NodeController extends Controller
         );
 
         $nodes  = $nodes->with(['permission']);
-        $user = User:: with(['friend.friends'])->get();
+        $user = User::with(['friend.friends'])->get();
         $node_count = $nodes->count();
         $max_amount_of_pages
             = $node_count / 8;
@@ -137,8 +137,8 @@ class NodeController extends Controller
                 $extra_handler["node_".$current_table."_join_by_column"] = ['location' => 'properties'];
                 $extra_rules["node_".$current_table."_join_columns"] = '';
                 $extra_handler["node_".$current_table."_join_columns"] = ['location' => 'properties'];
-                $extra_rules["node_previous_".$current_table."_join_column"]="";
-                $extra_handler["node_previous_".$current_table."_join_column"]="";
+                $extra_rules["node_previous_".$current_table."_join_column"] = "";
+                $extra_handler["node_previous_".$current_table."_join_column"] = "";
             }
         }
         if (0 < $node_endpoint_length) {
@@ -169,7 +169,7 @@ class NodeController extends Controller
         );
 
         if ($validator->fails()) {
-               dd($request->all(),$validator->errors());
+            dd($request->all(), $validator->errors());
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -205,7 +205,7 @@ class NodeController extends Controller
         $tables = $database != "null" ? collect(DB::connection($database)->select('SHOW TABLES'))
             ->map(fn ($value) => \array_values((array) $value))
             ->flatten() : [];
-        $columns = $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
+        $columns = !isset($table) || $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
         $table_items = $database != "null" && $table != "null" ? DB::connection($database)->table($table)->get() : [];
         $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "null" ? null : $this->getHttpData(request('node_url_to_consume'));
@@ -219,7 +219,7 @@ class NodeController extends Controller
             "tables" => $tables,
             "data_to_consume" => $data_to_consume,
             "columns" => $columns,
-            'display_aid_columns' => collect($data_to_consume)->keys() ?? $columns,
+            'display_aid_columns' => !empty($data_to_consume) ? collect($data_to_consume)->keys() : $columns,
             "table_items" => $table_items,
             "orderByTypes" => (new DataBusController())->orderByTypes,
             "databases" => collect(Cache::get('settings'))
@@ -232,7 +232,7 @@ class NodeController extends Controller
     public function databusTableData()
     {
         $query_conditions = ['=','!=','>','<'];
-        $selectedTables = explode(',', request()->get('tables'));
+        $selectedTables = explode(',', request()->get('tables', []));
         $database = request()->get('database');
         $tables_with_columns = collect([]);
         for($i = 0;$i < count($selectedTables);$i++) {

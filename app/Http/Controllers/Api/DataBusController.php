@@ -52,6 +52,7 @@ class DataBusController extends Controller
                 $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
             }
             $item = $item->first();
+
         } else {
             $item = [];
         }
@@ -59,38 +60,10 @@ class DataBusController extends Controller
     }
 
 
-    public function dynamicJoin($query, $mainTable, $joinTable, $firstColumn, $condition, $secondColumn)
-    {
-        // Define the alias for the join table
-        $joinAlias = $joinTable . '_alias';
 
-        // Perform the query with a dynamic join
-        $query
-           ->leftJoin("$joinTable as $joinAlias", "$mainTable.$firstColumn", $condition, "$joinAlias.$secondColumn")
-           ->select("$mainTable.*", "$joinAlias.*");  // Select all columns from both tables
-        // ->get()
-        // ->map(function ($item) use ($joinAlias) {
-        //     // Return results with the join table's data under its key
-        //     return [
-        //         $item->{$joinAlias . '_id'} => [
-        //             'id' => $item->{$joinAlias . '_id'},
-        //             'name' => $item->{$joinAlias . '_name'},
-        //             // Add other columns from the join table as needed
-        //         ],
-        //         'main_table' => [
-        //             'id' => $item->id,
-        //             'name' => $item->name,
-        //             // Add other columns from the main table as needed
-        //         ]
-        //     ];
-        // });
-
-        return $query;
-    }
 
     public function manyRecords(): JsonResponse
     {
-
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
@@ -99,45 +72,61 @@ class DataBusController extends Controller
         $properties = $currentRouteNode->properties['value'];
         $database = optional($properties)->node_database;
         $table = optional($properties)->node_table;
-        $joinTables = collect(json_decode($currentRouteNode->properties['value']->node_join_tables));
-        $columns = collect(optional($properties)->node_table_columns)->map(function ($c) use ($table, $joinTables) {
-            return trim($table.'.'.$c);
-        })->toArray() ?? ['*'];
+        $columns = optional($properties)->node_table_columns ?? ['*'];
         $limit = (int) optional($properties)->node_data_limit;
         $orderByField = optional($properties)->node_order_by_field;
         $orderByType = optional($properties)->node_order_by_type;
+
         if (!$database || !$table) {
             return response()->json([]);
         }
-        $query = new DynamicModel();
-        $query->setConnectionName($database)
-          ->setTableName($table);
-        $relationShips = $this->handleJoins($currentRouteNode);
-        if (count($relationShips) > 0) {
-            $relationShips->each(
-                function ($rel) use ($query, $database, $table) {
-                }
-            );
-        }
-
-        $query->select($columns);
+        $query = DB::connection($database)
+            ->table($table)
+            ->select($columns);
 
         if ($limit > 0) {
             $query->limit($limit);
         }
-
         if ($orderByField && $orderByType) {
-            $query->orderBy(count($joinTables) > 0 ? $table.'.'.$orderByField : $orderByField, $orderByType);
+            $query->orderBy($orderByField, $orderByType);
         }
         if ($route_parameters->count() > 0) {
             $route_parameters->each(fn ($value, $key) => $query->where($key, "LIKE", "%" . $value . "%"));
         }
-
-
         $items = $query->get();
+        $relationShips = $this->handleJoins($currentRouteNode);
+        if (count($relationShips) > 0) {
+            $items = $items->map(function ($item) use ($relationShips, $database) {
+                $database = DB::connection($database);
+                $item_to_change = null;
+                $relationShips->each(
+                    function ($rel, $idx) use ($item, $database, $relationShips, &$item_to_change) {
+                        if($item_to_change == null) {
+                            $item->{$rel['second_table']} = $database->table($rel['second_table'])
+                        ->select($rel['columns'])
+                        ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
+                        ->get();
+                            $item_to_change = $item->{$rel['second_table']};
+                        } else {
+                            collect($item_to_change)->each(function ($s_item) use ($rel, $database, &$item_to_change) {
+                                $s_item->{$rel['second_table']} = $database->table($rel['second_table'])
+                                        ->select($rel['columns'])
+                                        ->where($rel['second_value'], $rel['condition'], $s_item->{$rel['first_value']})
+                                        ->get();
+                                $item_to_change = $s_item->{$rel['second_table']};
+                                return $s_item;
+                            });
 
+
+                        }
+                    }
+                );
+                return $item;
+            });
+        }
         return \response()->json($items, 200);
     }
+
 
     public function checkRecord(): JsonResponse
     {

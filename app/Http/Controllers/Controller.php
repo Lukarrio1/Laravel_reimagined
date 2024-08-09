@@ -75,7 +75,7 @@ class Controller extends BaseController
 
     }
 
-     public function handleJoins($currentRouteNode)
+    public function handleJoins($currentRouteNode)
     {
         $joinTables = collect(json_decode($currentRouteNode->properties['value']->node_join_tables));
         $properties = $currentRouteNode->properties['value'];
@@ -85,7 +85,7 @@ class Controller extends BaseController
                 'first_table' => $idx == 0 ? $properties->{'node_table'} : $joinTables[$idx - 1],
                 'first_value' => $idx == 0
                     ? $properties->node_join_column
-                    : $joinTables[$idx - 1].'.'.$properties->{'node_previous_'.$item.'_join_column'},
+                    : $properties->{'node_previous_'.$item.'_join_column'},
                 'condition' => $properties->{'node_'.$item.'_join_by_condition'},
                 'second_value' =>  $properties->{'node_'.$item.'_join_by_column'},
                 'second_table' => $item,
@@ -96,5 +96,33 @@ class Controller extends BaseController
         });
 
         return $joinTableQueries;
+    }
+    public function dynamicJoin($query, $mainTable, $joinTable, $firstColumn, $condition, $secondColumn)
+    {
+        // Define the alias for the join table
+        $joinAlias = $joinTable . '_alias';
+
+        // Perform the query with a dynamic join
+        $query
+           ->leftJoin("$joinTable as $joinAlias", "$mainTable.$firstColumn", $condition, "$joinAlias.$secondColumn")
+           ->select("$mainTable.*", "$joinAlias.*");  // Select all columns from both tables
+        // ->get()
+        // ->map(function ($item) use ($joinAlias) {
+        //     // Return results with the join table's data under its key
+        //     return [
+        //         $item->{$joinAlias . '_id'} => [
+        //             'id' => $item->{$joinAlias . '_id'},
+        //             'name' => $item->{$joinAlias . '_name'},
+        //             // Add other columns from the join table as needed
+        //         ],
+        //         'main_table' => [
+        //             'id' => $item->id,
+        //             'name' => $item->name,
+        //             // Add other columns from the main table as needed
+        //         ]
+        //     ];
+        // });
+
+        return $query;
     }
 }
