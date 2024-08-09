@@ -134,7 +134,9 @@ class Node_Type extends Model
                     "node_order_by_field" => ['location' => 'properties'],
                     "node_order_by_type" => ['location' => 'properties'],
                     "node_item_display_aid" => ['location' => 'properties'],
-                    "node_endpoint_to_consume" => ['location' => 'properties']
+                    "node_endpoint_to_consume" => ['location' => 'properties'],
+                    "node_join_column"=> ['location' => 'properties'],
+                    "node_join_tables"=>['location' => 'properties']
                 ],
                 'rules' => [
                     'node_route' => 'required',
@@ -150,7 +152,9 @@ class Node_Type extends Model
                     "node_order_by_field" => '',
                     "node_order_by_type" => '',
                     "node_item_display_aid" => '',
-                    "node_endpoint_to_consume" => ''
+                    "node_endpoint_to_consume" => '',
+                    "node_join_column"=>'',
+                    "node_join_tables"=>''
                 ],
                 'extra_html' => "<div>
                  <div class='mb-3'>

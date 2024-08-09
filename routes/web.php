@@ -26,6 +26,9 @@ Auth::routes();
 Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::get('/nodes', [NodeController::class, 'index'])->name('viewNodes');
     Route::get('/node/databus', [NodeController::class, 'databusData']);
+    Route::get('/node/databus/tableData', [NodeController::class, 'databusTableData']);
+
+
     Route::post('/node', [NodeController::class, 'save'])->name('saveNode');
     Route::get('/node/{node}', [NodeController::class, 'node'])->name('viewNode');
     Route::delete('/node/delete/{node}', [NodeController::class, 'delete'])->name('deleteNode');

@@ -1,7 +1,7 @@
 <div class="col-sm-10 offset-sm-1 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-header bg-white">
-            <div class="text-center h3 fw-bold ">Routes, Pages, Links, Layouts & Components Management</div>
+            <div class="text-center h3 fw-bold ">Routes, Pages, Links, Layouts, Components & Data Interoperability Management</div>
 
         </div>
 
@@ -66,7 +66,7 @@
                 </div>
                 <div class="mb-3">
                     <div class="form-floating">
-                    <span className="text-primary">Display verbiage eg: title:"Welcome to {-app_name-}"||welcome_message:"We are happy to see you {-user_name-}."</span>
+                        <span className="text-primary">Display verbiage eg: title:"Welcome to {-app_name-}"||welcome_message:"We are happy to see you {-user_name-}."</span>
                         <textarea class="form-control" placeholder="display verbiage .." id="floatingTextarea2" style="height: 200px" name="verbiage">{{optional(optional($node)->verbiage)['value']}}</textarea>
                     </div>
                 </div>

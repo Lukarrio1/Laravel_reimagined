@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Node;
 
+use App\Models\User;
 use Mockery\Undefined;
 use App\Models\Node\Node;
 use Illuminate\Support\Str;
@@ -10,6 +11,7 @@ use App\Models\Tenant\Tenant;
 use App\Models\Node\Node_Type;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
@@ -87,6 +89,8 @@ class NodeController extends Controller
             })
         );
 
+        $nodes  = $nodes->with(['permission']);
+        $user = User:: with(['friend.friends'])->get();
         $node_count = $nodes->count();
         $max_amount_of_pages
             = $node_count / 8;
@@ -117,8 +121,26 @@ class NodeController extends Controller
     {
         $extra_rules = [];
         $extra_handler = [];
-        $node_endpoint_length = (int)$request->node_endpoint_length;
+        $node_join_tables = !empty($request->get('node_join_tables')) ?
+         json_decode($request->get('node_join_tables')) : [];
 
+        $node_endpoint_length = (int)$request->node_endpoint_length;
+        if(count($node_join_tables) > 0) {
+            for($i = 0;$i < count($node_join_tables);$i++) {
+                $current_table = $node_join_tables[$i];
+                // $node_categories_join_by_condition = $request->get("node_".$current_table."_join_by_condition");
+                // $node_categories_join_by_column = $request->get("node_".$current_table."_join_by_column");
+                // $node_categories_join_columns = $request->get("node_".$current_table."_join_columns");
+                $extra_rules["node_".$current_table."_join_by_condition"] = '';
+                $extra_handler["node_".$current_table."_join_by_condition"] = ['location' => 'properties'];
+                $extra_rules["node_".$current_table."_join_by_column"] = '';
+                $extra_handler["node_".$current_table."_join_by_column"] = ['location' => 'properties'];
+                $extra_rules["node_".$current_table."_join_columns"] = '';
+                $extra_handler["node_".$current_table."_join_columns"] = ['location' => 'properties'];
+                $extra_rules["node_previous_".$current_table."_join_column"]="";
+                $extra_handler["node_previous_".$current_table."_join_column"]="";
+            }
+        }
         if (0 < $node_endpoint_length) {
             $columns = \json_decode($request->node_endpoint_columns);
             $request->merge(["node_table_columns" => $columns]);
@@ -140,10 +162,17 @@ class NodeController extends Controller
         ];
         $current_node_type = (new Node_Type())->NODE_TYPES()->firstWhere('id', $request->node_type);
         $current_node = !empty($request->id) ? Node::find((int) $request->id) : null;
-        $validator = Validator::make($request->all(), isset($current_node_type['rules']) ? $current_node_type['rules'] + $main_rules : $main_rules);
+        $validator = Validator::make(
+            $request->all(),
+            isset($current_node_type['rules']) ? $current_node_type['rules'] + $main_rules :
+            $main_rules
+        );
+
         if ($validator->fails()) {
+               dd($request->all(),$validator->errors());
             return redirect()->back()->withErrors($validator)->withInput();
         }
+
         $request->merge([
             'permission_id' => empty($request->permission_id) ? 0 : $request->permission_id,
         ] + $this->tenancy->addTenantIdToCurrentItem(\optional(\auth()->user()->land)->id));
@@ -197,6 +226,24 @@ class NodeController extends Controller
                 ->where('key', 'database_configuration')->first()
                 ->getSettingValue()->keys()
         ];
+    }
+
+
+    public function databusTableData()
+    {
+        $query_conditions = ['=','!=','>','<'];
+        $selectedTables = explode(',', request()->get('tables'));
+        $database = request()->get('database');
+        $tables_with_columns = collect([]);
+        for($i = 0;$i < count($selectedTables);$i++) {
+            $tables_with_columns->put(
+                $selectedTables[$i],
+                DB::connection($database)->getSchemaBuilder()->getColumnListing($selectedTables[$i])
+            );
+        }
+
+
+        return ["tables_with_columns" => $tables_with_columns,'query_conditions' => $query_conditions];
     }
 
 
