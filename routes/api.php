@@ -22,6 +22,7 @@ use App\Http\Middleware\AuthMiddleware;
 // Retrieve cached routes
 $routes = Cache::get('routes', collect([]));
 
+
 $routes->each(function ($route) {
     $properties = $route->properties['value'];
     if (empty($properties->route_method) || empty($properties->node_route) || empty($properties->route_function)) {

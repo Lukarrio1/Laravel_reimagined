@@ -74,4 +74,27 @@ class Controller extends BaseController
         return !empty($url) ? Http::get($url)->json() : [];
 
     }
+
+     public function handleJoins($currentRouteNode)
+    {
+        $joinTables = collect(json_decode($currentRouteNode->properties['value']->node_join_tables));
+        $properties = $currentRouteNode->properties['value'];
+
+        $joinTableQueries = $joinTables->map(function ($item, $idx) use ($properties, $joinTables) {
+            return [
+                'first_table' => $idx == 0 ? $properties->{'node_table'} : $joinTables[$idx - 1],
+                'first_value' => $idx == 0
+                    ? $properties->node_join_column
+                    : $joinTables[$idx - 1].'.'.$properties->{'node_previous_'.$item.'_join_column'},
+                'condition' => $properties->{'node_'.$item.'_join_by_condition'},
+                'second_value' =>  $properties->{'node_'.$item.'_join_by_column'},
+                'second_table' => $item,
+                'columns' => collect($properties->{'node_'.$item.'_join_columns'})->map(function ($c) use ($item) {
+                    return  $c;
+                })->toArray(),
+            ];
+        });
+
+        return $joinTableQueries;
+    }
 }

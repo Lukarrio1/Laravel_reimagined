@@ -1,3 +1,303 @@
+function createQueryString(params) {
+    const queryString = Object.keys(params)
+        .map(
+            (key) =>
+                encodeURIComponent(key) +
+                "=" +
+                encodeURIComponent(params[key] ? params[key] : null)
+        )
+        .join("&");
+    return queryString;
+}
+function getPreviousElement(obj, currentKey) {
+    // Get all the keys of the object
+    const keys = Object.keys(obj);
+
+    // Find the index of the current key
+    const currentIndex = keys.indexOf(currentKey);
+
+    // Check if there is a previous key
+    if (currentIndex > 0) {
+        const previousKey = keys[currentIndex - 1];
+        return { obj: obj[previousKey], key: previousKey };
+    } else {
+        return null; // Return null if there is no previous element
+    }
+}
+
+function getUniqueElements(array) {
+    return array.filter((value, index, self) => self.indexOf(value) === index);
+}
+function TableToJoin({
+    table_columns,
+    columns,
+    table,
+    node,
+    query_conditions,
+    setSelectedTables,
+    MainTable,
+}) {
+    const previousElement = getPreviousElement(table_columns, table);
+    console.log(previousElement, "key here");
+    return (
+        <>
+            {previousElement?.key != null && (
+                <div class="mb-3">
+                    <label for="node_join_column" class="form-label">
+                        Node {previousElement?.key ?? MainTable} Column To Join
+                        By
+                    </label>
+                    <select
+                        id={`node_previous_${table}_join_column`}
+                        class="form-select"
+                        name={`node_previous_${table}_join_column`}
+                        onChange={(e) => {}}
+                    >
+                        <option value="">Select column</option>
+                        {previousElement?.obj &&
+                            previousElement?.obj?.map((column) => {
+                                return (
+                                    <option
+                                        selected={
+                                            node?.properties?.value[
+                                                `node_${
+                                                    previousElement?.key ??
+                                                    MainTable
+                                                }_join_column`
+                                            ] == column
+                                        }
+                                        value={column}
+                                    >
+                                        {column}
+                                    </option>
+                                );
+                            })}
+                    </select>
+                </div>
+            )}
+            <div class="mb-3">
+                <label for="node_join_by_column" class="form-label">
+                    Join {table} By Condition{" "}
+                    <button
+                        class="btn btn-danger btn-sm h4"
+                        title="Remove join entry"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setSelectedTables((pre) => [
+                                ...pre?.filter((c) => c != table),
+                            ]);
+                        }}
+                    >
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </label>
+                <select
+                    id={`node_${table}_join_by_condition`}
+                    class="form-select"
+                    name={`node_${table}_join_by_condition`}
+                    onChange={(e) => {}}
+                >
+                    <option value="">Select join by condition</option>
+                    {query_conditions &&
+                        query_conditions.map((condition) => {
+                            return (
+                                <option
+                                    selected={
+                                        node?.properties?.value[
+                                            `node_${table}_join_by_condition`
+                                        ] == condition
+                                    }
+                                    value={condition}
+                                >
+                                    {condition}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="node_join_by_column" class="form-label">
+                    Join {table} to {previousElement?.key ?? MainTable} By
+                </label>
+                <select
+                    id={`node_${table}_join_by_column`}
+                    class="form-select"
+                    name={`node_${table}_join_by_column`}
+                    onChange={(e) => {}}
+                >
+                    <option value="">Select join by column</option>
+                    {columns &&
+                        columns.map((column) => {
+                            return (
+                                <option
+                                    selected={
+                                        node?.properties?.value[
+                                            `node_${table}_join_by_column`
+                                        ] == column
+                                    }
+                                    value={column}
+                                >
+                                    {column}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="node_table" class="form-label">
+                    Node {table} Columns To Display
+                </label>
+                <select
+                    id="node_table_columns"
+                    class="form-select"
+                    name={`node_${table}_join_columns[]`}
+                    multiple={true}
+                >
+                    <option value="">Select A Table Columns</option>
+                    {columns &&
+                        columns
+                            // ?.filter((c) =>
+                            //     [
+                            //         "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                            //         "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                            //     ]?.includes(route_function_value?.split("_")[0])
+                            //         ? !columns_to_save.includes(c)
+                            //         : true
+                            // )
+                            ?.map((column) => {
+                                return (
+                                    <option
+                                        selected={node?.properties?.value[
+                                            `node_${table}_join_columns`
+                                        ]?.includes(column)}
+                                        value={column}
+                                    >
+                                        {column}
+                                    </option>
+                                );
+                            })}
+                </select>
+            </div>
+        </>
+    );
+}
+
+function JoinTablesForm({
+    mainColumns,
+    node,
+    mainTables,
+    database,
+    MainTable,
+}) {
+    const [selectedTables, setSelectedTables] = React.useState([]);
+    const [tablesToJoin, setTablesToJoin] = React.useState({});
+    const [query_conditions, setQueryConditions] = React.useState([]);
+
+    const getTableData = async () => {
+        const { data } = await axios.get(
+            "/node/databus/tableData?" +
+                createQueryString({ tables: selectedTables, database })
+        );
+        setTablesToJoin(data.tables_with_columns);
+        setQueryConditions(data.query_conditions);
+        console.log(data, "table data here");
+    };
+
+    React.useEffect(() => {
+        getTableData();
+    }, [selectedTables]);
+
+    React.useEffect(() => {
+        if (!node) return;
+        setSelectedTables(
+            JSON.parse(node?.properties?.value?.node_join_tables)
+        );
+    }, [node]);
+
+    return (
+        <>
+            {" "}
+            <div class="mb-3">
+                <label for="node_join_column" class="form-label">
+                    Node Column To Join By
+                </label>
+                <select
+                    id="node_join_column"
+                    class="form-select"
+                    name="node_join_column"
+                    onChange={(e) => {}}
+                >
+                    <option value="">Select column</option>
+                    {mainColumns &&
+                        mainColumns.map((column) => {
+                            return (
+                                <option
+                                    selected={
+                                        node?.properties?.value
+                                            ?.node_join_column == column
+                                    }
+                                    value={column}
+                                >
+                                    {column}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="node_table" class="form-label">
+                    Node Tables To Join To {JSON.stringify(selectedTables)}
+                    {/* {[
+                        "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                        "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                    ]?.includes(route_function_value?.split("_")[0])
+                        ? JSON.stringify(columns_to_save)
+                        : ""} */}
+                </label>
+                <select
+                    id="node_join_tables"
+                    class="form-select"
+                    // name="node_join_tables"
+                    onChange={(e) => {
+                        setSelectedTables([
+                            ...selectedTables?.filter(
+                                (c) => c != e.target.value
+                            ),
+                            e.target.value,
+                        ]);
+                    }}
+                >
+                    <option value="">Select table</option>
+                    {mainTables &&
+                        mainTables.map((table) => {
+                            return <option value={table}>{table}</option>;
+                        })}
+                </select>
+            </div>
+            <input
+                type="hidden"
+                value={JSON.stringify(selectedTables)}
+                name={"node_join_tables"}
+            />
+            {Object.keys(tablesToJoin)?.map(function (key) {
+                return (
+                    key.length > 0 && (
+                        <TableToJoin
+                            table_columns={tablesToJoin}
+                            table={key}
+                            columns={tablesToJoin[key]}
+                            node={node}
+                            query_conditions={query_conditions}
+                            setSelectedTables={setSelectedTables}
+                            MainTable={MainTable}
+                        ></TableToJoin>
+                    )
+                );
+            })}
+        </>
+    );
+}
+
 function App() {
     const possibleLabel = {
         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord":
@@ -15,11 +315,7 @@ function App() {
         "App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint":
             " (use route parameters based on columns from the database to filter the data eg. test/{column}/{column1})",
     };
-    function getUniqueElements(array) {
-        return array.filter(
-            (value, index, self) => self.indexOf(value) === index
-        );
-    }
+
     const node_type = document.querySelector("#node_type");
     const route_function = document.querySelector("#route_function");
     const node_id = document.querySelector("#node_id");
@@ -50,17 +346,6 @@ function App() {
     const [node_endpoint_to_consume, setNodeEndpointToConsume] =
         React.useState("");
 
-    function createQueryString(params) {
-        const queryString = Object.keys(params)
-            .map(
-                (key) =>
-                    encodeURIComponent(key) +
-                    "=" +
-                    encodeURIComponent(params[key] ? params[key] : null)
-            )
-            .join("&");
-        return queryString;
-    }
     const getData = async () => {
         const { data } = await axios.get(
             "/node/databus?" +
@@ -609,6 +894,15 @@ function App() {
                             </select>
                         </div>
                     </>
+                )}
+                {node && columns && (
+                    <JoinTablesForm
+                        mainColumns={columns}
+                        node={node}
+                        database={selected_database}
+                        mainTables={tables}
+                        MainTable={selected_table}
+                    ></JoinTablesForm>
                 )}
             </div>
         )

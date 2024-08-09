@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Support\Str;
+use App\Models\DynamicModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -56,40 +58,81 @@ class DataBusController extends Controller
         return \response()->json($item, 200);
     }
 
+
+    public function dynamicJoin($query, $mainTable, $joinTable, $firstColumn, $condition, $secondColumn)
+    {
+        // Define the alias for the join table
+        $joinAlias = $joinTable . '_alias';
+
+        // Perform the query with a dynamic join
+        $query
+           ->leftJoin("$joinTable as $joinAlias", "$mainTable.$firstColumn", $condition, "$joinAlias.$secondColumn")
+           ->select("$mainTable.*", "$joinAlias.*");  // Select all columns from both tables
+        // ->get()
+        // ->map(function ($item) use ($joinAlias) {
+        //     // Return results with the join table's data under its key
+        //     return [
+        //         $item->{$joinAlias . '_id'} => [
+        //             'id' => $item->{$joinAlias . '_id'},
+        //             'name' => $item->{$joinAlias . '_name'},
+        //             // Add other columns from the join table as needed
+        //         ],
+        //         'main_table' => [
+        //             'id' => $item->id,
+        //             'name' => $item->name,
+        //             // Add other columns from the main table as needed
+        //         ]
+        //     ];
+        // });
+
+        return $query;
+    }
+
     public function manyRecords(): JsonResponse
     {
+
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
             return response()->json([]);
         }
-
         $properties = $currentRouteNode->properties['value'];
         $database = optional($properties)->node_database;
         $table = optional($properties)->node_table;
-        $columns = optional($properties)->node_table_columns ?? ['*'];
+        $joinTables = collect(json_decode($currentRouteNode->properties['value']->node_join_tables));
+        $columns = collect(optional($properties)->node_table_columns)->map(function ($c) use ($table, $joinTables) {
+            return trim($table.'.'.$c);
+        })->toArray() ?? ['*'];
         $limit = (int) optional($properties)->node_data_limit;
         $orderByField = optional($properties)->node_order_by_field;
         $orderByType = optional($properties)->node_order_by_type;
-
         if (!$database || !$table) {
             return response()->json([]);
         }
+        $query = new DynamicModel();
+        $query->setConnectionName($database)
+          ->setTableName($table);
+        $relationShips = $this->handleJoins($currentRouteNode);
+        if (count($relationShips) > 0) {
+            $relationShips->each(
+                function ($rel) use ($query, $database, $table) {
+                }
+            );
+        }
 
-        $query = DB::connection($database)
-            ->table($table)
-            ->select($columns);
+        $query->select($columns);
 
         if ($limit > 0) {
             $query->limit($limit);
         }
 
         if ($orderByField && $orderByType) {
-            $query->orderBy($orderByField, $orderByType);
+            $query->orderBy(count($joinTables) > 0 ? $table.'.'.$orderByField : $orderByField, $orderByType);
         }
         if ($route_parameters->count() > 0) {
             $route_parameters->each(fn ($value, $key) => $query->where($key, "LIKE", "%" . $value . "%"));
         }
+
 
         $items = $query->get();
 
@@ -98,6 +141,7 @@ class DataBusController extends Controller
 
     public function checkRecord(): JsonResponse
     {
+
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         $database = $currentRouteNode->properties['value']->node_database;
