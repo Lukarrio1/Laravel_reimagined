@@ -192,7 +192,7 @@ function JoinTablesForm({
         console.log(data, "table data here");
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         getTableData();
     }, []);
 
