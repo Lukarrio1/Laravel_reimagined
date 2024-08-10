@@ -361,7 +361,7 @@ function App() {
 
         setDatabases(data?.databases);
         setTables(data?.tables);
-        setTableColumns(data?.columns);
+     setTimeout(()=>   setTableColumns(data?.columns),1000)
         setNode(data?.node);
         setOrderByTypes(data?.orderByTypes);
         setTableItems(data?.table_items);
