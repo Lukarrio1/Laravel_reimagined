@@ -192,6 +192,10 @@ function JoinTablesForm({
         console.log(data, "table data here");
     };
 
+    useEffect(() => {
+        getTableData();
+    }, []);
+
     React.useEffect(() => {
         getTableData();
     }, [selectedTables]);
@@ -905,8 +909,8 @@ function App() {
                             node?.properties?.value?.node_database ??
                             selected_database
                         }
-                        mainTables={tables??[]}
-                        MainTable={selected_table??null}
+                        mainTables={tables ?? []}
+                        MainTable={selected_table ?? null}
                     ></JoinTablesForm>
                 )}
             </div>
