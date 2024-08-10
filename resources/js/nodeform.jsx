@@ -894,9 +894,9 @@ function App() {
                         </div>
                     </>
                 )}
-                {node ||
-                    columns ||
-                    (node?.properties?.value?.node_table_columns &&
+                {columns ||
+                    (node &&
+                        node?.properties?.value?.node_table_columns &&
                         [
                             "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                             "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
