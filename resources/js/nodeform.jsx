@@ -361,7 +361,7 @@ function App() {
 
         setDatabases(data?.databases);
         setTables(data?.tables);
-     setTimeout(()=>   setTableColumns(data?.columns),1000)
+        setTableColumns(data?.columns);
         setNode(data?.node);
         setOrderByTypes(data?.orderByTypes);
         setTableItems(data?.table_items);
@@ -894,23 +894,24 @@ function App() {
                         </div>
                     </>
                 )}
-                {node &&
-                    columns &&
-                    [
-                        "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
-                        "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
-                    ].includes(route_function_value?.split("_")[0]) && (
-                        <JoinTablesForm
-                            mainColumns={columns}
-                            node={node}
-                            database={
-                                node?.properties?.value?.node_database ??
-                                selected_database
-                            }
-                            mainTables={tables}
-                            MainTable={selected_table}
-                        ></JoinTablesForm>
-                    )}
+                {node ||
+                    columns ||
+                    (node?.properties?.value?.node_table_columns &&
+                        [
+                            "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
+                            "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
+                        ].includes(route_function_value?.split("_")[0]) && (
+                            <JoinTablesForm
+                                mainColumns={columns}
+                                node={node}
+                                database={
+                                    node?.properties?.value?.node_database ??
+                                    selected_database
+                                }
+                                mainTables={tables}
+                                MainTable={selected_table}
+                            ></JoinTablesForm>
+                        ))}
             </div>
         )
     );
