@@ -895,12 +895,13 @@ function App() {
                     </>
                 )}
                 {node &&
+                    columns &&
                     [
                         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
                     ].includes(route_function_value?.split("_")[0]) && (
                         <JoinTablesForm
-                            mainColumns={columns ?? []}
+                            mainColumns={columns}
                             node={node}
                             database={
                                 node?.properties?.value?.node_database ??
