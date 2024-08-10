@@ -115,29 +115,29 @@ class AppServiceProvider extends ServiceProvider
             Cache::add('tenants', Tenant::all());
         }
 
-        if (!Cache::has('references')) {
-            Cache::add('references', ReferenceConfig::query()
-                ->whereIn('type', optional(collect(Cache::get('settings'))
-                    ->where('key', 'reference_types')->first())->getSettingValue() ?? collect([]))
-                ->distinct('type')
-                ->get());
-        }
+        // if (!Cache::has('references')) {
+        //     Cache::add('references', ReferenceConfig::query()
+        //         ->whereIn('type', optional(collect(Cache::get('settings'))
+        //             ->where('key', 'reference_types')->first())->getSettingValue() ?? collect([]))
+        //         ->distinct('type')
+        //         ->get());
+        // }
 
-        \collect(optional(collect(Cache::get('settings'))
-            ->where('key', 'reference_types')->first())->getSettingValue())
-            ->each(function ($ref) {
-                $rel_type = collect(\explode('_', $ref));
-                $ref = Cache::get('references')->where('type', $ref)->first();
-                if ($rel_type->count() > 1 && !empty($ref)) {
-                    $owned_model = $ref->owned_model;
-                    $owner_model = $ref->owner_model;
-                    $has_many = (int) $rel_type->last() == 1 ? "hasManyThrough" : "hasOneThrough";
-                    $owner_model::resolveRelationUsing($rel_type->first(), function ($owner_model) use ($owned_model, $has_many, $ref) {
-                        return $owner_model->$has_many($owned_model, Reference::class, 'owner_id', 'id', 'id', 'owned_id')
-                            ->where('references.type', $ref->type);
-                    });
-                }
-            });
+        // \collect(optional(collect(Cache::get('settings'))
+        //     ->where('key', 'reference_types')->first())->getSettingValue())
+        //     ->each(function ($ref) {
+        //         $rel_type = collect(\explode('_', $ref));
+        //         $ref = Cache::get('references')->where('type', $ref)->first();
+        //         if ($rel_type->count() > 1 && !empty($ref)) {
+        //             $owned_model = $ref->owned_model;
+        //             $owner_model = $ref->owner_model;
+        //             $has_many = (int) $rel_type->last() == 1 ? "hasManyThrough" : "hasOneThrough";
+        //             $owner_model::resolveRelationUsing($rel_type->first(), function ($owner_model) use ($owned_model, $has_many, $ref) {
+        //                 return $owner_model->$has_many($owned_model, Reference::class, 'owner_id', 'id', 'id', 'owned_id')
+        //                     ->where('references.type', $ref->type);
+        //             });
+        //         }
+        //     });
         \collect(
             optional(collect(Cache::get('settings'))
                 ->where('key', 'database_configuration')->first())
