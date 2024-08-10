@@ -85,7 +85,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $user = User::whereEmail($request->email)->first();
+        $user = User::query()->whereEmail($request->email)->first();
         $api_email_verification = (int) \optional(Cache::get('settings', \collect([]))
            ->where('key', 'api_email_verification')->first())
            ->getSettingValue();

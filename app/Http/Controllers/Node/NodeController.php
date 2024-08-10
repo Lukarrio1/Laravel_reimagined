@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenant\Tenant;
 use App\Models\Node\Node_Type;
 use Illuminate\Support\Facades\DB;
+use App\Models\Reference\Reference;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -89,8 +90,8 @@ class NodeController extends Controller
             })
         );
 
+
         $nodes  = $nodes->with(['permission']);
-        $user = User::with(['friend.friends'])->get();
         $node_count = $nodes->count();
         $max_amount_of_pages
             = $node_count / 8;

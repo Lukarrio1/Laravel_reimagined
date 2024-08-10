@@ -66,7 +66,7 @@
                      <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                      @enderror
                  </div>
-                 <div class="mb-3">
+                 {{-- <div class="mb-3">
                      <label for="owner_model_display_aid" class="form-label">Owner Model Display Aid</label>
                      <select id="owner_model_display_aid" class="form-select trigger" name="owner_model_display_aid"
                       onChange={(e)=>setForm({...form,owner_model_display_aid:e.target.value})}
@@ -92,7 +92,7 @@
                         @error('owner_item')
                         <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                         @enderror
-                    </div>
+                    </div> --}}
                       <div class="mb-3">
                           <label for="owned_model" class="form-label">Owned Model</label>
                           <select id="owned_model" class="form-select trigger" name="owned_model" onChange={(e)=>setForm({...form,owned_model:e.target.value})}>
@@ -105,7 +105,7 @@
                           <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                           @enderror
                       </div>
-
+{{--
                     <div class="mb-3">
                         <label for="owned_model_display_aid" class="form-label">Owned Model Display Aid</label>
                         <select id="owned_model_display_aid" class="form-select trigger" name="owned_model_display_aid"
@@ -136,7 +136,7 @@
                         @error('owned_model_display_aid')
                         <div style="color: red;">{{ $message }}</div> <!-- Display the error message -->
                         @enderror
-                    </div>
+                    </div> --}}
                     <div class="mb-3">
                         <label for="type" class="form-label">Type</label>
                         <select id="type" class="form-select" name="type"

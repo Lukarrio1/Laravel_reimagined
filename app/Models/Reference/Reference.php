@@ -2,14 +2,15 @@
 
 namespace App\Models\Reference;
 
+use App\Models\BaseModel;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Reference extends Model
+class Reference extends BaseModel
 {
     use HasFactory;
-    protected $fillable = ["owner_id", "owner_model", "owned_model", "owned_id", "type", 'description','has_many'];
+    protected $fillable = ["owner_id", "owner_model", "owned_model", "owned_id", "type"];
 
     public function items($types = [])
     {

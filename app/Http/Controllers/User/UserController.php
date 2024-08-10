@@ -20,6 +20,8 @@ class UserController extends Controller
     }
 
 
+
+
     public function index()
     {
         $translate = [
@@ -126,8 +128,8 @@ class UserController extends Controller
 
     public function delete(User $user)
     {
-        $user->delete();
-        Session::flash('message', 'The user was saved successfully.');
+        User::find($user->id)->delete();
+        Session::flash('message', 'The user was deleted successfully.');
         Session::flash('alert-class', 'alert-success');
         return \redirect()->back();
     }

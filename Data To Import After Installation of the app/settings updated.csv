@@ -1,7 +1,7 @@
 key,properties,tenant_id,allowed_for_api_use
 admin_role,"Super Admin_1",,0
 mail_host,sandbox.smtp.mailtrap.io,,0
-mail_port,2525,,0
+mail_port,465,,0
 mail_username,e1e0f01cad57ee,,0
 mail_password,245e87234a7039,,0
 mail_encryption,tls,,0
@@ -17,16 +17,16 @@ site_email_address,laravelreimagined@gmail.com,,1
 redirect_to_after_login,Home_/,,1
 redirect_to_after_register,Home_/,,1
 redirect_to_after_logout,Login_/login,,1
-multi_tenancy,0_false,,0
 registration_role,"Authenticated User_2",,0
 app_name,"Api Management Tool (AMT)",,1
 mail_mailer,smtp,,0
 cache_driver,"File Storage_file",,0
-api_email_verification,Disabled_,,0
+api_email_verification,Enabled_1,,0
 client_app_url,http://localhost:3000,,0
 reference_types,friend_0|friends_1,,0
 database_configuration,"agrilinkage:DB_CONNECTION=mysql|DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=agrilinkage|DB_USERNAME=root|DB_PASSWORD=root_user,
 calendar:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=calendar|DB_USERNAME=root|DB_PASSWORD=root_user,
-mainDatabase:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=laravel_reimagined|DB_USERNAME=root|DB_PASSWORD=root_user",,0
-database_backup_configuration,mainDatabase|agrilinkage,,0
+mainDatabase:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=laravel_reimagined|DB_USERNAME=root|DB_PASSWORD=root_user,
+karlCars:DB_CONNECTION=mysql| DB_HOST=127.0.0.1|DB_PORT=3306|DB_DATABASE=karl_cars_2023|DB_USERNAME=root|DB_PASSWORD=root_user",,0
 database_backup,Disabled_,,0
+database_backup_configuration,agrilinkage_agrilinkage|calendar_calendar|mainDatabase_mainDatabase|karlCars_karlCars,,0

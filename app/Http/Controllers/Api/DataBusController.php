@@ -53,7 +53,7 @@ class DataBusController extends Controller
             }
             $relationShips = $this->handleJoins($currentRouteNode);
             if (count($relationShips) > 0) {
-                $item = $this->addNestedRelationship( $item->get(), $currentRouteNode, $database)->first();
+                $item = $this->addNestedRelationship($item->get(), $currentRouteNode, $database)->first();
             } else {
                 $item = $item->first();
             }
@@ -102,33 +102,6 @@ class DataBusController extends Controller
         $relationShips = $this->handleJoins($currentRouteNode);
         if (count($relationShips) > 0) {
             $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
-            //  $items->map(function ($item) use ($relationShips, $database) {
-            //     $database = DB::connection($database);
-            //     $item_to_change = null;
-            //     $relationShips->each(
-            //         function ($rel, $idx) use ($item, $database, $relationShips, &$item_to_change) {
-            //             if($item_to_change == null) {
-            //                 $item->{$rel['second_table']} = $database->table($rel['second_table'])
-            //             ->select($rel['columns'])
-            //             ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
-            //             ->get();
-            //                 $item_to_change = $item->{$rel['second_table']};
-            //             } else {
-            //                 collect($item_to_change)->each(function ($s_item) use ($rel, $database, &$item_to_change) {
-            //                     $s_item->{$rel['second_table']} = $database->table($rel['second_table'])
-            //                             ->select($rel['columns'])
-            //                             ->where($rel['second_value'], $rel['condition'], $s_item->{$rel['first_value']})
-            //                             ->get();
-            //                     $item_to_change = $s_item->{$rel['second_table']};
-            //                     return $s_item;
-            //                 });
-
-
-            //             }
-            //         }
-            //     );
-            //     return $item;
-            // });
         }
         return \response()->json($items, 200);
     }

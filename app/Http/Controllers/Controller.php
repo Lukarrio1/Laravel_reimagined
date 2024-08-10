@@ -21,6 +21,24 @@ class Controller extends BaseController
     use ValidatesRequests;
     use SendEmailTrait;
 
+
+    public $exception_property_value_keys = [
+       'route_function',
+       'node_audit_message',
+       'node_endpoint_to_consume',
+       'node_item_display_aid',
+       'node_order_by_field',
+       'node_order_by_type',
+       'node_table_columns',
+       'node_database'
+    ];
+    public function removeKeys($properties)
+    {
+        $keys = collect($properties)->keys();
+        $object = collect([]);
+        $keys->each(fn ($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
+        return $object->toArray();
+    }
     public function clearCache()
     {
         Artisan::call('cache:clear');

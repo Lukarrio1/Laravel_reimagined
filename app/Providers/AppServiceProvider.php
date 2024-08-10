@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Setting;
 use App\Models\Node\Node;
 use App\Models\Tenant\Tenant;
+use App\Models\ReferenceConfig;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Models\Reference\Reference;
@@ -98,10 +99,10 @@ class AppServiceProvider extends ServiceProvider
 
             Cache::add('setting_backup_databases', $item->toArray());
         }
-// dd(   optional(collect(Cache::get('settings'))
-//                  ->where('key', 'database_configuration')->first())
-//                  ->getSettingValue('last'), \collect(optional(collect(Cache::get('settings'))
-//         ->where('key', 'database_backup_configuration')->first())->getSettingValue()));
+        // dd(   optional(collect(Cache::get('settings'))
+        //                  ->where('key', 'database_configuration')->first())
+        //                  ->getSettingValue('last'), \collect(optional(collect(Cache::get('settings'))
+        //         ->where('key', 'database_backup_configuration')->first())->getSettingValue()));
 
         if (!Cache::has('routes')) {
             $nodes = Node::where('node_status', 1)
@@ -115,9 +116,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if (!Cache::has('references')) {
-            Cache::add('references', Reference::query()
+            Cache::add('references', ReferenceConfig::query()
                 ->whereIn('type', optional(collect(Cache::get('settings'))
-                    ->where('key', 'reference_types')->first())->getSettingValue() ?? [])
+                    ->where('key', 'reference_types')->first())->getSettingValue() ?? collect([]))
                 ->distinct('type')
                 ->get());
         }

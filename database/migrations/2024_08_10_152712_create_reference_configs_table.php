@@ -10,13 +10,12 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('references', function (Blueprint $table) {
+        Schema::create('reference_configs', function (Blueprint $table) {
             $table->id();
-            $table->integer('owner_id')->nullable();
-            $table->integer('owned_id')->nullable();
             $table->string('owner_model')->nullable();
             $table->string('owned_model')->nullable();
             $table->string('type')->nullable();
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('references');
+        Schema::dropIfExists('reference_configs');
     }
 };

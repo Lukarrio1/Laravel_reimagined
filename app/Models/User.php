@@ -19,6 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Mail\Api\Auth\EmailVerification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -39,8 +40,10 @@ class User extends Authenticatable
     public function __construct()
     {
         $this->table_name = $this->table;
+        static::addGlobalScope('UserDeleteAt', function (Builder $builder) {
+            $builder->whereNull('deleted_at');
+        });
     }
-
 
     /**
      * The attributes that are mass assignable.

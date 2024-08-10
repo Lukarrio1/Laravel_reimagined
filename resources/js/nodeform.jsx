@@ -51,7 +51,7 @@ function TableToJoin({
                         id={`node_previous_${table}_join_column`}
                         class="form-select"
                         name={`node_previous_${table}_join_column`}
-                        onChange={(e) => {}}
+                        required
                     >
                         <option value="">Select column</option>
                         {previousElement?.obj &&
@@ -92,7 +92,7 @@ function TableToJoin({
                     id={`node_${table}_join_by_condition`}
                     class="form-select"
                     name={`node_${table}_join_by_condition`}
-                    onChange={(e) => {}}
+                    required
                 >
                     <option value="">Select join by condition</option>
                     {query_conditions &&
@@ -120,7 +120,7 @@ function TableToJoin({
                     id={`node_${table}_join_by_column`}
                     class="form-select"
                     name={`node_${table}_join_by_column`}
-                    onChange={(e) => {}}
+                    required
                 >
                     <option value="">Select join by column</option>
                     {columns &&
@@ -149,30 +149,22 @@ function TableToJoin({
                     class="form-select"
                     name={`node_${table}_join_columns[]`}
                     multiple={true}
+                    required
                 >
                     <option value="">Select A Table Columns</option>
                     {columns &&
-                        columns
-                            // ?.filter((c) =>
-                            //     [
-                            //         "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
-                            //         "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
-                            //     ]?.includes(route_function_value?.split("_")[0])
-                            //         ? !columns_to_save.includes(c)
-                            //         : true
-                            // )
-                            ?.map((column) => {
-                                return (
-                                    <option
-                                        selected={node?.properties?.value[
-                                            `node_${table}_join_columns`
-                                        ]?.includes(column)}
-                                        value={column}
-                                    >
-                                        {column}
-                                    </option>
-                                );
-                            })}
+                        columns?.map((column) => {
+                            return (
+                                <option
+                                    selected={node?.properties?.value[
+                                        `node_${table}_join_columns`
+                                    ]?.includes(column)}
+                                    value={column}
+                                >
+                                    {column}
+                                </option>
+                            );
+                        })}
                 </select>
             </div>
         </>
@@ -214,6 +206,14 @@ function JoinTablesForm({
 
     return (
         <>
+            <div class="mb-3">
+                <div className="card">
+                    <div className="card-body text-center h4">
+                        Use with caution, this is still in beta . (leave fields
+                        blank if you don't intend to use nested joins).
+                    </div>
+                </div>
+            </div>
             <div class="mb-3">
                 <label for="node_join_column" class="form-label">
                     Node Column To Join By
@@ -894,15 +894,23 @@ function App() {
                         </div>
                     </>
                 )}
-                {node && columns && (
-                    <JoinTablesForm
-                        mainColumns={columns}
-                        node={node}
-                        database={node?.properties?.value?.node_database}
-                        mainTables={tables}
-                        MainTable={selected_table}
-                    ></JoinTablesForm>
-                )}
+                {node &&
+                    columns &&
+                    [
+                        "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
+                        "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
+                    ].includes(route_function_value?.split("_")[0]) && (
+                        <JoinTablesForm
+                            mainColumns={columns}
+                            node={node}
+                            database={
+                                node?.properties?.value?.node_database ??
+                                selected_database
+                            }
+                            mainTables={tables}
+                            MainTable={selected_table}
+                        ></JoinTablesForm>
+                    )}
             </div>
         )
     );
