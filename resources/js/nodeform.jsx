@@ -895,7 +895,6 @@ function App() {
                     </>
                 )}
                 {node &&
-                    columns &&
                     [
                         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
