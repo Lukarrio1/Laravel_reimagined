@@ -38,14 +38,13 @@ class DataBusController extends Controller
     public function oneRecord($method)
     {
         $item = [];
+        $currentRouteNode = $this->getCurrentRoute();
+        $route_parameters = \collect(Route::current()->parameters());
+        $database = $currentRouteNode->properties['value']->node_database;
+        $table = $currentRouteNode->properties['value']->node_table;
+        $node_table_columns =
+        $currentRouteNode->properties['value']->node_table_columns;
         if(!Cache::has($method)) {
-            $currentRouteNode = $this->getCurrentRoute();
-            $route_parameters = \collect(Route::current()->parameters());
-            $database = $currentRouteNode->properties['value']->node_database;
-            $table = $currentRouteNode->properties['value']->node_table;
-            $node_table_columns =
-
-            $currentRouteNode->properties['value']->node_table_columns;
             if ($database != null && $table != null) {
                 $item =  DB::connection($database)
                     ->table($table)

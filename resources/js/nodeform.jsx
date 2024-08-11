@@ -209,8 +209,9 @@ function JoinTablesForm({
             <div class="mb-3">
                 <div className="card">
                     <div className="card-body text-center h4">
-                        Use with caution, this is still in beta . (leave fields
-                        blank if you don't intend to use nested joins).
+                        Use with caution, this is still in beta. (leave fields
+                        blank if you don't intend to use nested joins, if so try to
+                        keep your joins to a reasonable amount eg 3).
                     </div>
                 </div>
             </div>
@@ -256,14 +257,12 @@ function JoinTablesForm({
                     class="form-select"
                     // name="node_join_tables"
                     onChange={(e) => {
-                        setSelectedTables(
-                            [
-                                ...selectedTables?.filter(
-                                    (c, idx) => c != e.target.value
-                                ),
-                                e.target.value,
-                            ].filter((c, idx) => idx < 6)
-                        );
+                        setSelectedTables([
+                            ...selectedTables?.filter(
+                                (c, idx) => c != e.target.value
+                            ),
+                            e.target.value,
+                        ]);
                     }}
                 >
                     <option value="">Select table</option>
@@ -546,7 +545,7 @@ function App() {
                                 id="node_endpoint_to_consume"
                                 aria-describedby="node_name"
                                 name="node_endpoint_to_consume"
-                                onKeyUp={(e) =>
+                                onChange={(e) =>
                                     setTimeout(
                                         () =>
                                             setNodeEndpointToConsume(

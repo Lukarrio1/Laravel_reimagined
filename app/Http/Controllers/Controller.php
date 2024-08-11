@@ -125,34 +125,7 @@ class Controller extends BaseController
 
         return $joinTableQueries;
     }
-    public function dynamicJoin($query, $mainTable, $joinTable, $firstColumn, $condition, $secondColumn)
-    {
-        // Define the alias for the join table
-        $joinAlias = $joinTable . '_alias';
 
-        // Perform the query with a dynamic join
-        $query
-           ->leftJoin("$joinTable as $joinAlias", "$mainTable.$firstColumn", $condition, "$joinAlias.$secondColumn")
-           ->select("$mainTable.*", "$joinAlias.*");  // Select all columns from both tables
-        // ->get()
-        // ->map(function ($item) use ($joinAlias) {
-        //     // Return results with the join table's data under its key
-        //     return [
-        //         $item->{$joinAlias . '_id'} => [
-        //             'id' => $item->{$joinAlias . '_id'},
-        //             'name' => $item->{$joinAlias . '_name'},
-        //             // Add other columns from the join table as needed
-        //         ],
-        //         'main_table' => [
-        //             'id' => $item->id,
-        //             'name' => $item->name,
-        //             // Add other columns from the main table as needed
-        //         ]
-        //     ];
-        // });
-
-        return $query;
-    }
 
     public function addNestedRelationship2($items, $currentRouteNode, $database)
     {
@@ -215,9 +188,7 @@ class Controller extends BaseController
                 ->select($rel['columns'])
                 ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
                 ->get();
-
             $item->{$rel['second_table']} = $relatedItems;
-
             $relatedItems->each(function ($relatedItem) use ($relationShips, $database, $level) {
                 $this->processRelationships($relatedItem, $relationShips, $database, $level + 1);
             });
