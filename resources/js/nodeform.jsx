@@ -410,12 +410,14 @@ function App() {
 
     React.useEffect(() => {
         if (!node) return;
-        setSelectedDatabases(node?.properties?.value?.node_database ?? null);
-        setSelectedTable(node?.properties?.value?.node_table ?? null);
+        setSelectedDatabases(
+            selected_database ?? node?.properties?.value?.node_database
+        );
+        setSelectedTable(selected_table ?? node?.properties?.value?.node_table);
         setRouteFunctionValue(route_function?.value);
-        setDataLimit(node?.properties?.value?.node_data_limit ?? null);
+        setDataLimit(data_limit ?? node?.properties?.value?.node_data_limit);
         setNodeDisplayAid(
-            node?.properties?.value?.node_item_display_aid ?? display_aid
+            display_aid ?? node?.properties?.value?.node_item_display_aid
         );
         setNodeEndpointToConsume((pre) =>
             node_endpoint_to_consume?.length > 0
@@ -638,86 +640,84 @@ function App() {
                         )}
                     </>
                 )}
-                {"App\\Http\\Controllers\\Api\\DataBusController::deleteRecord" !=
-                    route_function_value?.split("_")[0] && (
-                    <div class="mb-3">
-                        <label for="node_table" class="form-label">
-                            Node Table Columns{" "}
-                            {[
+
+                <div class="mb-3">
+                    <label for="node_table" class="form-label">
+                        Node Table Columns{" "}
+                        {[
+                            "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                            "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                        ]?.includes(route_function_value?.split("_")[0])
+                            ? JSON.stringify(columns_to_save)
+                            : ""}
+                    </label>
+                    <select
+                        id="node_table_columns"
+                        class="form-select"
+                        name="node_table_columns[]"
+                        onChange={(e) => {
+                            setSelectedTableColumns(e.target.value);
+                            if (
+                                [
+                                    "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                                    "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                                ]?.includes(route_function_value?.split("_")[0])
+                            )
+                                setColumnsToSave([
+                                    ...columns_to_save,
+                                    e.target.value,
+                                ]);
+                        }}
+                        multiple={
+                            [
                                 "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
                                 "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
                             ]?.includes(route_function_value?.split("_")[0])
-                                ? JSON.stringify(columns_to_save)
-                                : ""}
-                        </label>
-                        <select
-                            id="node_table_columns"
-                            class="form-select"
-                            name="node_table_columns[]"
-                            onChange={(e) => {
-                                setSelectedTableColumns(e.target.value);
-                                if (
+                                ? false
+                                : true
+                        }
+                        disabled={[
+                            "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
+                            "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
+                            "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
+                        ]?.includes(route_function_value?.split("_")[0])}
+                    >
+                        <option value="">Select A Table Columns</option>
+                        {columns &&
+                            columns
+                                ?.filter((c) =>
                                     [
                                         "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
                                         "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
                                     ]?.includes(
                                         route_function_value?.split("_")[0]
                                     )
+                                        ? !columns_to_save.includes(c)
+                                        : true
                                 )
-                                    setColumnsToSave([
-                                        ...columns_to_save,
-                                        e.target.value,
-                                    ]);
-                            }}
-                            multiple={
-                                [
-                                    "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
-                                    "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
-                                ]?.includes(route_function_value?.split("_")[0])
-                                    ? false
-                                    : true
-                            }
-                            disabled={[
-                                "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
-                                "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
-                            ]?.includes(route_function_value?.split("_")[0])}
-                        >
-                            <option value="">Select A Table Columns</option>
-                            {columns &&
-                                columns
-                                    ?.filter((c) =>
-                                        [
-                                            "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
-                                            "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
-                                        ]?.includes(
-                                            route_function_value?.split("_")[0]
-                                        )
-                                            ? !columns_to_save.includes(c)
-                                            : true
-                                    )
-                                    ?.map((column) => {
-                                        return (
-                                            <option
-                                                selected={node?.properties?.value?.node_table_columns?.includes(
-                                                    column
-                                                )}
-                                                // onClick={() =>
-                                                //     setColumnsToSave((pre) => [
-                                                //         ...pre?.filter(
-                                                //             (c) => c != column
-                                                //         ),
-                                                //         column,
-                                                //     ])
-                                                // }
-                                                value={column}
-                                            >
-                                                {column}
-                                            </option>
-                                        );
-                                    })}
-                        </select>
-                    </div>
-                )}
+                                ?.map((column) => {
+                                    return (
+                                        <option
+                                            selected={node?.properties?.value?.node_table_columns?.includes(
+                                                column
+                                            )}
+                                            // onClick={() =>
+                                            //     setColumnsToSave((pre) => [
+                                            //         ...pre?.filter(
+                                            //             (c) => c != column
+                                            //         ),
+                                            //         column,
+                                            //     ])
+                                            // }
+                                            value={column}
+                                        >
+                                            {column}
+                                        </option>
+                                    );
+                                })}
+                    </select>
+                </div>
+
                 {[
                     "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
                     "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
@@ -895,6 +895,7 @@ function App() {
                     </>
                 )}
                 {node &&
+                    columns &&
                     [
                         "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",

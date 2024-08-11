@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 
@@ -67,41 +68,47 @@ class DataBusController extends Controller
 
 
 
-    public function manyRecords(): JsonResponse
+    public function manyRecords($method): JsonResponse
     {
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
         if (!$currentRouteNode) {
             return response()->json([]);
         }
-        $properties = $currentRouteNode->properties['value'];
-        $database = optional($properties)->node_database;
-        $table = optional($properties)->node_table;
-        $columns = optional($properties)->node_table_columns ?? ['*'];
-        $limit = (int) optional($properties)->node_data_limit;
-        $orderByField = optional($properties)->node_order_by_field;
-        $orderByType = optional($properties)->node_order_by_type;
+        if(!Cache::has($method)) {
+            $properties = $currentRouteNode->properties['value'];
+            $database = optional($properties)->node_database;
+            $table = optional($properties)->node_table;
+            $columns = optional($properties)->node_table_columns ?? ['*'];
+            $limit = (int) optional($properties)->node_data_limit;
+            $orderByField = optional($properties)->node_order_by_field;
+            $orderByType = optional($properties)->node_order_by_type;
 
-        if (!$database || !$table) {
-            return response()->json([]);
-        }
-        $query = DB::connection($database)
-            ->table($table)
-            ->select($columns);
+            if (!$database || !$table) {
+                return response()->json([]);
+            }
+            $query = DB::connection($database)
+                ->table($table)
+                ->select($columns);
 
-        if ($limit > 0) {
-            $query->limit($limit);
-        }
-        if ($orderByField && $orderByType) {
-            $query->orderBy($orderByField, $orderByType);
-        }
-        if ($route_parameters->count() > 0) {
-            $route_parameters->each(fn ($value, $key) => $query->where($key, "LIKE", "%" . $value . "%"));
-        }
-        $items = $query->get();
-        $relationShips = $this->handleJoins($currentRouteNode);
-        if (count($relationShips) > 0) {
-            $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
+            if ($limit > 0) {
+                $query->limit($limit);
+            }
+            if ($orderByField && $orderByType) {
+                $query->orderBy($orderByField, $orderByType);
+            }
+            if ($route_parameters->count() > 0) {
+                $route_parameters->each(fn ($value, $key) => $query->where($key, "LIKE", "%" . $value . "%"));
+            }
+            $items = $query->get();
+            $relationShips = $this->handleJoins($currentRouteNode);
+            if (count($relationShips) > 0) {
+                $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
+            }
+            // Cached for 20 minutes
+            Cache::add($method, $items,1200);
+        } else {
+            $items = Cache::get($method);
         }
         return \response()->json($items, 200);
     }

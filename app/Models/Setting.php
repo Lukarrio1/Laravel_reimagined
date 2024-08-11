@@ -65,12 +65,12 @@ class Setting extends Model
                   ";
                 break;
             case "config_string":
-                $html = "eg: example_db:'DB_CONNECTION=mysql|
+                $html = "eg: example_db:DB_CONNECTION=mysql|
                              DB_HOST=127.0.0.1|
                              DB_PORT=3306|
                              DB_DATABASE=laravel_reimagined|
                              DB_USERNAME=root|
-                             DB_PASSWORD=root_user',
+                             DB_PASSWORD=root_user,
                         <textarea class='form-control' name='value'>$field_value</textarea>
                   ";
                 // no break

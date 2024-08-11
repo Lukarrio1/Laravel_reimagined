@@ -38,7 +38,7 @@ class SettingController extends Controller
 
         return view('Setting.View', [
             'keys' => $keys,
-            'key_value' => $setting->SETTING_KEYS($setting_key, $field_value)['field'],
+            'key_value' => $setting->SETTING_KEYS($setting_key, $field_value)['field'] ?? '',
             'allowed_for_api_use' => \collect(Cache::get('settings', \collect(Setting::all()))
                 ->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
             'setting_key' => $setting_key,

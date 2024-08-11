@@ -83,23 +83,25 @@ class AppServiceProvider extends ServiceProvider
 
         if (!Cache::has('setting_databases')) {
             $databases = collect([]);
-            collect(Cache::get('settings'))
-                ->where('key', 'database_configuration')->first()
-                ->getSettingValue()->keys()
+            $data_configurations = Cache::get('settings')
+                ->where('key', 'database_configuration')->first();
+            $data_configurations = !empty($data_configurations) ? $data_configurations->getSettingValue() : [];
+            collect($data_configurations)
+                ->keys()
                 ->each(fn ($db) => $databases->put($db, $db));
             Cache::add('setting_databases', $databases);
         }
         if (!Cache::has('setting_backup_databases')) {
             $item =  collect(Cache::get('settings'))
-                ->where('key', 'database_backup_configuration')->first();
+                ->where('key', 'database_backup_configuration')->first() ?? [];
             if(!empty($item)) {
-                $item = $item->getSettingValue();
+                $item = gettype($item) == "array" ? [] : $item->getSettingValue()->toArray();
 
             }
 
-            Cache::add('setting_backup_databases', $item->toArray());
+            Cache::add('setting_backup_databases', $item);
         }
-        // dd(   optional(collect(Cache::get('settings'))
+        // dd(optional(collect(Cache::get('settings'))
         //                  ->where('key', 'database_configuration')->first())
         //                  ->getSettingValue('last'), \collect(optional(collect(Cache::get('settings'))
         //         ->where('key', 'database_backup_configuration')->first())->getSettingValue()));
@@ -138,6 +140,8 @@ class AppServiceProvider extends ServiceProvider
                     });
                 }
             });
+
+
         \collect(
             optional(collect(Cache::get('settings'))
                 ->where('key', 'database_configuration')->first())
