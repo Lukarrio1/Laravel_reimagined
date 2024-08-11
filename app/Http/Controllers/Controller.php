@@ -21,6 +21,12 @@ class Controller extends BaseController
     use ValidatesRequests;
     use SendEmailTrait;
 
+    public $cache_ttl = 0;
+
+    public function __construct()
+    {
+        $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? 0;
+    }
 
     public $exception_property_value_keys = [
        'route_function',
@@ -148,13 +154,14 @@ class Controller extends BaseController
         return $query;
     }
 
-    public function addNestedRelationship($items, $currentRouteNode, $database)
+    public function addNestedRelationship2($items, $currentRouteNode, $database)
     {
         $relationShips = $this->handleJoins($currentRouteNode);
         if (count($relationShips) > 0) {
             $items = $items->map(function ($item) use ($relationShips, $database) {
                 $database = DB::connection($database);
                 $item_to_change = null;
+                $tracker = 0;
                 $relationShips->each(
                     function ($rel, $idx) use ($item, $database, $relationShips, &$item_to_change) {
                         if($item_to_change == null) {
@@ -164,12 +171,15 @@ class Controller extends BaseController
                         ->get();
                             $item_to_change = $item->{$rel['second_table']};
                         } else {
-                            collect($item_to_change)->each(function ($s_item) use ($rel, $database, &$item_to_change) {
+                            collect($item_to_change)->each(function ($s_item) use ($rel, $database, $relationShips, &$item_to_change) {
                                 $s_item->{$rel['second_table']} = $database->table($rel['second_table'])
                                         ->select($rel['columns'])
                                         ->where($rel['second_value'], $rel['condition'], $s_item->{$rel['first_value']})
                                         ->get();
-                                $item_to_change = $s_item->{$rel['second_table']};
+                                if($relationShips->count() != $idx + 1) {
+                                    collect($s_item->{$rel['second_table']});
+
+                                }
                                 return $s_item;
                             });
 
@@ -182,4 +192,39 @@ class Controller extends BaseController
         }
         return $items;
     }
+
+
+    public function addNestedRelationship($items, $currentRouteNode, $database)
+    {
+        $relationShips = $this->handleJoins($currentRouteNode);
+        if (count($relationShips) > 0) {
+            $items = $items->map(function ($item) use ($relationShips, $database) {
+                $database = DB::connection($database);
+                $this->processRelationships($item, $relationShips, $database);
+                return $item;
+            });
+        }
+        return $items;
+    }
+
+    private function processRelationships(&$item, $relationShips, $database, $level = 0)
+    {
+        if ($level < $relationShips->count()) {
+            $rel = $relationShips[$level];
+            $relatedItems = $database->table($rel['second_table'])
+                ->select($rel['columns'])
+                ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
+                ->get();
+
+            $item->{$rel['second_table']} = $relatedItems;
+
+            $relatedItems->each(function ($relatedItem) use ($relationShips, $database, $level) {
+                $this->processRelationships($relatedItem, $relationShips, $database, $level + 1);
+            });
+        }
+    }
+
+
+
+
 }

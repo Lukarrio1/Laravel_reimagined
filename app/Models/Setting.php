@@ -54,7 +54,7 @@ class Setting extends Model
                 $html = "<input class='form-control' name='value' value='" . $field_value . "'>";
                 break;
             case 'input_number':
-                $html = "<input class='form-control' type='number' placeholder='How many (months/weeks) ?' name='value' value='" . $field_value . "'>";
+                $html = "<input class='form-control' type='number' placeholder='How many (number) ?' name='value' value='" . $field_value . "'>";
                 break;
             case 'input_email':
                 $html = "<input class='form-control' type='email' name='value' value='" . $field_value . "'>";
@@ -214,6 +214,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('multi_select', Cache::get('setting_databases'), $key, Cache::get('setting_backup_databases', [])),
                 'handle' => ['action' => 'multi_split', 'value' => 'last'],
             ],
+            'cache_ttl' => [
+                'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ]
 
             // delete_inactive_users
             // 'not_exportable_tables' => [
@@ -312,7 +316,8 @@ class Setting extends Model
             'reference_types' => "Reference Types",
             'database_configuration' => "Database Configurations",
             "database_backup_configuration" => "Database Backup Configurations",
-            "database_backup" => "Database Backup (Weekly)"
+            "database_backup" => "Database Backup (Weekly)",
+            "cache_ttl"    =>   "Cache Time To Live (seconds)"
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

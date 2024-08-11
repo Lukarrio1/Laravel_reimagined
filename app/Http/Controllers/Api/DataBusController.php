@@ -35,32 +35,36 @@ class DataBusController extends Controller
 
 
 
-    public function oneRecord()
+    public function oneRecord($method)
     {
-        $currentRouteNode = $this->getCurrentRoute();
-        $route_parameters = \collect(Route::current()->parameters());
-        $database = $currentRouteNode->properties['value']->node_database;
-        $table = $currentRouteNode->properties['value']->node_table;
-        $node_table_columns =
-            $currentRouteNode->properties['value']->node_table_columns;
-        if ($database != null && $table != null) {
-            $item =  DB::connection($database)
-                ->table($table)
-                ->select($node_table_columns);
-            if (isset($currentRouteNode->properties['value']->node_item)) {
-                $item->where('id', $currentRouteNode->properties['value']->node_item);
-            } else {
-                $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
-            }
-            $relationShips = $this->handleJoins($currentRouteNode);
-            if (count($relationShips) > 0) {
-                $item = $this->addNestedRelationship($item->get(), $currentRouteNode, $database)->first();
-            } else {
-                $item = $item->first();
-            }
+        $item = [];
+        if(!Cache::has($method)) {
+            $currentRouteNode = $this->getCurrentRoute();
+            $route_parameters = \collect(Route::current()->parameters());
+            $database = $currentRouteNode->properties['value']->node_database;
+            $table = $currentRouteNode->properties['value']->node_table;
+            $node_table_columns =
 
+            $currentRouteNode->properties['value']->node_table_columns;
+            if ($database != null && $table != null) {
+                $item =  DB::connection($database)
+                    ->table($table)
+                    ->select($node_table_columns);
+                if (isset($currentRouteNode->properties['value']->node_item)) {
+                    $item->where('id', $currentRouteNode->properties['value']->node_item);
+                } else {
+                    $route_parameters->each(fn ($value, $key) => $item->where($key, $value));
+                }
+                $relationShips = $this->handleJoins($currentRouteNode);
+                if (count($relationShips) > 0) {
+                    $item = $this->addNestedRelationship($item->get(), $currentRouteNode, $database)->first();
+                } else {
+                    $item = $item->first();
+                }
+
+            }
         } else {
-            $item = [];
+            Cache::add($method, $item, $this->cache_ttl);
         }
         return \response()->json($item, 200);
     }
@@ -105,8 +109,7 @@ class DataBusController extends Controller
             if (count($relationShips) > 0) {
                 $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
             }
-            // Cached for 20 minutes
-            Cache::add($method, $items,1200);
+            Cache::add($method, $items, $this->cache_ttl);
         } else {
             $items = Cache::get($method);
         }

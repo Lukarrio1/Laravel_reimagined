@@ -262,7 +262,7 @@ function JoinTablesForm({
                                     (c, idx) => c != e.target.value
                                 ),
                                 e.target.value,
-                            ].filter((c, idx) => idx < 2)
+                            ].filter((c, idx) => idx < 6)
                         );
                     }}
                 >
