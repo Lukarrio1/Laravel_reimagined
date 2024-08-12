@@ -20,6 +20,7 @@ class ExportController extends Controller
         $table = \request()->get('table');
         $database = \request()->get('database');
         $selected_table_columns = \request()->get('table_columns', []);
+        $data_limit = request()->get('data_limit');
         $databases =
             collect(Cache::get('settings'))
             ->where('key', 'database_configuration')->first()
@@ -39,6 +40,7 @@ class ExportController extends Controller
         if (!empty($table) && !empty($database)) {
             $table_columns = $export->getAllTableColumns($table, $database);
         }
+
         if (\count($selected_table_columns) > 0) {
             $table_validation = \collect($selected_table_columns)
                 ->filter(function ($item) use ($table_columns) {
@@ -54,10 +56,14 @@ class ExportController extends Controller
             if ($table_validation) {
                 return \redirect()->back()->withErrors(['table_error' => "$table does not contain $failed_keys."]);
             }
-            $table_data = $export->getTableData($table, $selected_table_columns, $searchParams, $database)->get($selected_table_columns);
+            $table_data = $export->getTableData($table, $selected_table_columns, $searchParams, $database)
+            ->when($data_limit>0,fn($q)=>$q->limit($data_limit))
+            ->get($selected_table_columns);
         } else {
             try {
-                $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams, $database)->get();
+                $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams, $database)
+                ->when($data_limit>0,fn($q)=>$q->limit($data_limit))
+                ->get();
                 $selected_table_columns = $table_columns;
             } catch (\Throwable $th) {
                 return \redirect()->back()->withErrors(['table_error' => "$database database does not contain the $table table."]);
