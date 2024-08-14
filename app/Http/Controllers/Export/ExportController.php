@@ -21,6 +21,8 @@ class ExportController extends Controller
         $database = \request()->get('database');
         $selected_table_columns = \request()->get('table_columns', []);
         $data_limit = request()->get('data_limit');
+        $order_by = request()->get('order_by');
+        $order_by_type = request()->get('order_by_type');
         $databases =
             collect(Cache::get('settings'))
             ->where('key', 'database_configuration')->first()
@@ -57,12 +59,17 @@ class ExportController extends Controller
                 return \redirect()->back()->withErrors(['table_error' => "$table does not contain $failed_keys."]);
             }
             $table_data = $export->getTableData($table, $selected_table_columns, $searchParams, $database)
-            ->when($data_limit>0,fn($q)=>$q->limit($data_limit))
-            ->get($selected_table_columns);
+            ->when($data_limit > 0, fn ($q) => $q->limit($data_limit));
+
+            // if(!empty($order_by)) {
+            //     $table_data->orderBy($order_by, $order_by_type);
+            // }
+            $table_data = $table_data->get($selected_table_columns);
         } else {
             try {
                 $table_data = empty($table) ?: $export->getTableData($table, ['*'], $searchParams, $database)
-                ->when($data_limit>0,fn($q)=>$q->limit($data_limit))
+                ->when($data_limit > 0, fn ($q) => $q->limit($data_limit))
+                // ->when(!empty($order_by) && !empty($order_by_type), fn ($q) => $q->orderBy($order_by_type, $order_by))
                 ->get();
                 $selected_table_columns = $table_columns;
             } catch (\Throwable $th) {

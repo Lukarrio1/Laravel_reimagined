@@ -64,26 +64,17 @@ class AppServiceProvider extends ServiceProvider
             Cache::set('roles', Role::all()->pluck('id', 'name'));
         }
 
-        // Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-        //     ->getSettingValue('last'));
+        Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
+            ->getSettingValue('last')??"file");
 
         if (!Cache::has('setting_allowed_login_roles')) {
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
             Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
         }
 
-
-        //   if (!Cache::has('setting_databases_backup_values')) {
-        //     $databases = collect([]);
-        //     \optional(Setting::where('key', 'database_configuration')->first())->getSettingValue("last")->keys()
-        //         ->each(fn($db)=>$databases->put($db,$db)) ?? \collect([]);
-        //     Cache::add('setting_databases_backup_values', $databases->toArray());
-        // }
-
-
         if (!Cache::has('setting_databases')) {
             $databases = collect([]);
-            $data_configurations = Cache::get('settings')
+            $data_configurations = Cache::get('settings',collect([]))
                 ->where('key', 'database_configuration')->first();
             $data_configurations = !empty($data_configurations) ? $data_configurations->getSettingValue() : [];
             collect($data_configurations)
@@ -101,17 +92,12 @@ class AppServiceProvider extends ServiceProvider
 
             Cache::add('setting_backup_databases', $item);
         }
-        // dd(optional(collect(Cache::get('settings'))
-        //                  ->where('key', 'database_configuration')->first())
-        //                  ->getSettingValue('last'), \collect(optional(collect(Cache::get('settings'))
-        //         ->where('key', 'database_backup_configuration')->first())->getSettingValue()));
 
         if (!Cache::has('routes')) {
             $nodes = Node::where('node_status', 1)
                 ->where('node_type', 1)
                 ->get();
-            // Add routes to cache
-            Cache::add('routes', $nodes); // Cache with expiration (optional)
+            Cache::add('routes', $nodes);
         }
         if (!Cache::has('tenants')) {
             Cache::add('tenants', Tenant::all());
@@ -124,7 +110,6 @@ class AppServiceProvider extends ServiceProvider
                 ->distinct('type')
                 ->get());
         }
-
         \collect(optional(collect(Cache::get('settings'))
             ->where('key', 'reference_types')->first())->getSettingValue())
             ->each(function ($ref) {
@@ -140,8 +125,6 @@ class AppServiceProvider extends ServiceProvider
                     });
                 }
             });
-
-
         \collect(
             optional(collect(Cache::get('settings'))
                 ->where('key', 'database_configuration')->first())

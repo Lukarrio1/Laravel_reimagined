@@ -41,6 +41,7 @@ function TableToJoin({
     console.log(previousElement, "key here");
     return (
         <>
+            <hr />
             {previousElement?.key != null && (
                 <div class="mb-3">
                     <label for="node_join_column" class="form-label">
@@ -167,6 +168,36 @@ function TableToJoin({
                         })}
                 </select>
             </div>
+            <div class="mb-3">
+                <label for={`node_${table}_one_or_many`} class="form-label">
+                    Object Or Array
+                </label>
+                <select
+                    id={`node_${table}_one_or_many`}
+                    class="form-select"
+                    name={`node_${table}_one_or_many`}
+                    required
+                >
+                    <option value="">Select an option</option>
+                    {[
+                        { key: "Array", value: 1 },
+                        { key: "Object", value: 2 },
+                    ].map((item) => {
+                        return (
+                            <option
+                                value={item.value}
+                                selected={
+                                    node?.properties?.value[
+                                        `node_${table}_one_or_many`
+                                    ] == item.value
+                                }
+                            >
+                                {item.key}
+                            </option>
+                        );
+                    })}
+                </select>
+            </div>
         </>
     );
 }
@@ -181,6 +212,7 @@ function JoinTablesForm({
     const [selectedTables, setSelectedTables] = React.useState([]);
     const [tablesToJoin, setTablesToJoin] = React.useState({});
     const [query_conditions, setQueryConditions] = React.useState([]);
+    const [ttl, setTtl] = React.useState(0);
 
     const getTableData = async () => {
         const { data } = await axios.get(
@@ -202,6 +234,7 @@ function JoinTablesForm({
         setSelectedTables(
             JSON.parse(node?.properties?.value?.node_join_tables)
         );
+        setTtl(node?.properties?.value?.node_cache_ttl);
     }, [node]);
 
     return (
@@ -210,11 +243,35 @@ function JoinTablesForm({
                 <div className="card">
                     <div className="card-body text-center h4">
                         Use with caution, this is still in beta. (leave fields
-                        blank if you don't intend to use nested joins, if so try to
-                        keep your joins to a reasonable amount eg 3).
+                        blank if you don't intend to use nested joins, if so try
+                        to keep your joins to a reasonable amount eg 3 levels
+                        deep).
                     </div>
                 </div>
             </div>
+            <div class="mb-3">
+                <label for={`node_cache_ttl`} class="form-label">
+                    Node Endpoint Cache Time To Live{" "}
+                    <bold> ({ttl ?? 0} seconds)</bold>
+                </label>
+                <input
+                    type="number"
+                    class="form-control"
+                    id={`node_cache_ttl`}
+                    aria-describedby="node_name"
+                    name={`node_cache_ttl`}
+                    onChange={(e) => setTtl(e.target.value)}
+                    placeholder={"0"}
+                />
+                <input
+                    type="hidden"
+                    aria-describedby="node_name"
+                    name={`node_cache_ttl`}
+                    placeholder={"0"}
+                    value={ttl}
+                />
+            </div>
+
             <div class="mb-3">
                 <label for="node_join_column" class="form-label">
                     Node Column To Join By

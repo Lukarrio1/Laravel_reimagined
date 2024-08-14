@@ -44,6 +44,8 @@
             <div style="color: red;">{{ $message }}</div>
             @enderror
         </div>
+
+
         <div class="mb-3">
             <label for="name" class="form-label">Data Limit</label>
             <input type="number" class="form-control" id="data_limit" aria-describedby="node_name" name="data_limit" value="{{request('data_limit')}}" placeholder="0">
@@ -68,3 +70,26 @@
     </div>
 </div>
 </div>
+
+
+
+
+
+
+{{-- <div class="mb-3">
+    <label for="table" class="form-label">Order By Column</label>
+    <select class="form-select" aria-label="Default select example" name="order_by">
+        <option selected value=''>Open this select menu</option>
+        @foreach ($table_columns as $column )
+        <option value="{{$column}}">{{$column}}</option>
+        @endforeach
+    </select>
+</div>
+<div class="mb-3">
+    <label for="table" class="form-label">Order By Type</label>
+    <select class="form-select" aria-label="Default select example" name="order_by_type">
+        <option selected value=''>Open this select menu</option>
+        <option value='asc'>Ascending Order</option>
+        <option value='desc'>Descending Order</option>
+    </select>
+</div> --}}
