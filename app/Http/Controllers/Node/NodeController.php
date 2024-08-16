@@ -81,12 +81,12 @@ class NodeController extends Controller
                 }
                 // Convert 'type' value to its corresponding node type ID
                 if ($translate[$key] === 'node_type') {
-                    $convertedValue = array_search(\strtoupper($value), Node::NODE_TYPE);
+                    $convertedValue = array_search(\strtoupper(Str::lower($value)), Node::NODE_TYPE);
                 } else {
                     $convertedValue = $value;
                 }
 
-                $nodes->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
+                $nodes->where(Str::lower($translate[$key]), 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
             })
         );
 
@@ -132,19 +132,19 @@ class NodeController extends Controller
                 // $node_categories_join_by_condition = $request->get("node_".$current_table."_join_by_condition");
                 // $node_categories_join_by_column = $request->get("node_".$current_table."_join_by_column");
                 // $node_categories_join_columns = $request->get("node_".$current_table."_join_columns");
-                $extra_rules["node_previous_".$current_table."_join_column"] = "";
+                $extra_rules["node_previous_".$current_table."_join_column"] = "required";
                 $extra_handler["node_previous_".$current_table."_join_column"] = "";
 
-                $extra_rules["node_".$current_table."_join_by_condition"] = '';
+                $extra_rules["node_".$current_table."_join_by_condition"] = 'required';
                 $extra_handler["node_".$current_table."_join_by_condition"] = ['location' => 'properties'];
 
-                $extra_rules["node_".$current_table."_join_by_column"] = '';
+                $extra_rules["node_".$current_table."_join_by_column"] = 'required';
                 $extra_handler["node_".$current_table."_join_by_column"] = ['location' => 'properties'];
 
-                $extra_rules["node_".$current_table."_one_or_many"] = '';
-                $extra_handler["node_".$current_table."_one_or_many"] = ['location' => 'properties'];
+                $extra_rules["node_".$current_table."_object_or_array"] = 'required';
+                $extra_handler["node_".$current_table."_object_or_array"] = ['location' => 'properties'];
 
-                $extra_rules["node_".$current_table."_join_columns"] = '';
+                $extra_rules["node_".$current_table."_join_columns"] = 'required';
                 $extra_handler["node_".$current_table."_join_columns"] = ['location' => 'properties'];
 
 

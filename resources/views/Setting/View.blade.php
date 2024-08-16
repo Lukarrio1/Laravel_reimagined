@@ -58,6 +58,16 @@
 </div>
 <div class="col-sm-10 offset-sm-1 mt-3">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+        <div class="card-header bg-white">
+            <form>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label h4">
+                        <span class="badge text-bg-secondary">Settings: ({{count($settings)!=$settings_count?count($settings).'/'.$settings_count:$settings_count}})</span>
+                    </label>
+                    <input type="text" class="form-control" name="search" value="{{request()->get('search')}}">
+                </div>
+            </form>
+        </div>
         @can('can view settings data table', auth()->user())
         <div class="card-body  scrollable-div">
             <table class="table table-hover">

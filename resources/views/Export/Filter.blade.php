@@ -82,8 +82,8 @@
         <option selected value=''>Open this select menu</option>
         @foreach ($table_columns as $column )
         <option value="{{$column}}">{{$column}}</option>
-        @endforeach
-    </select>
+@endforeach
+</select>
 </div>
 <div class="mb-3">
     <label for="table" class="form-label">Order By Type</label>

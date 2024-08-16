@@ -25,9 +25,14 @@ class Controller extends BaseController
 
     public function __construct()
     {
-        $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? 0;
+        $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? null;
     }
 
+    /**
+     * exception_property_value_keys
+     *
+     * @var array
+     */
     public $exception_property_value_keys = [
         'route_function',
         'node_audit_message',
@@ -38,6 +43,15 @@ class Controller extends BaseController
         'node_table_columns',
         'node_database'
     ];
+
+
+    /**
+     * Method removeKeys
+     *
+     * @param $properties object [This refers to the properties of a route node]
+     *
+     * @return array
+     */
     public function removeKeys($properties)
     {
         $keys = collect($properties)->keys();
@@ -45,12 +59,22 @@ class Controller extends BaseController
         $keys->each(fn($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
         return $object->toArray();
     }
+    /**
+     * Method clearCache
+     *
+     * @return void
+     */
     public function clearCache()
     {
         Artisan::call('cache:clear');
         Artisan::call('optimize');
     }
 
+    /**
+     * Method getCurrentRoute
+     *
+     * @return object
+     */
     public function getCurrentRoute()
     {
         $currentRoute = join('::', explode('@', Route::currentRouteAction()));
@@ -59,12 +83,28 @@ class Controller extends BaseController
             ->first();
     }
 
+    /**
+     * Method getValidationRules
+     *
+     * @return array
+     */
     public function getValidationRules()
     {
         $rules = ['required', 'integer', 'min:3', 'min:5', 'min:10', 'sometimes', 'present', 'max:3', 'max:5', 'max:10'];
         return $rules;
     }
 
+    /**
+     * Method backupDatabase
+     *
+     * @param $databaseName string [The database name]
+     * @param $databaseUser string [The database user]
+     * @param $databasePassword string [The database password]
+     * @param $databaseHost string [The database host]
+     * @param $databasePort string [The database port]
+     *
+     * @return void
+     */
     public function backupDatabase($databaseName, $databaseUser, $databasePassword, $databaseHost, $databasePort = 3306)
     {
         $backupFileName = $databaseName . '-backup-' . date('Y-m-d-h-m-s') . '.sql';
@@ -94,11 +134,36 @@ class Controller extends BaseController
         }
     }
 
+    /**
+     * Method getHttpData
+     *
+     * @param $url string [This is url for the data end point]
+     *
+     * @return mixed
+     */
     public function getHttpData($url)
     {
         return !empty($url) ? Http::get($url)->json() : [];
     }
+    public $extra_rel = [
+        [
+            'first_table' => 'users',
+            'first_value' => 'id',
+            'condition' => '=',
+            'second_value' => 'model_id',
+            'second_table' => 'model_has_roles',
+            'one_or_many' => 1,
+            'columns' => []
+        ]
+    ];
 
+    /**
+     * Method handleJoins
+     *
+     * @param $currentRouteNode object
+     *
+     * @return array
+     */
     public function handleJoins($currentRouteNode)
     {
         if (!isset($currentRouteNode->properties['value']->node_join_tables)) {
@@ -116,7 +181,7 @@ class Controller extends BaseController
                 'condition' => $properties->{'node_' . $item . '_join_by_condition'},
                 'second_value' =>  $properties->{'node_' . $item . '_join_by_column'},
                 'second_table' => $item,
-                'one_or_many' => $properties->{"node_" . $item . "_one_or_many"},
+                'one_or_many' => $properties->{"node_" . $item . "_object_or_array"},
                 'columns' => collect($properties->{'node_' . $item . '_join_columns'})->map(function ($c) use ($item) {
                     return  $c;
                 })->toArray(),
@@ -127,58 +192,15 @@ class Controller extends BaseController
     }
 
 
-    // public function addNestedRelationship2($items, $currentRouteNode, $database)
-    // {
-    //     $relationShips = $this->handleJoins($currentRouteNode);
-    //     if (count($relationShips) > 0) {
-    //         $items = $items->map(function ($item) use ($relationShips, $database) {
-    //             $database = DB::connection($database);
-    //             $item_to_change = null;
-    //             $tracker = 0;
-    //             $relationShips->each(
-    //                 function ($rel, $idx) use ($item, $database, $relationShips, &$item_to_change) {
-    //                     if ($item_to_change == null) {
-    //                         $item->{$rel['second_table']} = $database->table($rel['second_table'])
-    //                             ->select($rel['columns'])
-    //                             ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
-    //                             ->get();
-    //                         $item_to_change = $item->{$rel['second_table']};
-    //                     } else {
-    //                         collect($item_to_change)->each(function ($s_item) use ($rel, $database, $relationShips, &$item_to_change) {
-    //                             $s_item->{$rel['second_table']} = $database->table($rel['second_table'])
-    //                                 ->select($rel['columns'])
-    //                                 ->where($rel['second_value'], $rel['condition'], $s_item->{$rel['first_value']})
-    //                                 ->get();
-    //                             if ($relationShips->count() != $idx + 1) {
-    //                                 collect($s_item->{$rel['second_table']});
-    //                             }
-    //                             return $s_item;
-    //                         });
-    //                     }
-    //                 }
-    //             );
-    //             return $item;
-    //         });
-    //     }
-    //     return $items;
-    // }
-
-    // private function processRelationships2(&$item, $relationShips, $database, $level = 0)
-    // {
-    //     if ($level < $relationShips->count()) {
-    //         $rel = $relationShips[$level];
-    //         $relatedItems = $database->table($rel['second_table'])
-    //             ->select($rel['columns'])
-    //             ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
-    //             ->get();
-    //         $item->{$rel['second_table']} = $relatedItems;
-    //         $relatedItems->each(function ($relatedItem) use ($relationShips, $database, $level) {
-    //             $this->processRelationships($relatedItem, $relationShips, $database, $level + 1);
-    //         });
-    //     }
-    // }
-
-
+    /**
+     * Method addNestedRelationship
+     *
+     * @param $items collection
+     * @param $currentRouteNode object
+     * @param $database string
+     *
+     * @return collection
+     */
     public function addNestedRelationship($items, $currentRouteNode, $database)
     {
         $relationShips = $this->handleJoins($currentRouteNode);
@@ -192,6 +214,20 @@ class Controller extends BaseController
         return $items;
     }
 
+    /**
+     * Method processRelationships
+     *
+     * @param &$item object [This is the related item]
+     * @param $relationShips Object [This is the relationships]
+     * @param $database mixed [This is the database connection]
+     * @param $level integer [this is the current level at which the related item should be attached]
+     *
+     * @return void
+     *
+     *  This only scales vertically meaning, it only nest relations on an object or elements of an array (object).
+     *  The next step is to make it scale horizontally in terms of adding relations to an item given the level of the related
+     *  item(s) that should be directly related to it.
+     */
     private function processRelationships(&$item, $relationShips, $database, $level = 0)
     {
         if ($level < $relationShips->count()) {
@@ -202,20 +238,18 @@ class Controller extends BaseController
                 ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
                 ->orderBy($rel['second_value'])
                 ->when($rel['one_or_many'] == 2, fn($q) => $q->limit(1))
-                ->chunk(200, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level) {
+                ->chunk(1000, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level, $rel) {
                     $allRelatedItems = $allRelatedItems->merge($relatedItems);
+                    if ($rel['one_or_many'] == 3) {
+                        return false; // Exits the chunking loop early
+                    }
                     $relatedItems->each(function ($relatedItem) use ($relationShips, $database, $level) {
                         $this->processRelationships($relatedItem, $relationShips, $database, $level + 1);
                     });
                 });
-
-            if ($rel['one_or_many'] == 1) {
-                $item->{$rel['second_table']} = $allRelatedItems->toArray();
-            } elseif ($rel['one_or_many'] == 2) {
-                $item->{$rel['second_table']} = $allRelatedItems->first();
-            } else {
-                $item->{$rel['second_table']} = $allRelatedItems;
-            }
+            $item->{$rel['second_table']} = $rel['one_or_many'] == 2 ?
+                $allRelatedItems->toArray() : ($rel['one_or_many'] == 3 ?
+                    $allRelatedItems->count() : $allRelatedItems->first());
         }
     }
 }
