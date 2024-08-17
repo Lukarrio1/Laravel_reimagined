@@ -182,7 +182,7 @@ class Controller extends BaseController
                 'condition' => $properties->{'node_' . $item . '_join_by_condition'},
                 'second_value' =>  $properties->{'node_' . $item . '_join_by_column'},
                 'second_table' => $item,
-                'one_or_many' => $properties->{"node_" . $item . "_object_or_array"} ?? 2,
+                'one_or_many' => $properties->{"node_" . $item . "_object_or_array_or_count"} ?? 2,
                 'columns' => collect($properties->{'node_' . $item . '_join_columns'})->map(function ($c) use ($item) {
                     return  $c;
                 })->toArray(),
