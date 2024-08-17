@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Setting;
 use PSpell\Config;
 use App\Models\Setting;
 use App\Models\Node\Node;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Tenant\Tenant;
 use Spatie\Permission\Models\Role;
@@ -26,12 +27,15 @@ class SettingController extends Controller
     public function index($setting_key = 'admin_role')
     {
         $setting = new Setting();
+        $search = Str::lower(\trim(request()->get('search')));
         $settings_for_display
-            = $setting->query()
-                ->latest('updated_at')->get();
+            = $setting->query()->latest('updated_at');
+        $settings_count = $settings_for_display
+            ->count();
+        $settings_for_display = $settings_for_display->when($search, fn($q) => $q->where('key', 'LIKE', '%' . $search . '%'))->get();
         $keys
             = collect($setting->getAllSettingKeys())
-                ->filter(fn ($key, $idx) => \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
+            ->filter(fn($key, $idx) => \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
 
         $setting_key = empty(\request()->get('setting_key')) ? $keys->keys()->first() : \request()->get('setting_key');
         $field_value = optional(collect(Cache::get('settings')));
@@ -43,6 +47,7 @@ class SettingController extends Controller
                 ->firstWhere('key', $setting_key))->get('allowed_for_api_use', 0),
             'setting_key' => $setting_key,
             'settings' => [...$settings_for_display],
+            'settings_count' => $settings_count
         ]);
     }
 
@@ -55,7 +60,7 @@ class SettingController extends Controller
         }
         // $multi_tenancy_role_id = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
         // $role_for_checking = !empty($setting) ? Role::find((int)$multi_tenancy_role_id) : null;
-        $value = \in_array($request->setting_key, ["allowed_login_roles", 'not_exportable_tables','database_backup_configuration']) ? \collect($request->value)->map(function ($item) {
+        $value = \in_array($request->setting_key, ["allowed_login_roles", 'not_exportable_tables', 'database_backup_configuration']) ? \collect($request->value)->map(function ($item) {
             return \collect(\explode(' ', $item))->join("--");
         })->join('|') : $request->value;
 

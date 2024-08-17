@@ -62,7 +62,7 @@ class NodeController extends Controller
 
         // Parse the search parameter from the request and create key-value pairs
         $searchParams = empty(request()->get('search')) ? \collect([]) : collect(explode('|', request()->get('search')))
-            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -72,8 +72,8 @@ class NodeController extends Controller
         $nodes_count_overall = $nodes->count();
 
         $searchParams->when(
-            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
-            fn ($collection) => $collection->each(function ($section) use ($nodes, $translate) {
+            $searchParams->filter(fn($val) => \count($val) > 1)->count() > 0,
+            fn($collection) => $collection->each(function ($section) use ($nodes, $translate) {
                 list($key, $value) = $section;
                 // Check if the key is valid in the translation map
                 if (!isset($translate[$key])) {
@@ -81,18 +81,24 @@ class NodeController extends Controller
                 }
                 // Convert 'type' value to its corresponding node type ID
                 if ($translate[$key] === 'node_type') {
-                    $convertedValue = array_search(\strtoupper($value), Node::NODE_TYPE);
+                    $convertedValue = array_search(\strtoupper(Str::lower($value)), Node::NODE_TYPE);
                 } else {
                     $convertedValue = $value;
                 }
 
-                $nodes->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
+                $nodes->where(Str::lower($translate[$key]), 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
             })
         );
 
 
         $nodes  = $nodes->with(['permission']);
-        $node_count = $nodes->count();
+        $node_count = $nodes->get()->when(
+            !auth()->user()->hasPermissionTo('can crud data bus nodes'),
+            fn($collection) => $collection->filter(
+                fn($item) => !isset($item->properties['value']->node_database)
+                    &&   !isset($item->properties['value']->node_endpoint_to_consume)
+            )
+        )->count();
         $max_amount_of_pages
             = $node_count / 8;
 
@@ -107,7 +113,16 @@ class NodeController extends Controller
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $node_count,
             'nodes' => $nodes->latest("updated_at")->with('permission')->customPaginate(8, (int)\request()->get('page'))->get()
-                ->when($node, fn ($collection) => [$node, ...$collection->filter(fn ($item) => \optional($item)->id != $node->id)]),
+                ->when($node, fn($collection) => \collect([
+                    $node,
+                    ...$collection->filter(fn($item) => \optional($item)->id != $node->id)
+                ]))->when(
+                    !auth()->user()->hasPermissionTo('can crud data bus nodes'),
+                    fn($collection) => $collection->filter(
+                        fn($item) => !isset($item->properties['value']->node_database)
+                            &&   !isset($item->properties['value']->node_endpoint_to_consume)
+                    )
+                ),
             'node' => $node,
             'extra_scripts' => (new Node_Type())->extraScripts()->join(''),
             'permissions' => Permission::all(),
@@ -123,31 +138,29 @@ class NodeController extends Controller
         $extra_rules = [];
         $extra_handler = [];
         $node_join_tables = !empty($request->get('node_join_tables')) ?
-         json_decode($request->get('node_join_tables')) : [];
+            json_decode($request->get('node_join_tables')) : [];
 
         $node_endpoint_length = (int)$request->node_endpoint_length;
-        if(count($node_join_tables) > 0) {
-            for($i = 0;$i < count($node_join_tables);$i++) {
+        if (count($node_join_tables) > 0) {
+            for ($i = 0; $i < count($node_join_tables); $i++) {
                 $current_table = $node_join_tables[$i];
                 // $node_categories_join_by_condition = $request->get("node_".$current_table."_join_by_condition");
                 // $node_categories_join_by_column = $request->get("node_".$current_table."_join_by_column");
                 // $node_categories_join_columns = $request->get("node_".$current_table."_join_columns");
-                $extra_rules["node_previous_".$current_table."_join_column"] = "";
-                $extra_handler["node_previous_".$current_table."_join_column"] = "";
+                $extra_rules["node_previous_" . $current_table . "_join_column"] = "required";
+                $extra_handler["node_previous_" . $current_table . "_join_column"] = "";
 
-                $extra_rules["node_".$current_table."_join_by_condition"] = '';
-                $extra_handler["node_".$current_table."_join_by_condition"] = ['location' => 'properties'];
+                $extra_rules["node_" . $current_table . "_join_by_condition"] = 'required';
+                $extra_handler["node_" . $current_table . "_join_by_condition"] = ['location' => 'properties'];
 
-                $extra_rules["node_".$current_table."_join_by_column"] = '';
-                $extra_handler["node_".$current_table."_join_by_column"] = ['location' => 'properties'];
+                $extra_rules["node_" . $current_table . "_join_by_column"] = 'required';
+                $extra_handler["node_" . $current_table . "_join_by_column"] = ['location' => 'properties'];
 
-                $extra_rules["node_".$current_table."_one_or_many"] = '';
-                $extra_handler["node_".$current_table."_one_or_many"] = ['location' => 'properties'];
+                $extra_rules["node_" . $current_table . "_object_or_array_or_count"] = 'required';
+                $extra_handler["node_" . $current_table . "_object_or_array_or_count"] = ['location' => 'properties'];
 
-                $extra_rules["node_".$current_table."_join_columns"] = '';
-                $extra_handler["node_".$current_table."_join_columns"] = ['location' => 'properties'];
-
-
+                $extra_rules["node_" . $current_table . "_join_columns"] = 'required';
+                $extra_handler["node_" . $current_table . "_join_columns"] = ['location' => 'properties'];
             }
         }
         if (0 < $node_endpoint_length) {
@@ -174,7 +187,7 @@ class NodeController extends Controller
         $validator = Validator::make(
             $request->all(),
             isset($current_node_type['rules']) ? $current_node_type['rules'] + $main_rules :
-            $main_rules
+                $main_rules
         );
 
         if ($validator->fails()) {
@@ -212,13 +225,13 @@ class NodeController extends Controller
         $display_aid = \request('display_aid');
         // getColumnListing
         $tables = $database != "null" ? collect(DB::connection($database)->select('SHOW TABLES'))
-            ->map(fn ($value) => \array_values((array) $value))
+            ->map(fn($value) => \array_values((array) $value))
             ->flatten() : [];
         $columns = !isset($table) || $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
         $table_items = $database != "null" && $table != "null" ? DB::connection($database)->table($table)->get() : [];
         $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "null" ? null : $this->getHttpData(request('node_url_to_consume'));
-        if(!empty($data_to_consume) && $display_aid != "null") {
+        if (!empty($data_to_consume) && $display_aid != "null") {
             $data = isset($data_to_consume[$display_aid]) && gettype($data_to_consume[$display_aid]) != "int" ? collect($data_to_consume[$display_aid])->toArray() : [];
             $columns = gettype($data) == "object" ? array_keys($data) : array_keys($data[0]);
         }
@@ -240,11 +253,11 @@ class NodeController extends Controller
 
     public function databusTableData()
     {
-        $query_conditions = ['=','!=','>','<'];
+        $query_conditions = ['=', '!=', '>', '<'];
         $selectedTables = explode(',', request()->get('tables', []));
         $database = request()->get('database');
         $tables_with_columns = collect([]);
-        for($i = 0;$i < count($selectedTables);$i++) {
+        for ($i = 0; $i < count($selectedTables); $i++) {
             $tables_with_columns->put(
                 $selectedTables[$i],
                 DB::connection($database)->getSchemaBuilder()->getColumnListing($selectedTables[$i])
@@ -252,7 +265,7 @@ class NodeController extends Controller
         }
 
 
-        return ["tables_with_columns" => $tables_with_columns,'query_conditions' => $query_conditions];
+        return ["tables_with_columns" => $tables_with_columns, 'query_conditions' => $query_conditions];
     }
 
 

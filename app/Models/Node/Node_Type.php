@@ -21,7 +21,7 @@ class Node_Type extends Model
         $methods = \collect((new Node())->getControllerMethods());
         $options = '';
         // creates a string that has the controller name and method as options
-        $methods->filter(fn ($con, $loc) => \in_array('Api', \explode('\\', $loc)))
+        $methods->filter(fn($con, $loc) => \in_array('Api', \explode('\\', $loc)))
             ->each(function ($controller, $location) use (&$options, $filler) {
                 collect($controller)
                     ->each(function ($method) use ($location, &$options, $filler) {
@@ -35,17 +35,17 @@ class Node_Type extends Model
         $node_pages_options = '';
         // creates a string that has node pages as option
         Node::where('node_type', 3)->get()
-        ->each(function ($page) use (&$node_pages_options, $filler) {
-            $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->node_page == $page->id ? "selected" : '';
-            $node_pages_options .= "<option value='" . $page->id . "'$selected>" . $page->name . "</option>";
-        });
+            ->each(function ($page) use (&$node_pages_options, $filler) {
+                $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->node_page == $page->id ? "selected" : '';
+                $node_pages_options .= "<option value='" . $page->id . "'$selected>" . $page->name . "</option>";
+            });
         // creates a string that has route method as option
         $route_method_options = '';
         collect(['put', 'post', 'get', 'delete'])
-        ->each(function ($route_method) use (&$route_method_options, $filler) {
-            $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
-            $route_method_options .= "<option value='$route_method' $selected>$route_method</option>";
-        });
+            ->each(function ($route_method) use (&$route_method_options, $filler) {
+                $selected = !empty($filler) && \optional(\optional($filler)->properties['value'])->route_method == $route_method ? 'selected' : '';
+                $route_method_options .= "<option value='$route_method' $selected>$route_method</option>";
+            });
         $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())->getSettingValue('first');
         $setting
             = (int)optional(collect(Cache::get('settings'))
@@ -62,10 +62,10 @@ class Node_Type extends Model
         // creates a string that has node layouts as option
         $layouts = '';
         Node::where('node_type', 5)->get()
-        ->each(function ($layout) use (&$layouts, $filler) {
-            $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->layout_id == $layout->id ? "selected" : '';
-            $layouts .= "<option value='" . $layout->id . "'$selected>" . $layout->name . "</option>";
-        });
+            ->each(function ($layout) use (&$layouts, $filler) {
+                $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->layout_id == $layout->id ? "selected" : '';
+                $layouts .= "<option value='" . $layout->id . "'$selected>" . $layout->name . "</option>";
+            });
         $node_page_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_page_name;
         $page_link = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->page_link;
         $node_audit_message = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_audit_message;
@@ -135,9 +135,10 @@ class Node_Type extends Model
                     "node_order_by_type" => ['location' => 'properties'],
                     "node_item_display_aid" => ['location' => 'properties'],
                     "node_endpoint_to_consume" => ['location' => 'properties'],
+                    "node_cache_ttl" => ['location' => 'properties'],
                     "node_join_tables" => ['location' => 'properties'],
                     "node_join_column" => ['location' => 'properties'],
-                    "node_cache_ttl" => ['location' => 'properties'],
+
                 ],
                 'rules' => [
                     'node_route' => 'required',

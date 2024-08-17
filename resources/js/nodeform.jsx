@@ -169,26 +169,30 @@ function TableToJoin({
                 </select>
             </div>
             <div class="mb-3">
-                <label for={`node_${table}_one_or_many`} class="form-label">
-                    Object Or Array
+                <label
+                    for={`node_${table}_object_or_array_or_count`}
+                    class="form-label"
+                >
+                    Object, Array or Count
                 </label>
                 <select
-                    id={`node_${table}_one_or_many`}
+                    id={`node_${table}_object_or_array_or_count`}
                     class="form-select"
-                    name={`node_${table}_one_or_many`}
+                    name={`node_${table}_object_or_array_or_count`}
                     required
                 >
                     <option value="">Select an option</option>
                     {[
-                        { key: "Array", value: 1 },
-                        { key: "Object", value: 2 },
+                        { key: "Array", value: 2 },
+                        { key: "Object", value: 1 },
+                        { key: "Count", value: 3 },
                     ].map((item) => {
                         return (
                             <option
                                 value={item.value}
                                 selected={
                                     node?.properties?.value[
-                                        `node_${table}_one_or_many`
+                                        `node_${table}_object_or_array_or_count`
                                     ] == item.value
                                 }
                             >

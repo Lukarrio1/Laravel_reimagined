@@ -14,20 +14,23 @@ class SettingController extends Controller
 
     public function settings()
     {
-        // if(Cache::has('[a'))
-
-        $settings =
-            // Cache::get('settings')->whereIn('id',[3,11]);
-            Setting::select('key', 'properties', 'id', 'allowed_for_api_use')
-            ->get()
-            ->map(function ($item) {
-                $item->properties = $item->allowed_for_api_use == 1 ?
-                    ['key' => $item->getSettingValue('first'), 'value' => $item->getSettingValue('last')] :
-                    ['key' => '', 'value' => null];
-                unset($item->allowed_for_api_use);
-                unset($item->id);
-                return $item;
-            });
+        $settings = [];
+        if (!Cache::has('api_settings')) {
+            $settings =
+                Setting::select('key', 'properties', 'id', 'allowed_for_api_use')
+                ->get()
+                ->map(function ($item) {
+                    $item->properties = $item->allowed_for_api_use == 1 ?
+                        ['key' => $item->getSettingValue('first'), 'value' => $item->getSettingValue('last')] :
+                        ['key' => '', 'value' => null];
+                    unset($item->allowed_for_api_use);
+                    unset($item->id);
+                    return $item;
+                });
+            Cache::set('api_settings', $settings, $this->cache_ttl);
+        } else {
+            $settings = Cache::get('api_settings');
+        }
         return \response()->json(['settings' => $settings]);
     }
 }

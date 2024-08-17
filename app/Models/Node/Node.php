@@ -34,6 +34,12 @@ class Node extends BaseModel
         0 => 'UNAUTHENTICATED',
         2 => 'PUBLIC',
     ];
+
+    public $object_array_count = [
+        1 => 'Object',
+        2 => 'Array',
+        3 => 'Count'
+    ];
     public const NODE_STATUS = [1 => 'ENABLED', 0 => 'DISABLED'];
 
     public const NODE_TYPE = [1 => 'ROUTE', 2 => 'LINK', 3 => 'PAGE', 4 => 'COMPONENT', 5 => 'LAYOUT'];
@@ -127,8 +133,9 @@ class Node extends BaseModel
             'value' => $this->addAppUrlToNodeRoute(\json_decode($value)),
             'html_value' => "<ul class='list-group list-group-flush'>" . \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
                 function ($value, $key) {
-                    $value = gettype($value) == 'array' ? \json_encode($value) : $value;
-                    return "<li class='list-group-item'>" . collect(\explode('_', $key))->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
+                    $value = gettype($value) == 'array' ? \json_encode($value) : (\count(\explode('_object_or_array_or_count', $key)) > 1 ? $this->object_array_count[$value] : $value);
+                    return "<li class='list-group-item'>" . collect(\explode('_', $key))
+                        ->map(fn($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
                 }
             )->join('') . '</ul>'
         ];
@@ -157,7 +164,7 @@ class Node extends BaseModel
         $verbiage = collect([]);
         collect(\explode('||', $value))->map(function ($item) use ($verbiage) {
             $segments = collect(\explode(':', $item));
-            $verbiage->put($segments->first(), \str_replace('"', '', $segments->filter(fn ($_, $idx) => $idx > 0)->join(':')));
+            $verbiage->put($segments->first(), \str_replace('"', '', $segments->filter(fn($_, $idx) => $idx > 0)->join(':')));
         });
         return ['value' => $value, 'human_value' => $verbiage];
     }
