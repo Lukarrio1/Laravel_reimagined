@@ -4,6 +4,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
 use App\Console\Commands\DatabaseBackup;
 use Illuminate\Support\Facades\Schedule;

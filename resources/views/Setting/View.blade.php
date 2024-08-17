@@ -64,7 +64,7 @@
                     <label for="exampleInputEmail1" class="form-label h4">
                         <span class="badge text-bg-secondary">Settings: ({{count($settings)!=$settings_count?count($settings).'/'.$settings_count:$settings_count}})</span>
                     </label>
-                    <input type="text" class="form-control" name="search" value="{{request()->get('search')}}">
+                    <input type="text" class="form-control" name="search" value="{{request()->get('search')}}" placeholder="Press enter to search">
                 </div>
             </form>
         </div>

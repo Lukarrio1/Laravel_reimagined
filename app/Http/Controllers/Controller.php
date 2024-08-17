@@ -22,10 +22,11 @@ class Controller extends BaseController
     use SendEmailTrait;
 
     public $cache_ttl = 0;
-
+    public  $search_skip_word;
     public function __construct()
     {
         $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? null;
+        $this->search_skip_word = optional(collect(Cache::get('settings'))->where('key', 'search_skip_word')->first())->properties;
     }
 
     /**

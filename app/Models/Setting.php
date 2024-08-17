@@ -47,7 +47,6 @@ class Setting extends Model
                     $selected = \in_array($key, \collect($field_value)->toArray()) ? "selected" : '';
                     $html .= "<option value='" . $val . "_" . $key . "' $selected>$val</option>";
                 });
-                // dd(\collect($field_value)->toArray());
                 $html = "<select class='form-select' name='value[]' multiple>$html</select>";
                 break;
             case 'input':
@@ -202,30 +201,23 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('config_string', [], $key, $field_value),
                 'handle' => ['action' => 'config_split', 'value' => 'last'],
             ],
-            // 'database_backup_configuration' => [
-            //     'field' => $this->SETTING_OPTIONS('magic_string', [], $key, $field_value),
-            //     'handle' => ['action' => 'magic_split', 'value' => 'last'],
-            // ],
             'database_backup' => [
                 'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
-              'database_backup_configuration' => [
+            'database_backup_configuration' => [
                 'field' => $this->SETTING_OPTIONS('multi_select', Cache::get('setting_databases'), $key, Cache::get('setting_backup_databases', [])),
                 'handle' => ['action' => 'multi_split', 'value' => 'last'],
             ],
             'cache_ttl' => [
                 'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
+            ],
+            'search_skip_word' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
             ]
-
-            // delete_inactive_users
-            // 'not_exportable_tables' => [
-            //     'field' => $this->SETTING_OPTIONS('multi_select', \collect(array_flip(\collect((new Export())->getAllTables())->toArray())), $key, Cache::get('not_exportable_tables', [])),
-            //     'handle' => ['action' => 'multi_split', 'value' => 'last'],
-            // ],
         ]);
-        // dd($roles,Cache::get('setting_databases'),Cache::get('setting_backup_databases', []));
         return $keys->get($key);
     }
 
@@ -241,17 +233,17 @@ class Setting extends Model
             case 'multi_split':
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
-                    ->map(fn ($item) => \collect(\explode('_', $item))
-                        ->filter(fn ($item, $idx) =>  $idx == 0)
-                        ->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
-                    ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
-                    collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
-                        ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
+                    ->map(fn($item) => \collect(\explode('_', $item))
+                        ->filter(fn($item, $idx) =>  $idx == 0)
+                        ->map(fn($item) => \collect(\explode('--', $item))->join(' ')))
+                    ->flatten()->map(fn($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
+                    collect(\explode('|', $this->properties))->map(fn($item) => \collect(\explode('_', $item))
+                        ->filter(fn($item, $idx) =>  $idx > 0))->flatten();
                 break;
             case "magic_split":
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
-                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
+                    ->map(fn($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
                 break;
             case "config_split":
                 $value = !empty($value) ? $value : $key['value'];
@@ -268,7 +260,7 @@ class Setting extends Model
                         return [$outerKey => $innerArray];
                     });
                 $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode(',', $this->properties))
-                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
+                    ->map(fn($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
                     $else_val;
                 break;
             default:
@@ -281,8 +273,6 @@ class Setting extends Model
     public function getAllSettingKeys($key = "")
     {
 
-        // $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
-        //     ->getSettingValue('first');
 
         $keys = \collect([
             'admin_role' => "Super Admin Role",
@@ -302,7 +292,6 @@ class Setting extends Model
             "redirect_to_after_login" => "React router redirect to after login",
             "redirect_to_after_register" => "React router redirect to after register",
             "redirect_to_after_logout" => "React router redirect to after logout",
-            // 'not_exportable_tables' => 'Not Exportable Tables',
             "delete_inactive_users" => "Delete Inactive Users after some (months)",
             \strtolower('MAIL_MAILER') => 'Mail Mailer',
             \strtolower('MAIL_HOST') => 'Mail Host',
@@ -317,7 +306,8 @@ class Setting extends Model
             'database_configuration' => "Database Configurations",
             "database_backup_configuration" => "Database Backup Configurations",
             "database_backup" => "Database Backup (Weekly)",
-            "cache_ttl"    =>   "Cache Time To Live (seconds)"
+            "cache_ttl"    =>   "Cache Time To Live (seconds)",
+            "search_skip_word"    => "Search Skip Word (used to preserve a route if the value of a parameter is empty when searching or filtering data)"
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

@@ -20,6 +20,7 @@ class DataBusController extends Controller
         "asc",
         'desc'
     ];
+
     public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord", "updateRecord", "consumeGetEndPoint"];
     public function __call($method, $parameters)
     {
@@ -29,7 +30,7 @@ class DataBusController extends Controller
         if (\in_array(collect(explode('_', $method))->first(), $this->methods)) {
             return $this->$method_to_call($method, $parameters);
         }
-        return response()->json(['error' => 'Resources not found.'], 404);
+        return response()->json(['error' => 'Resource not found.'], 404);
     }
 
 
@@ -61,7 +62,7 @@ class DataBusController extends Controller
                 if (isset($currentRouteNode->properties['value']->node_item)) {
                     $item->where('id', $currentRouteNode->properties['value']->node_item);
                 } else {
-                    $route_parameters->each(fn($value, $key) => $item->where($key, $value));
+                    $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, "LIKE", "%" . $value . "%")));
                 }
                 $relationShips = $this->handleJoins($currentRouteNode);
                 if (count($relationShips) > 0) {
@@ -118,7 +119,7 @@ class DataBusController extends Controller
                 $query->orderBy($orderByField, $orderByType);
             }
             if ($route_parameters->count() > 0) {
-                $route_parameters->each(fn($value, $key) => $query->where($key, "LIKE", "%" . $value . "%"));
+                $route_parameters->each(fn($value, $key) => $query->when($value != $this->search_skip_word, fn($q) => $q->where($key, "LIKE", "%" . $value . "%")));
             }
             $items = $query->get();
 
@@ -155,7 +156,7 @@ class DataBusController extends Controller
             if (isset($currentRouteNode->properties['value']->node_item)) {
                 $item->where('id', $currentRouteNode->properties['value']->node_item);
             } else {
-                $route_parameters->each(fn($value, $key) => $item->where($key, $value));
+                $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
             }
             $item = $item->first();
         } else {
@@ -179,7 +180,7 @@ class DataBusController extends Controller
         if ($database != null && $table != null) {
             $item =  DB::connection($database)
                 ->table($table);
-            $route_parameters->each(fn($value, $key) => $item->where($key, $value));
+            $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
             $item->delete();
         } else {
             $item = null;
@@ -252,7 +253,7 @@ class DataBusController extends Controller
         if ($database != null && $table != null) {
             $query =  DB::connection($database)
                 ->table($table);
-            $route_parameters->each(fn($value, $key) => $query->where($key, $value));
+            $route_parameters->each(fn($value, $key) => $query->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
             $query->update($data);
             $item =
                 DB::connection($database)
