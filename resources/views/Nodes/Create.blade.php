@@ -73,7 +73,9 @@
 
 
                 <div id="extra_fields"></div>
+                @can('can crud data bus nodes', auth()->user())
                 <div id="data_bus_fields"></div>
+                @endcan
                 <div class="mb-3">
                     <label for="permission" class="form-label">Node Permission</label>
                     <select id="permission" class="form-select" name="permission_id">

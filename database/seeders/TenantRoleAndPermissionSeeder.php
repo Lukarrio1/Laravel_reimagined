@@ -22,6 +22,7 @@ class TenantRoleAndPermissionSeeder extends Seeder
             ['core' => true, 'name' => 'can view export button'],
             ['core' => true, 'name' => 'can import'],
             ['core' => true, 'name' => 'can crud nodes'],
+            ['core' => true, 'name' => 'can crud data bus nodes'],
             ['core' => true, 'name' => 'can view nodes delete button'],
             ['core' => true, 'name' => 'can view nodes edit button'],
             ['core' => true, 'name' => 'can view nodes edit or create form'],
