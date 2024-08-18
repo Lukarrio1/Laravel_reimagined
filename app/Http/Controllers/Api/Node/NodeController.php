@@ -92,21 +92,21 @@ class NodeController extends Controller
     }
 
 
-    public function unauthNodes()
-    {
-        $nodes = Node::where('node_type', '>', 1)
-            ->whereIn('authentication_level', [0, 2])
-            ->where(
-                'node_status',
-                1
-            )
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
-            ->get()->map(function ($node) {
-                $node->hasAccess = true;
-                $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
-                return $node;
-            });
+    // public function unauthNodes()
+    // {
+    //     $nodes = Node::where('node_type', '>', 1)
+    //         ->whereIn('authentication_level', [0, 2])
+    //         ->where(
+    //             'node_status',
+    //             1
+    //         )
+    //         ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
+    //         ->get()->map(function ($node) {
+    //             $node->hasAccess = true;
+    //             $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
+    //             return $node;
+    //         });
 
-        return ['nodes' => $nodes];
-    }
+    //     return ['nodes' => $nodes];
+    // }
 }

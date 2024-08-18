@@ -36,9 +36,10 @@ function TableToJoin({
     query_conditions,
     setSelectedTables,
     MainTable,
+    database,
+    tables,
 }) {
     const previousElement = getPreviousElement(table_columns, table);
-    console.log(previousElement, "key here");
     return (
         <>
             <hr />
@@ -202,6 +203,242 @@ function TableToJoin({
                     })}
                 </select>
             </div>
+            <SameLevelJoin
+                mainTable={previousElement?.key}
+                mainTables={tables}
+                node={node}
+                query_conditions={query_conditions}
+                database={database}
+                mainColumns={columns}
+                level={table}
+            ></SameLevelJoin>
+        </>
+    );
+}
+
+function SameLevelJoinFields({
+    mainTable,
+    MainTable,
+    setBaseLevelTables,
+    query_conditions,
+    columns,
+    mainColumns,
+}) {
+    return (
+        <>
+            <div className="text-center h4">{mainTable}: start</div>
+            <div class="mb-3">
+                <label for="node_join_column" class="form-label">
+                    Node {MainTable} Column To Join By{" "}
+                </label>
+                <button
+                    class="btn btn-danger btn-sm h4"
+                    title="Remove join entry"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setBaseLevelTables((pre) => [
+                            ...pre?.filter((c) => c != mainTable),
+                        ]);
+                    }}
+                >
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+                <select
+                    id="node_join_column"
+                    class="form-select"
+                    name="node_join_column"
+                    onChange={(e) => {}}
+                >
+                    <option value="">Select column</option>
+                    {mainColumns &&
+                        mainColumns.map((column) => {
+                            return (
+                                <option
+                                    // selected={
+                                    //     node?.properties?.value
+                                    //         ?.node_join_column == column
+                                    // }
+                                    value={column}
+                                >
+                                    {column}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label
+                    for={`node_${mainTable}_level_join_by_column`}
+                    class="form-label"
+                >
+                    Node {mainTable} join by condition
+                </label>
+                <select
+                    id={`node_${mainTable}_level_join_by_column`}
+                    class="form-select"
+                    name={`node_${mainTable}_level_join_by_column`}
+                    required
+                >
+                    <option value="">Select join by condition</option>
+                    {query_conditions &&
+                        query_conditions.map((condition) => {
+                            return (
+                                <option
+                                    // selected={
+                                    //     node?.properties?.value[
+                                    //         `node_${table}_join_by_condition`
+                                    //     ] == condition
+                                    // }
+                                    value={condition}
+                                >
+                                    {condition}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label
+                    for={`node_${mainTable}_level_join_by_column`}
+                    class="form-label"
+                >
+                    Node {mainTable} join column
+                </label>
+                <select
+                    id={`node_${mainTable}_level_join_by_column`}
+                    class="form-select"
+                    name={`node_${mainTable}_level_join_by_column`}
+                    required
+                >
+                    <option value="">Select join by column</option>
+                    {columns &&
+                        columns.map((column) => {
+                            return (
+                                <option
+                                    // selected={
+                                    //     node?.properties?.value[
+                                    //         `node_${table}_join_by_condition`
+                                    //     ] == condition
+                                    // }
+                                    value={column}
+                                >
+                                    {column}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for={`node_object_or_array_or_count`} class="form-label">
+                    Object, Array or Count
+                </label>
+                <select
+                    id={`node_object_or_array_or_count`}
+                    class="form-select"
+                    name={`node_object_or_array_or_count`}
+                    required
+                >
+                    <option value="">Select an option</option>
+                    {[
+                        { key: "Array", value: 2 },
+                        { key: "Object", value: 1 },
+                        { key: "Count", value: 3 },
+                    ].map((item) => {
+                        return <option value={item.value}>{item.key}</option>;
+                    })}
+                </select>
+            </div>
+            <div className="text-center h4">{mainTable}: end</div>
+        </>
+    );
+}
+
+function SameLevelJoin({
+    mainTable,
+    mainTables,
+    mainColumns,
+    node,
+    query_conditions,
+    database,
+    level = 0,
+}) {
+    const [node_base_level_join_tables, setBaseLevelTables] = React.useState(
+        []
+    );
+    const [mainTableColumns, setMainTableColumns] = React.useState(null);
+
+    const getTableData = async () => {
+        const { data } = await axios.get(
+            "/node/databus/tableData?" +
+                createQueryString({
+                    tables: node_base_level_join_tables ?? [level],
+                    database,
+                })
+        );
+        setMainTableColumns(data?.tables_with_columns);
+    };
+    React.useEffect(() => {
+        getTableData();
+    }, [node_base_level_join_tables]);
+
+    return (
+        <>
+            <div class="mb-3">
+                <label for={`node_base_level_join_table`} class="form-label">
+                    Node Tables To Join on {mainTable} level{" "}
+                    {JSON.stringify(node_base_level_join_tables)}
+                </label>
+                <select
+                    id={`node_base_level_join_tables`}
+                    class="form-select"
+                    name={`node_base_level_join_tables`}
+                    onChange={(e) => {
+                        setBaseLevelTables([
+                            ...node_base_level_join_tables?.filter(
+                                (c, idx) => c != e.target.value
+                            ),
+                            e.target.value,
+                        ]);
+                    }}
+                >
+                    <option value="">Select table</option>
+                    {mainTables &&
+                        mainTables.map((table) => {
+                            return (
+                                <option
+                                    selected={
+                                        node?.properties?.value
+                                            ?.node_base_level_join_table ==
+                                        table
+                                    }
+                                    value={table}
+                                >
+                                    {table}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
+            {node_base_level_join_tables.length > 0 &&
+                mainTableColumns != null &&
+                node_base_level_join_tables.map((nd, idx) => {
+                    return (
+                        <SameLevelJoinFields
+                            mainTable={nd}
+                            MainTable={mainTable}
+                            setBaseLevelTables={setBaseLevelTables}
+                            query_conditions={query_conditions}
+                            database={database}
+                            columns={mainTableColumns[nd]}
+                            mainColumns={mainColumns}
+                        ></SameLevelJoinFields>
+                    );
+                })}
+            <input
+                type="hidden"
+                value={JSON.stringify(node_base_level_join_tables ?? [])}
+                name={"node_base_level_join_tables"}
+            />
         </>
     );
 }
@@ -217,6 +454,9 @@ function JoinTablesForm({
     const [tablesToJoin, setTablesToJoin] = React.useState({});
     const [query_conditions, setQueryConditions] = React.useState([]);
     const [ttl, setTtl] = React.useState(0);
+    const [node_base_level_join_tables, setBaseLevelTables] = React.useState(
+        []
+    );
 
     const getTableData = async () => {
         const { data } = await axios.get(
@@ -275,34 +515,15 @@ function JoinTablesForm({
                     value={ttl}
                 />
             </div>
-
-            <div class="mb-3">
-                <label for="node_join_column" class="form-label">
-                    Node Column To Join By
-                </label>
-                <select
-                    id="node_join_column"
-                    class="form-select"
-                    name="node_join_column"
-                    onChange={(e) => {}}
-                >
-                    <option value="">Select column</option>
-                    {mainColumns &&
-                        mainColumns.map((column) => {
-                            return (
-                                <option
-                                    selected={
-                                        node?.properties?.value
-                                            ?.node_join_column == column
-                                    }
-                                    value={column}
-                                >
-                                    {column}
-                                </option>
-                            );
-                        })}
-                </select>
-            </div>
+            <SameLevelJoin
+                mainTable={MainTable}
+                mainTables={mainTables}
+                node={node}
+                query_conditions={query_conditions}
+                database={database}
+                mainColumns={mainColumns}
+                level={MainTable}
+            ></SameLevelJoin>
             <div class="mb-3">
                 <label for="node_table" class="form-label">
                     Node Tables To Join To {JSON.stringify(selectedTables)}
@@ -333,6 +554,33 @@ function JoinTablesForm({
                         })}
                 </select>
             </div>
+            <div class="mb-3">
+                <label for="node_join_column" class="form-label">
+                    Node Column To Join By
+                </label>
+                <select
+                    id="node_join_column"
+                    class="form-select"
+                    name="node_join_column"
+                    onChange={(e) => {}}
+                >
+                    <option value="">Select column</option>
+                    {mainColumns &&
+                        mainColumns.map((column) => {
+                            return (
+                                <option
+                                    selected={
+                                        node?.properties?.value
+                                            ?.node_join_column == column
+                                    }
+                                    value={column}
+                                >
+                                    {column}
+                                </option>
+                            );
+                        })}
+                </select>
+            </div>
             <input
                 type="hidden"
                 value={JSON.stringify(selectedTables)}
@@ -349,6 +597,8 @@ function JoinTablesForm({
                             query_conditions={query_conditions}
                             setSelectedTables={setSelectedTables}
                             MainTable={MainTable}
+                            database={database}
+                            tables={mainTables}
                         ></TableToJoin>
                     )
                 );

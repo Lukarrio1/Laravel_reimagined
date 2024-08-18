@@ -38,7 +38,7 @@ class UserController extends Controller
 
         $search = \request()->get('search', '||');
         $searchParams = collect(explode('|', $search))
-            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -57,12 +57,12 @@ class UserController extends Controller
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
         $roles = Role::query()
-            ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
+            ->when(!\request()->user()->hasRole($role_for_checking), fn($q) => $q->where('priority', '>', Role::min('priority')))
             ->get();
 
         $searchParams->when(
-            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
-            fn ($collection) => $collection->each(function ($section) use ($users, $translate) {
+            $searchParams->filter(fn($val) => \count($val) > 1)->count() > 0,
+            fn($collection) => $collection->each(function ($section) use ($users, $translate) {
                 list($key, $value) = $section;
                 // Check if the key is valid in the translation map
                 if (!isset($translate[$key])) {
@@ -75,7 +75,7 @@ class UserController extends Controller
                     $convertedValue = $value;
                 }
                 if ($translate[$key] === 'role') {
-                    $users->whereHas('roles', fn ($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
+                    $users->whereHas('roles', fn($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
                 } else {
                     $users->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
 
@@ -119,7 +119,8 @@ class UserController extends Controller
 
     public function update(UserUpdateRequest $request)
     {
-        User::find((int) $request->id)->update($request->except(['password']) + ['password' => Hash::make($request->password)]);
+        User::find((int) $request->id)
+            ->update($request->except(['password']) + ['password' => Hash::make($request->password)]);
         Session::flash('message', 'The user was saved successfully.');
         Session::flash('alert-class', 'alert-success');
 
