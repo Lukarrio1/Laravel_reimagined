@@ -38,7 +38,6 @@ function TableToJoin({
     MainTable,
 }) {
     const previousElement = getPreviousElement(table_columns, table);
-    console.log(previousElement, "key here");
     return (
         <>
             <hr />
@@ -225,7 +224,6 @@ function JoinTablesForm({
         );
         setTablesToJoin(data.tables_with_columns);
         setQueryConditions(data.query_conditions);
-        console.log(data, "table data here");
     };
 
     React.useEffect(() => {
@@ -510,9 +508,7 @@ function App() {
             possibleLabel[route_function_value?.split("_")[0]];
     }, [route_function_value]);
 
-    React.useEffect(() => {
-        console.log("this is the selected columns", columns_to_save);
-    }, [columns_to_save]);
+    React.useEffect(() => {}, [columns_to_save]);
 
     // React.useEffect(() => {
     //     if (!node_endpoint_to_consume || !display_aid) return;
@@ -909,6 +905,7 @@ function App() {
                                 onChange={(e) =>
                                     setNodeDisplayAid(e.target.value)
                                 }
+                                required
                             >
                                 <option>Select field to order by</option>
                                 {columns &&
@@ -939,6 +936,7 @@ function App() {
                                 onChange={(e) =>
                                     setSelectedOrderByTypes(e.target.value)
                                 }
+                                required
                             >
                                 <option>Select field to order by</option>
                                 {orderByTypes &&
