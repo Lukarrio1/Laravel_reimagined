@@ -39,14 +39,16 @@ class NodeController extends Controller
             'name' => 'name',
             'description' => 'small_description',
             'type' => 'node_type',
-            'uuid' => 'uuid'
+            'uuid' => 'uuid',
+            // 'properties' => 'properties'
         ];
 
         $translateExamples = [
             'name' => 'Link 1',
             'description' => 'link to the home page',
             'type' => 'link',
-            "uuid" => 'asdalsdlada'
+            "uuid" => 'asdalsdlada',
+            // 'properties' => 'method'
         ];
 
         // Build the search placeholder
