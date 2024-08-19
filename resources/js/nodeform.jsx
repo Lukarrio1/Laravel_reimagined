@@ -473,7 +473,13 @@ function App() {
         setSelectedDatabases(
             selected_database ?? node?.properties?.value?.node_database
         );
-        setSelectedTable(selected_table ?? node?.properties?.value?.node_table);
+        setTimeout(
+            () =>
+                setSelectedTable(
+                    selected_table ?? node?.properties?.value?.node_table
+                ),
+            1000
+        );
         setRouteFunctionValue(route_function?.value);
         setDataLimit(data_limit ?? node?.properties?.value?.node_data_limit);
         setNodeDisplayAid(
