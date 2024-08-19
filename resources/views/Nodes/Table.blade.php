@@ -20,6 +20,8 @@
 
                         <th scope="col" class="text-center h4 fw-bold">Description</th>
 
+                        <th scope="col" class="text-center h4 fw-bold">Properties</th>
+
                         <th scope="col" class="text-center h4 fw-bold">Authentication Level</th>
 
                         <th scope="col" class="text-center h4 fw-bold">Type</th>
@@ -32,7 +34,6 @@
 
                         <th scope="col" class="text-center h4 fw-bold">UUID</th>
 
-                        <th scope="col" class="text-center h4 fw-bold">Properties</th>
 
                         <th scope="col" class="text-center h4 fw-bold">Action</th>
 
@@ -47,6 +48,12 @@
                         <td>
                             <div class="text-bg-light p-3 fw-semibold">{{$Node->small_description}}</div>
                         </td>
+                        <td>
+                            <strong>
+                                {!!$Node->properties['html_value']!!}
+                            </strong>
+                        </td>
+
                         <td>
                             <div class="text-bg-light p-3 fw-semibold">{{$Node->authentication_level['human_value']}}</div>
                         </td>
@@ -76,11 +83,7 @@
                         <td>
                             <div class="text-bg-light p-3 fw-semibold">{{$Node->uuid}}</div>
                         </td>
-                        <td>
-                        <strong>
-                                {!!$Node->properties['html_value']!!}
-                            </strong>
-                            </td>
+
                         <td>
                             <ul class="list-group list-group-flush pt-2">
                                 @can('can view nodes edit button', auth()->user())
