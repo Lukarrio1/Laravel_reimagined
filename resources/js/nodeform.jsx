@@ -515,7 +515,8 @@ function App() {
 
     return (
         launch &&
-        nodeType == 1 && (
+        nodeType == 1 &&
+        columns && (
             <div>
                 {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" !=
                     route_function_value?.split("_")[0] && (
