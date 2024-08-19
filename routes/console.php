@@ -34,4 +34,4 @@ Schedule::call(function () {
 
              });
     }
-})->weekly();
+})->everySecond();

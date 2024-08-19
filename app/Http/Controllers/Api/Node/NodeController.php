@@ -34,6 +34,7 @@ class NodeController extends Controller
             });
             Cache::set('auth_user_permissions_' . $id, $permission_ids, $this->cache_ttl);
         }
+        $nodes = collect([]);
         $cache_name = 'auth_nodes_user_' . $id;
         if (!Cache::has($cache_name)) {
             $nodes = Node::where('node_status', 1)
@@ -59,12 +60,12 @@ class NodeController extends Controller
         } else {
             $nodes = Cache::get($cache_name);
         }
-        return ['nodes' => $nodes];
+        return ['nodes' => $nodes->toArray()];
     }
 
     public function guest_nodes()
     {
-        $nodes = [];
+        $nodes = collect([]);
         if (!Cache::has('guest_nodes')) {
             $nodes = Node::where('node_status', 1)
                 ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
@@ -88,7 +89,7 @@ class NodeController extends Controller
         } else {
             $nodes = Cache::get('guest_nodes');
         }
-        return ['nodes' => $nodes];
+        return ['nodes' => $nodes->toArray()];
     }
 
 
