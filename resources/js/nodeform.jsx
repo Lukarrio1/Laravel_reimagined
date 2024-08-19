@@ -516,7 +516,7 @@ function App() {
     return (
         launch &&
         nodeType == 1 &&
-        columns && (
+        selected_table && (
             <div>
                 {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" !=
                     route_function_value?.split("_")[0] && (
@@ -551,7 +551,6 @@ function App() {
                                     })}
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label for="node_table" class="form-label">
                                 Node Table
