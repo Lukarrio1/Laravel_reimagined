@@ -35,59 +35,50 @@ class NodeController extends Controller
             Cache::set('auth_user_permissions_' . $id, $permission_ids, $this->cache_ttl);
         }
         $cache_name = 'auth_nodes_user_' . $id;
-        if (!Cache::has($cache_name)) {
-            $nodes = Node::where('node_status', 1)
-                ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
-                ->with(['permission'])
-                ->get()
-                ->filter(function ($node) {
-                    if ($node->node_type['value'] == 1) {
-                        if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
-                            return false;
-                        }
-                        return true;
+
+        $nodes = Node::where('node_status', 1)
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
+            ->with(['permission'])
+            ->get()
+            ->filter(function ($node) {
+                if ($node->node_type['value'] == 1) {
+                    if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
+                        return false;
                     }
                     return true;
-                })
-                ->map(function ($node) {
-                    $node->hasAccess = $node->authentication_level['value'] == 0 ||
-                        !empty($node->permission) && !\auth()->user()->hasPermissionTo(\optional($node->permission)->name) ? false : true;
-                    $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
-                    return $node;
-                });
-            Cache::set($cache_name, $nodes, $this->cache_ttl);
-        } else {
-            $nodes = Cache::get($cache_name);
-        }
+                }
+                return true;
+            })
+            ->map(function ($node) {
+                $node->hasAccess = $node->authentication_level['value'] == 0 ||
+                    !empty($node->permission) && !\auth()->user()->hasPermissionTo(\optional($node->permission)->name) ? false : true;
+                $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
+                return $node;
+            });
+
         return ['nodes' => $nodes];
     }
 
     public function guest_nodes()
     {
-        $nodes = [];
-        if (!Cache::has('guest_nodes')) {
-            $nodes = Node::where('node_status', 1)
-                ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
-                ->with(['permission'])
-                ->get()
-                ->filter(function ($node) {
-                    if ($node->node_type['value'] == 1) {
-                        if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
-                            return false;
-                        }
-                        return true;
+        $nodes = Node::where('node_status', 1)
+            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
+            ->with(['permission'])
+            ->get()
+            ->filter(function ($node) {
+                if ($node->node_type['value'] == 1) {
+                    if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
+                        return false;
                     }
                     return true;
-                })
-                ->map(function ($node) {
-                    $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
-                    $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
-                    return $node;
-                });
-            Cache::set('guest_nodes', $nodes);
-        } else {
-            $nodes = Cache::get('guest_nodes');
-        }
+                }
+                return true;
+            })
+            ->map(function ($node) {
+                $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
+                $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
+                return $node;
+            });
         return ['nodes' => $nodes];
     }
 
