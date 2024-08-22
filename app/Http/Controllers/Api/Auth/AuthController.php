@@ -33,7 +33,7 @@ class AuthController extends Controller
             $verification_front_end_link = \explode('/', \optional(optional(Node::where('uuid', 'yuUkEHFptRPqzkBdOosQPeU5yeKbycDcE2qPvmr8LhIb6OmlYE')->first()->properties)['value'])->node_route);
             $email_token = Str::random(30);
             $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
-                ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
+                ->filter(fn($_, $idx) => 1 + $idx != \count($verification_front_end_link))
                 ->join('/') . '/' . $email_token;
             $this->sendEmail(
                 $request->email,
@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
 
-        return ['user' => $user, 'token' => $token];
+        return response()->json(['user' => $user, 'token' => $token]);
     }
 
     public function sendPasswordEmail(PasswordEmailRequest $request)
@@ -87,16 +87,16 @@ class AuthController extends Controller
     {
         $user = User::query()->whereEmail($request->email)->first();
         $api_email_verification = (int) \optional(Cache::get('settings', \collect([]))
-           ->where('key', 'api_email_verification')->first())
-           ->getSettingValue();
+            ->where('key', 'api_email_verification')->first())
+            ->getSettingValue();
         if (!empty($user)) {
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
                 User::find($user->id)->update(['last_login_at' => Carbon::now()]);
-                if($api_email_verification == 1) {
+                if ($api_email_verification == 1) {
                     return !empty($user->email_verification_token) ?
-                    \response()->json(['token' => $token, 'user' => $user]) :
-                    response()->json(['message' => 'Please verify your email address,
+                        \response()->json(['token' => $token, 'user' => $user]) :
+                        response()->json(['message' => 'Please verify your email address,
                     an email was sent to your email address when registered.'], 401);
                 }
                 return \response()->json(['token' => $token, 'user' => $user]);

@@ -29,6 +29,11 @@ class Controller extends BaseController
         $this->search_skip_word = optional(collect(Cache::get('settings'))->where('key', 'search_skip_word')->first())->properties;
     }
 
+    public function auth_user()
+    {
+        return \auth()->user();
+    }
+
     /**
      * exception_property_value_keys
      *

@@ -36,7 +36,8 @@ class NodeController extends Controller
         }
         $cache_name = 'auth_nodes_user_' . $id;
 
-        $nodes = Node::where('node_status', 1)
+        $nodes = \collect();
+        Node::where('node_status', 1)
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->with(['permission'])
             ->get()
@@ -54,14 +55,15 @@ class NodeController extends Controller
                     !empty($node->permission) && !\auth()->user()->hasPermissionTo(\optional($node->permission)->name) ? false : true;
                 $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
                 return $node;
-            });
+            })->each(fn($item) => $nodes->push($item));
 
         return ['nodes' => $nodes];
     }
 
     public function guest_nodes()
     {
-        $nodes = Node::where('node_status', 1)
+        $nodes = \collect();
+        Node::where('node_status', 1)
             ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
             ->with(['permission'])
             ->get()
@@ -78,7 +80,7 @@ class NodeController extends Controller
                 $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
                 $node = (object)[...$node->toArray(), 'properties' => ['value' => $this->removeKeys($node->properties['value'])]];
                 return $node;
-            });
+            })->each(fn($item) => $nodes->push($item));
         return ['nodes' => $nodes];
     }
 
