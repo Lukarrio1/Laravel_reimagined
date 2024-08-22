@@ -13,6 +13,7 @@ use App\Models\Reference\Reference;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Container\Attributes\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-            ->getSettingValue('last')??"file");
+            ->getSettingValue('last') ?? "file");
 
         if (!Cache::has('setting_allowed_login_roles')) {
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
@@ -74,20 +75,19 @@ class AppServiceProvider extends ServiceProvider
 
         if (!Cache::has('setting_databases')) {
             $databases = collect([]);
-            $data_configurations = Cache::get('settings',collect([]))
+            $data_configurations = Cache::get('settings', collect([]))
                 ->where('key', 'database_configuration')->first();
             $data_configurations = !empty($data_configurations) ? $data_configurations->getSettingValue() : [];
             collect($data_configurations)
                 ->keys()
-                ->each(fn ($db) => $databases->put($db, $db));
+                ->each(fn($db) => $databases->put($db, $db));
             Cache::add('setting_databases', $databases);
         }
         if (!Cache::has('setting_backup_databases')) {
             $item =  collect(Cache::get('settings'))
                 ->where('key', 'database_backup_configuration')->first() ?? [];
-            if(!empty($item)) {
+            if (!empty($item)) {
                 $item = gettype($item) == "array" ? [] : $item->getSettingValue()->toArray();
-
             }
 
             Cache::add('setting_backup_databases', $item);
@@ -134,17 +134,22 @@ class AppServiceProvider extends ServiceProvider
                 if (empty($item) || empty($key)) {
                     return false;
                 }
-                Config::set("database.connections.{$key}", [
-                    'driver'    => $item->get('DB_CONNECTION') ?? "mysql",
-                    'host'      => $item->get('DB_HOST'),
-                    'port'      => $item->get('DB_PORT'),
-                    'database'  => $item->get('DB_DATABASE'),
-                    'username'  => $item->get('DB_USERNAME'),
-                    'password'  => $item->get('DB_PASSWORD'),
-                    'charset'   => 'utf8',
-                    'collation' => 'utf8_unicode_ci',
-                    'prefix'    => '',
-                ]);
+                try {
+                    Config::set("database.connections.{$key}", [
+                        'driver'    => $item->get('DB_CONNECTION') ?? "mysql",
+                        'host'      => $item->get('DB_HOST'),
+                        'port'      => $item->get('DB_PORT'),
+                        'database'  => $item->get('DB_DATABASE'),
+                        'username'  => $item->get('DB_USERNAME'),
+                        'password'  => $item->get('DB_PASSWORD'),
+                        'charset'   => 'utf8',
+                        'collation' => 'utf8_unicode_ci',
+                        'prefix'    => '',
+                    ]);
+                } catch (\Throwable $th) {
+                    //throw $th;
+
+                }
 
                 // // Set the default connection to the newly configured one
                 // Config::set('database.default', $connectionName);
