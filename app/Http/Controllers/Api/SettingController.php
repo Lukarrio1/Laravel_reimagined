@@ -31,6 +31,9 @@ class SettingController extends Controller
         } else {
             $settings = Cache::get('api_settings');
         }
-        return \response()->json(['settings' => $settings]);
+        return \response()->json(['settings' => [...$settings->toArray(), [
+            'key' => "is_cache_valid",
+            "properties" => ["key" => "is_cache_valid", "value" => Cache::get("is_cache_valid")]
+        ]]]);
     }
 }

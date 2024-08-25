@@ -1,4 +1,6 @@
-function createQueryString(params) {
+import JoinTablesForm from "./JoinTablesForm";
+
+export function createQueryString(params) {
     const queryString = Object.keys(params)
         .map(
             (key) =>
@@ -9,7 +11,7 @@ function createQueryString(params) {
         .join("&");
     return queryString;
 }
-function getPreviousElement(obj, currentKey) {
+export function getPreviousElement(obj, currentKey) {
     // Get all the keys of the object
     const keys = Object.keys(obj);
 
@@ -25,334 +27,8 @@ function getPreviousElement(obj, currentKey) {
     }
 }
 
-function getUniqueElements(array) {
+export function getUniqueElements(array) {
     return array.filter((value, index, self) => self.indexOf(value) === index);
-}
-function TableToJoin({
-    table_columns,
-    columns,
-    table,
-    node,
-    query_conditions,
-    setSelectedTables,
-    MainTable,
-}) {
-    const previousElement = getPreviousElement(table_columns, table);
-    return (
-        <>
-            <hr />
-            {previousElement?.key != null && (
-                <div class="mb-3">
-                    <label for="node_join_column" class="form-label">
-                        Node {previousElement?.key ?? MainTable} Column To Join
-                        By
-                    </label>
-                    <select
-                        id={`node_previous_${table}_join_column`}
-                        class="form-select"
-                        name={`node_previous_${table}_join_column`}
-                        required
-                    >
-                        <option value="">Select column</option>
-                        {previousElement?.obj &&
-                            previousElement?.obj?.map((column) => {
-                                return (
-                                    <option
-                                        selected={
-                                            node?.properties?.value[
-                                                `node_previous_${table}_join_column`
-                                            ] == column
-                                        }
-                                        value={column}
-                                    >
-                                        {column}
-                                    </option>
-                                );
-                            })}
-                    </select>
-                </div>
-            )}
-            <div class="mb-3">
-                <label for="node_join_by_column" class="form-label">
-                    Join {table} By Condition{" "}
-                    <button
-                        class="btn btn-danger btn-sm h4"
-                        title="Remove join entry"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            setSelectedTables((pre) => [
-                                ...pre?.filter((c) => c != table),
-                            ]);
-                        }}
-                    >
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
-                </label>
-                <select
-                    id={`node_${table}_join_by_condition`}
-                    class="form-select"
-                    name={`node_${table}_join_by_condition`}
-                    required
-                >
-                    <option value="">Select join by condition</option>
-                    {query_conditions &&
-                        query_conditions.map((condition) => {
-                            return (
-                                <option
-                                    selected={
-                                        node?.properties?.value[
-                                            `node_${table}_join_by_condition`
-                                        ] == condition
-                                    }
-                                    value={condition}
-                                >
-                                    {condition}
-                                </option>
-                            );
-                        })}
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="node_join_by_column" class="form-label">
-                    Join {table} to {previousElement?.key ?? MainTable} By
-                </label>
-                <select
-                    id={`node_${table}_join_by_column`}
-                    class="form-select"
-                    name={`node_${table}_join_by_column`}
-                    required
-                >
-                    <option value="">Select join by column</option>
-                    {columns &&
-                        columns.map((column) => {
-                            return (
-                                <option
-                                    selected={
-                                        node?.properties?.value[
-                                            `node_${table}_join_by_column`
-                                        ] == column
-                                    }
-                                    value={column}
-                                >
-                                    {column}
-                                </option>
-                            );
-                        })}
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="node_table" class="form-label">
-                    Node {table} Columns To Display
-                </label>
-                <select
-                    id="node_table_columns"
-                    class="form-select"
-                    name={`node_${table}_join_columns[]`}
-                    multiple={true}
-                    required
-                >
-                    <option value="">Select A Table Columns</option>
-                    {columns &&
-                        columns?.map((column) => {
-                            return (
-                                <option
-                                    selected={node?.properties?.value[
-                                        `node_${table}_join_columns`
-                                    ]?.includes(column)}
-                                    value={column}
-                                >
-                                    {column}
-                                </option>
-                            );
-                        })}
-                </select>
-            </div>
-            <div class="mb-3">
-                <label
-                    for={`node_${table}_object_or_array_or_count`}
-                    class="form-label"
-                >
-                    Object, Array or Count
-                </label>
-                <select
-                    id={`node_${table}_object_or_array_or_count`}
-                    class="form-select"
-                    name={`node_${table}_object_or_array_or_count`}
-                    required
-                >
-                    <option value="">Select an option</option>
-                    {[
-                        { key: "Array", value: 2 },
-                        { key: "Object", value: 1 },
-                        { key: "Count", value: 3 },
-                    ].map((item) => {
-                        return (
-                            <option
-                                value={item.value}
-                                selected={
-                                    node?.properties?.value[
-                                        `node_${table}_object_or_array_or_count`
-                                    ] == item.value
-                                }
-                            >
-                                {item.key}
-                            </option>
-                        );
-                    })}
-                </select>
-            </div>
-        </>
-    );
-}
-
-function JoinTablesForm({
-    mainColumns,
-    node,
-    mainTables,
-    database,
-    MainTable,
-}) {
-    const [selectedTables, setSelectedTables] = React.useState([]);
-    const [tablesToJoin, setTablesToJoin] = React.useState({});
-    const [query_conditions, setQueryConditions] = React.useState([]);
-    const [ttl, setTtl] = React.useState(0);
-
-    const getTableData = async () => {
-        const { data } = await axios.get(
-            "/node/databus/tableData?" +
-                createQueryString({ tables: selectedTables ?? "", database })
-        );
-        setTablesToJoin(data.tables_with_columns);
-        setQueryConditions(data.query_conditions);
-    };
-
-    React.useEffect(() => {
-        getTableData();
-    }, [selectedTables]);
-
-    React.useEffect(() => {
-        if (!node) return;
-        if (!node?.properties?.value?.node_join_tables) return;
-        setSelectedTables(
-            JSON.parse(node?.properties?.value?.node_join_tables)
-        );
-        setTtl(node?.properties?.value?.node_cache_ttl);
-    }, [node]);
-
-    return (
-        <>
-            <div class="mb-3">
-                <div className="card">
-                    <div className="card-body text-center h4">
-                        Use with caution, this is still in beta. (leave fields
-                        blank if you don't intend to use nested joins, if so try
-                        to keep your joins to a reasonable amount eg 3 levels
-                        deep).
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for={`node_cache_ttl`} class="form-label">
-                    Node Endpoint Cache Time To Live{" "}
-                    <bold> ({ttl ?? 0} seconds)</bold>
-                </label>
-                <input
-                    type="number"
-                    class="form-control"
-                    id={`node_cache_ttl`}
-                    aria-describedby="node_name"
-                    name={`node_cache_ttl`}
-                    onChange={(e) => setTtl(e.target.value)}
-                    placeholder={"0"}
-                />
-                <input
-                    type="hidden"
-                    aria-describedby="node_name"
-                    name={`node_cache_ttl`}
-                    placeholder={"0"}
-                    value={ttl}
-                />
-            </div>
-
-            <div class="mb-3">
-                <label for="node_join_column" class="form-label">
-                    Node Column To Join By
-                </label>
-                <select
-                    id="node_join_column"
-                    class="form-select"
-                    name="node_join_column"
-                    onChange={(e) => {}}
-                >
-                    <option value="">Select column</option>
-                    {mainColumns &&
-                        mainColumns.map((column) => {
-                            return (
-                                <option
-                                    selected={
-                                        node?.properties?.value
-                                            ?.node_join_column == column
-                                    }
-                                    value={column}
-                                >
-                                    {column}
-                                </option>
-                            );
-                        })}
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="node_table" class="form-label">
-                    Node Tables To Join To {JSON.stringify(selectedTables)}
-                    {/* {[
-                        "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
-                        "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
-                    ]?.includes(route_function_value?.split("_")[0])
-                        ? JSON.stringify(columns_to_save)
-                        : ""} */}
-                </label>
-                <select
-                    id="node_join_tables"
-                    class="form-select"
-                    // name="node_join_tables"
-                    onChange={(e) => {
-                        setSelectedTables([
-                            ...selectedTables?.filter(
-                                (c, idx) => c != e.target.value
-                            ),
-                            e.target.value,
-                        ]);
-                    }}
-                >
-                    <option value="">Select table</option>
-                    {mainTables &&
-                        mainTables.map((table) => {
-                            return <option value={table}>{table}</option>;
-                        })}
-                </select>
-            </div>
-            <input
-                type="hidden"
-                value={JSON.stringify(selectedTables)}
-                name={"node_join_tables"}
-            />
-            {Object.keys(tablesToJoin)?.map(function (key) {
-                return (
-                    key.length > 0 && (
-                        <TableToJoin
-                            table_columns={tablesToJoin}
-                            table={key}
-                            columns={tablesToJoin[key]}
-                            node={node}
-                            query_conditions={query_conditions}
-                            setSelectedTables={setSelectedTables}
-                            MainTable={MainTable}
-                        ></TableToJoin>
-                    )
-                );
-            })}
-        </>
-    );
 }
 
 function App() {
@@ -498,8 +174,9 @@ function App() {
                 ...(node?.properties?.value?.node_table_columns ?? []),
             ])
         );
-        setLaunch(false);
-        setLaunch(true);
+        setLaunch((pre) => false);
+        setLaunch((pre) => true);
+        console.log("launching the node form");
     }, [node]);
 
     React.useEffect(() => {
@@ -516,9 +193,7 @@ function App() {
     // }, [node_endpoint_to_consume,]);
 
     return (
-        launch &&
-        nodeType == 1 &&
-        selected_table != null && (
+        launch && (
             <div>
                 {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" !=
                     route_function_value?.split("_")[0] && (

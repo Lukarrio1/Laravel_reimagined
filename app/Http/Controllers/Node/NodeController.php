@@ -148,6 +148,27 @@ class NodeController extends Controller
         if (count($node_join_tables) > 0) {
             for ($i = 0; $i < count($node_join_tables); $i++) {
                 $current_table = $node_join_tables[$i];
+                $same_level_relationship = $request->get('node_base_level_join_tables_' . $current_table, []);
+                $tables = 'node_base_level_join_tables_' . $current_table;
+                if (\count($same_level_relationship) > 0) {
+                    $extra_rules[$tables] = "required";
+                    $extra_handler[$tables] = ['location' => 'properties'];
+                    for ($i = 0; $i < count($same_level_relationship); $i++) {
+                        $first_column = "node_join_" . $current_table . "_to_" . $same_level_relationship[$i] . "_by_column";
+                        $second_column = "node_join_" . $same_level_relationship[$i] . "_to_" . $current_table . "_by_column";
+                        $condition = "node_join_" . $current_table . "_to_" . $same_level_relationship[$i] . "_by_condition";
+                        $type = "node_join_" . $same_level_relationship[$i] . "_to_" . $current_table . "_by_type";
+                        $extra_rules[$first_column] = "required";
+                        $extra_handler[$first_column] = ['location' => 'properties'];
+                        $extra_rules[$condition] = "required";
+                        $extra_handler[$condition] = ['location' => 'properties'];
+                        $extra_rules[$second_column] = "required";
+                        $extra_handler[$second_column] = ['location' => 'properties'];
+                        $extra_rules[$type] = "required";
+                        $extra_handler[$type] = ['location' => 'properties'];
+                    }
+                }
+                //
                 // $node_categories_join_by_condition = $request->get("node_".$current_table."_join_by_condition");
                 // $node_categories_join_by_column = $request->get("node_".$current_table."_join_by_column");
                 // $node_categories_join_columns = $request->get("node_".$current_table."_join_columns");

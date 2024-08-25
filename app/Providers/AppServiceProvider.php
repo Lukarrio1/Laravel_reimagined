@@ -65,8 +65,10 @@ class AppServiceProvider extends ServiceProvider
             Cache::set('roles', Role::all()->pluck('id', 'name'));
         }
 
+        // \dd(\optional(Setting::where('key', 'cache_driver')->first())
+        //     ->getSettingValue('last'));
         Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-            ->getSettingValue('last') ?? "file");
+            ->getSettingValue('last') ?? "redis");
 
         if (!Cache::has('setting_allowed_login_roles')) {
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
@@ -99,9 +101,9 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
             Cache::add('routes', $nodes);
         }
-        if (!Cache::has('tenants')) {
-            Cache::add('tenants', Tenant::all());
-        }
+        // if (!Cache::has('tenants')) {
+        //     Cache::add('tenants', Tenant::all());
+        // }
 
         if (!Cache::has('references')) {
             Cache::add('references', ReferenceConfig::query()

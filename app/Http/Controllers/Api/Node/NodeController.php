@@ -15,7 +15,15 @@ class NodeController extends Controller
 {
     public function node($uuid): JsonResponse
     {
-        return \response()->json(['node' => Node::where('uuid', $uuid)->first()]);
+        $node = null;
+        $cache_name = 'app_node_' . $uuid;
+        if (!Cache::has($cache_name)) {
+            $node = Node::where('uuid', $uuid)->first();
+            Cache::set($cache_name, $node, $this->cache_ttl);
+        } else {
+            $node = Cache::get($cache_name);
+        }
+        return \response()->json(['node' => $node]);
     }
 
     public function nodes(): JsonResponse
@@ -64,7 +72,7 @@ class NodeController extends Controller
                     ];
                     return $node;
                 })->each(fn($item) => $nodes->push($item));
-            Cache::set($cache_name, $nodes);
+            Cache::set($cache_name, $nodes, $this->cache_ttl);
         } else {
             $nodes = Cache::get($cache_name);
         }
@@ -74,53 +82,57 @@ class NodeController extends Controller
     public function guest_nodes(): JsonResponse
     {
         $nodes = \collect();
-        Node::where('node_status', 1)
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
-            ->with(['permission'])
-            ->get()
-            ->filter(function ($node) {
-                if ($node->node_type['value'] == 1) {
-                    if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
-                        return false;
+        if (!Cache::has("guest_nodes")) {
+            Node::where('node_status', 1)
+                ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
+                ->with(['permission'])
+                ->get()
+                ->filter(function ($node) {
+                    if ($node->node_type['value'] == 1) {
+                        if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
+                            return false;
+                        }
+                        return true;
                     }
                     return true;
-                }
-                return true;
-            })
-            ->map(function ($node) {
-                $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
-                $node = (object)[
-                    ...$node->toArray(),
-                    'properties' => [
-                        'value' => $this->removeKeys($node->properties['value'])
-                    ]
-                ];
-                return $node;
-            })->each(fn($item) => $nodes->push($item));
-
+                })
+                ->map(function ($node) {
+                    $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
+                    $node = (object)[
+                        ...$node->toArray(),
+                        'properties' => [
+                            'value' => $this->removeKeys($node->properties['value'])
+                        ]
+                    ];
+                    return $node;
+                })->each(fn($item) => $nodes->push($item));
+            Cache::set('guest_nodes', $nodes, $this->cache_ttl);
+        } else {
+            Cache::get('guest_nodes')->each(fn($item) => $nodes->push($item));
+        }
         return \response()->json(['nodes' => $nodes]);
     }
 
-    public function unauthNodes(): JsonResponse
-    {
-        $nodes = Node::where('node_type', '>', 1)
-            ->whereIn('authentication_level', [0, 2])
-            ->where(
-                'node_status',
-                1
-            )
-            ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
-            ->get()->map(function ($node) {
-                $node->hasAccess = true;
-                $node = (object)[
-                    ...$node->toArray(),
-                    'properties' => [
-                        'value' => $this->removeKeys($node->properties['value'])
-                    ]
-                ];
-                return $node;
-            });
+    // public function unauthNodes(): JsonResponse
+    // {
+    //     $nodes = Node::where('node_type', '>', 1)
+    //         ->whereIn('authentication_level', [0, 2])
+    //         ->where(
+    //             'node_status',
+    //             1
+    //         )
+    //         ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
+    //         ->get()->map(function ($node) {
+    //             $node->hasAccess = true;
+    //             $node = (object)[
+    //                 ...$node->toArray(),
+    //                 'properties' => [
+    //                     'value' => $this->removeKeys($node->properties['value'])
+    //                 ]
+    //             ];
+    //             return $node;
+    //         });
 
-        return \response()->json(['nodes' => $nodes]);
-    }
+    //     return \response()->json(['nodes' => $nodes]);
+    // }
 }

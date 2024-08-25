@@ -15,23 +15,23 @@ Schedule::call(function () {
     $database_backup_configuration = \collect(optional(collect(Cache::get('settings'))
         ->where('key', 'database_backup_configuration')->first())->getSettingValue());
     $database_backup = Setting::where('key', 'database_backup')->first()
-                 ->getSettingValue('last') ?? 0;
-    if($database_backup == 1) {
+        ->getSettingValue('last') ?? 0;
+    if ($database_backup == 1) {
         \collect(
             optional(collect(Cache::get('settings'))
-                 ->where('key', 'database_configuration')->first())
-                 ->getSettingValue('last')
+                ->where('key', 'database_configuration')->first())
+                ->getSettingValue('last')
         )
-         ->filter(fn ($value, $key) => in_array($key, $database_backup_configuration->toArray()))
-             ->each(function ($item, $key) use ($backup) {
-                 $backup->backupDatabase(
-                     $item->get('DB_DATABASE'),
-                     $item->get('DB_USERNAME'),
-                     $item->get('DB_PASSWORD'),
-                     $item->get('DB_HOST'),
-                     $item->get('DB_PORT')
-                 );
-
-             });
+            ->filter(fn($value, $key) => in_array($key, $database_backup_configuration->toArray()))
+            ->each(function ($item, $key) use ($backup) {
+                $backup->backupDatabase(
+                    $item->get('DB_DATABASE'),
+                    $item->get('DB_USERNAME'),
+                    $item->get('DB_PASSWORD'),
+                    $item->get('DB_HOST'),
+                    $item->get('DB_PORT')
+                );
+            });
     }
 })->weekly();
+

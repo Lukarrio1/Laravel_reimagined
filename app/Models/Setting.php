@@ -186,7 +186,7 @@ class Setting extends Model
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'cache_driver' => [
-                'field' => $this->SETTING_OPTIONS('drop_down', ['File Storage' => 'file', 'Database Storage' => 'database'], $key, $field_value),
+                'field' => $this->SETTING_OPTIONS('drop_down', ['File Storage' => 'file', 'Database Storage' => 'database', 'Redis Storage' => 'redis.cache'], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
             'api_email_verification' => [

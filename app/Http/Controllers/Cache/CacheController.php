@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Cache;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Session;
 
@@ -32,14 +34,15 @@ class CacheController extends Controller
         $cache_to_clear = \collect(\request()->all())->keys();
         if (
             \collect($this->cacheOptions)->keys()
-            ->filter(fn ($key) => in_array($key, $cache_to_clear->toArray()))->count()
+            ->filter(fn($key) => in_array($key, $cache_to_clear->toArray()))->count()
             == \count($this->cacheOptions)
         ) {
-            $cache_to_clear->each(fn ($key) => Artisan::call($this->cacheOptions[$key]));
+            $cache_to_clear->each(fn($key) => Artisan::call($this->cacheOptions[$key]));
         } else {
             Artisan::call('cache:clear');
             Artisan::call('optimize:clear');
         }
+        Cache::set("is_cache_valid", Str::random(40));
         Session::flash('message', 'The system cache was refreshed successfully.');
         Session::flash('alert-class', 'alert-success');
 
