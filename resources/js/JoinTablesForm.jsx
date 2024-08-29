@@ -48,7 +48,7 @@ export default function JoinTablesForm({
                     </div>
                 </div>
             </div>
-            <div class="mb-3">
+            {/* <div class="mb-3">
                 <label for={`node_cache_ttl`} class="form-label">
                     Node Endpoint Cache Time To Live{" "}
                     <bold> ({ttl ?? 0} seconds)</bold>
@@ -69,8 +69,7 @@ export default function JoinTablesForm({
                     placeholder={"0"}
                     value={ttl}
                 />
-            </div>
-
+            </div> */}
             <div class="mb-3">
                 <label for="node_join_column" class="form-label">
                     Node Column To Join By

@@ -89,6 +89,11 @@ class Controller extends BaseController
             ->first();
     }
 
+    public function getCurrentMethodCacheTtl()
+    {
+        return  \optional(\optional($this->getCurrentRoute())->properties['value'])->node_cache_ttl ?? $this->cache_ttl;
+    }
+
     /**
      * Method getValidationRules
      *
@@ -210,9 +215,9 @@ class Controller extends BaseController
     public function addNestedRelationship($items, $currentRouteNode, $database)
     {
         $relationShips = $this->handleJoins($currentRouteNode);
+        $database = DB::connection($database);
         if (count($relationShips) > 0) {
             $items = $items->map(function ($item) use ($relationShips, $database) {
-                $database = DB::connection($database);
                 $this->processRelationships($item, $relationShips, $database);
                 return $item;
             });
@@ -247,7 +252,7 @@ class Controller extends BaseController
                 ->chunk(1000, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level, $rel) {
                     $allRelatedItems = $allRelatedItems->merge($relatedItems);
                     if ($rel['one_or_many'] == 3) {
-                        return false; // Exits the chunking loop early
+                        return false;
                     }
                     $relatedItems->each(function ($relatedItem) use ($relationShips, $database, $level) {
                         $this->processRelationships($relatedItem, $relationShips, $database, $level + 1);

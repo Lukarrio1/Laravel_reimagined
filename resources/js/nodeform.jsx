@@ -174,8 +174,20 @@ function App() {
                 ...(node?.properties?.value?.node_table_columns ?? []),
             ])
         );
+        // setLaunch((pre) => false);
         setLaunch((pre) => false);
-        setLaunch((pre) => true);
+        setLaunch(
+            [
+                "App\\Http\\Controllers\\Api\\DataBusController::oneRecord",
+                "App\\Http\\Controllers\\Api\\DataBusController::manyRecords",
+                "App\\Http\\Controllers\\Api\\DataBusController::checkRecord",
+                "App\\Http\\Controllers\\Api\\DataBusController::deleteRecord",
+                "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
+                "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
+                "App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint",
+            ].includes(node?.properties?.value?.route_function.split("_")[0]) ==
+                true
+        );
         console.log("launching the node form");
     }, [node]);
 
@@ -193,7 +205,8 @@ function App() {
     // }, [node_endpoint_to_consume,]);
 
     return (
-        launch && (
+        launch &&
+        nodeType == 1 && (
             <div>
                 {"App\\Http\\Controllers\\Api\\DataBusController::consumeGetEndPoint" !=
                     route_function_value?.split("_")[0] && (

@@ -21,13 +21,14 @@ class Node_Type extends Model
         $methods = \collect((new Node())->getControllerMethods());
         $options = '';
         // creates a string that has the controller name and method as options
+        $databus_methods = (new DataBusController())->methods;
         $methods->filter(fn($con, $loc) => \in_array('Api', \explode('\\', $loc)))
-            ->each(function ($controller, $location) use (&$options, $filler) {
+            ->each(function ($controller, $location) use (&$options, $filler, $databus_methods) {
                 collect($controller)
-                    ->each(function ($method) use ($location, &$options, $filler) {
-                        $method_updated = \in_array($method, (new DataBusController())->methods) ? $method . "_" . Str::random(10) : $method;
-                        $selected = !empty($filler) && optional(\optional($filler)->properties['value'])->route_function == $location . '::' . $method ? "selected" : '';
-                        $selected = !empty($filler) && \collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))->first() == $location . '::' . $method ? "selected" : '';
+                    ->each(function ($method) use ($location, &$options, $filler, $databus_methods) {
+                        $method_updated = \in_array($method, $databus_methods) ? $method . "_" . Str::random(10) : $method;
+                        $selected = !empty($filler) && \collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))
+                            ->first() == $location . '::' . $method_updated ? "selected" : '';
                         $display_location = \collect(\explode('\\', $location))->last();
                         $options .= "<option value='" . $location . '::' . $method_updated . "' $selected>" . $display_location . "::" . $method . "</option>";
                     });
@@ -75,7 +76,7 @@ class Node_Type extends Model
         $is_auditing_on = (int) optional(collect(Cache::get('settings'))
             ->where('key', 'app_auditing')->first())
             ->getSettingValue('last') == 1;
-
+        $node_cache_ttl = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_cache_ttl;
         $app_auditing = $is_auditing_on ? "<div class='mb-3'>
                     <label for='route ' class='form-label'>Node Audit Message <small>( use {name} for user name, {at} for the current time and date.)</small></label>
                     <input
@@ -182,7 +183,16 @@ class Node_Type extends Model
                       $route_method_options
                       </select>
                   </div>
-                  </div>",
+                    <div class='mb-3' id='node_cache_ttl_server_side'>
+                      <label for='node_cache_ttl' class='form-label'>Node Cache Ttl</label>
+                     <input
+                    type='number' class='form-control'
+                     id='' aria-describedby='node_cache_ttl' name='node_cache_ttl'
+                     value='" . $node_cache_ttl . "' required>
+                  </div>
+                  </div>
+                  </div>
+                  ",
             ],
             'page' => [
                 'id' => 3,

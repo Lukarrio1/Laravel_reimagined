@@ -13,13 +13,15 @@ use App\Http\Controllers\Api\DataBusController;
 
 class NodeController extends Controller
 {
+
+
     public function node($uuid): JsonResponse
     {
         $node = null;
         $cache_name = 'app_node_' . $uuid;
         if (!Cache::has($cache_name)) {
             $node = Node::where('uuid', $uuid)->first();
-            Cache::set($cache_name, $node, $this->cache_ttl);
+            Cache::set($cache_name, $node, $this->getCurrentMethodCacheTtl());
         } else {
             $node = Cache::get($cache_name);
         }
@@ -72,15 +74,16 @@ class NodeController extends Controller
                     ];
                     return $node;
                 })->each(fn($item) => $nodes->push($item));
-            Cache::set($cache_name, $nodes, $this->cache_ttl);
+            Cache::set($cache_name, $nodes, $this->getCurrentMethodCacheTtl());
         } else {
             $nodes = Cache::get($cache_name);
         }
         return \response()->json(['nodes' => $nodes]);
     }
 
-    public function guest_nodes(): JsonResponse
+    public function guestNodes(): JsonResponse
     {
+
         $nodes = \collect();
         if (!Cache::has("guest_nodes")) {
             Node::where('node_status', 1)
@@ -106,7 +109,7 @@ class NodeController extends Controller
                     ];
                     return $node;
                 })->each(fn($item) => $nodes->push($item));
-            Cache::set('guest_nodes', $nodes, $this->cache_ttl);
+            Cache::set('guest_nodes', $nodes, $this->getCurrentMethodCacheTtl());
         } else {
             Cache::get('guest_nodes')->each(fn($item) => $nodes->push($item));
         }
