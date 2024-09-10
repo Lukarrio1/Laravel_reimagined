@@ -27,9 +27,9 @@ class Node_Type extends Model
                 collect($controller)
                     ->each(function ($method) use ($location, &$options, $filler, $databus_methods) {
                         $method_updated = \in_array($method, $databus_methods) ? $method . "_" . Str::random(10) : $method;
-                        $current_function =\collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))
-                            ->first();
-                        $selected = !empty($filler) && $current_function== $location . '::' . $method ? "selected" : '';
+                        $current_function =!empty($filler) ?\collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))
+                            ->first():$method;
+                        $selected =  $current_function== $location . '::' . $method ? "selected" : '';
                         $display_location = \collect(\explode('\\', $location))->last();
                         $options .= "<option value='" . $location . '::' . $method_updated . "' $selected>" . $display_location . "::" . $method . "</option>";
                     });
