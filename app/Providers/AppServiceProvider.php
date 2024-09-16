@@ -65,8 +65,6 @@ class AppServiceProvider extends ServiceProvider
             Cache::set('roles', Role::all()->pluck('id', 'name'));
         }
 
-        // \dd(\optional(Setting::where('key', 'cache_driver')->first())
-        //     ->getSettingValue('last'));
         Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
             ->getSettingValue('last') ?? "redis");
 
@@ -101,9 +99,6 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
             Cache::add('routes', $nodes);
         }
-        // if (!Cache::has('tenants')) {
-        //     Cache::add('tenants', Tenant::all());
-        // }
 
         if (!Cache::has('references')) {
             Cache::add('references', ReferenceConfig::query()
@@ -127,6 +122,7 @@ class AppServiceProvider extends ServiceProvider
                     });
                 }
             });
+
         \collect(
             optional(collect(Cache::get('settings'))
                 ->where('key', 'database_configuration')->first())
@@ -152,11 +148,7 @@ class AppServiceProvider extends ServiceProvider
                     //throw $th;
 
                 }
-
-                // // Set the default connection to the newly configured one
-                // Config::set('database.default', $connectionName);
             });
-
 
 
         (new User())->deleteInactiveUsers();
