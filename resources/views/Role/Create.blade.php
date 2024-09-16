@@ -24,7 +24,7 @@
 
                 <div class="mb-3">
                     <label for="role_name" class="form-label">Permissions (<small class="text-primary">Use shift to select more than 1 permission</small>)</label>
-                    <select class="form-select" multiple aria-label="Multiple select example" name="permissions[]">
+                    <select class="form-select" multiple aria-label="Multiple select example" name="permissions[]" style="height:500px">
                         <option selected>Open this select menu</option>
                         @foreach ($permissions as $permission )
                         <option value="{{$permission->id}}" {{in_array($permission->id,empty(optional(optional($role)->permissions)->pluck('id'))?[]:

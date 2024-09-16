@@ -156,17 +156,6 @@ class Controller extends BaseController
     {
         return !empty($url) ? Http::get($url)->json() : [];
     }
-    public $extra_rel = [
-        [
-            'first_table' => 'users',
-            'first_value' => 'id',
-            'condition' => '=',
-            'second_value' => 'model_id',
-            'second_table' => 'model_has_roles',
-            'one_or_many' => 1,
-            'columns' => []
-        ]
-    ];
 
     /**
      * Method handleJoins
@@ -249,7 +238,7 @@ class Controller extends BaseController
                 ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
                 ->orderBy($rel['second_value'])
                 ->when($rel['one_or_many'] == 2, fn($q) => $q->limit(1))
-                ->chunk(1000, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level, $rel) {
+                ->chunk(500, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level, $rel) {
                     $allRelatedItems = $allRelatedItems->merge($relatedItems);
                     if ($rel['one_or_many'] == 3) {
                         return false;

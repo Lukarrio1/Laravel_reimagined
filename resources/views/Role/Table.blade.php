@@ -42,6 +42,7 @@
                                     <li class="list-group-item">
                                         <bold>{{$name}}</bold>
                                     </li>
+                                    <hr>
                                     @endforeach
                                 </ul>
                             </div>

@@ -97,6 +97,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'client_app_name' => [
+                'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
             \strtolower('MAIL_MAILER') => [
                 'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
@@ -279,6 +283,7 @@ class Setting extends Model
             'registration_role' => 'Api Registration Role',
             'allowed_login_roles' => "Roles that are allowed to login",
             'app_name' => 'Application Name',
+            'client_app_name' => 'Client Application Name',
             'app_url' => 'Server Side URL',
             'client_app_url' => 'Client Side URl',
             'app_version' => 'Application Version',

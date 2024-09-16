@@ -298,6 +298,10 @@ class NodeController extends Controller
         $node->delete();
         Session::flash('message', 'The node was deleted successfully.');
         Session::flash('alert-class', 'alert-success');
+        \request()->merge([
+            'page' => \request('page'),
+            'search' =>  request()->get('search')
+        ]);
         return \redirect()->route('viewNodes');
     }
 }
