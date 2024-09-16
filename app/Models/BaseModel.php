@@ -18,10 +18,14 @@ class BaseModel extends Model
 
     public function createReference($type, $owner_id, $owned_id)
     {
-        if (empty($type)) {
-            return [];
+        if (empty($type) || empty($owned_id) || empty($owned_id)) {
+            return null;
         }
         $config =  ReferenceConfig::where('type', $type)->first();
+
+        if (empty($config)) {
+            return null;
+        }
         $Reference = Reference::create([
             "owner_id" => $owner_id,
             "owner_model" => $config->owner_model,
