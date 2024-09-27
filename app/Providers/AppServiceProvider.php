@@ -161,4 +161,8 @@ class AppServiceProvider extends ServiceProvider
 
         (new User())->deleteInactiveUsers();
     }
+
+    // public function boot(){
+
+    // }
 }

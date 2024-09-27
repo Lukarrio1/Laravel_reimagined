@@ -29,8 +29,7 @@ class Controller extends BaseController
     {
         $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? null;
         $this->search_skip_word = optional(collect(Cache::get('settings'))->where('key', 'search_skip_word')->first())->properties;
-        $this->data_interoperability = (bool)optional(collect(Cache::get('settings'))
-            ->where('key', 'data_interoperability')->first())?->getSettingValue();
+
         // \dd(optional(collect(Cache::get('settings'))->where('key', 'data_interoperability')->first())?->getSettingValue());
     }
 
