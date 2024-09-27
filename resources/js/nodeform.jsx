@@ -205,6 +205,7 @@ function App() {
     // }, [node_endpoint_to_consume,]);
 
     return (
+        databases?.length > 0 &&
         launch &&
         nodeType == 1 && (
             <div>

@@ -186,9 +186,9 @@ class Node_Type extends Model
                     <div class='mb-3' id='node_cache_ttl_server_side'>
                       <label for='node_cache_ttl' class='form-label'>Node Cache Ttl</label>
                      <input
-                    type='number' class='form-control'
-                     id='' aria-describedby='node_cache_ttl' name='node_cache_ttl'
-                     value='" . $node_cache_ttl . "' required>
+                      type='number' class='form-control'
+                      id='' aria-describedby='node_cache_ttl' name='node_cache_ttl'
+                      value='" . $node_cache_ttl . "'>
                   </div>
                   </div>
                   </div>

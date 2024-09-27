@@ -220,7 +220,11 @@ class Setting extends Model
             'search_skip_word' => [
                 'field' => $this->SETTING_OPTIONS('input', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
-            ]
+            ],
+            'data_interoperability' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
         ]);
         return $keys->get($key);
     }
@@ -312,7 +316,8 @@ class Setting extends Model
             "database_backup_configuration" => "Database Backup Configurations",
             "database_backup" => "Database Backup (Weekly)",
             "cache_ttl"    =>   "Cache Time To Live (seconds)",
-            "search_skip_word"    => "Search Skip Word (used to preserve a data interoperability route if the value of a parameter is empty when searching or filtering data)"
+            "search_skip_word"    => "Search Skip Word (used to preserve a data interoperability route if the value of a parameter is empty when searching or filtering data)",
+            "data_interoperability" => "Data Interoperability"
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

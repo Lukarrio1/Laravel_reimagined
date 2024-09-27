@@ -30,6 +30,8 @@ class NodeController extends Controller
         $this->middleware('can:can crud nodes');
         $this->cache = new CacheController();
         $this->tenancy = new Tenant();
+        $this->data_interoperability = (bool)optional(collect(Cache::get('settings'))
+            ->where('key', 'data_interoperability')->first())?->getSettingValue();
     }
 
 
@@ -110,7 +112,6 @@ class NodeController extends Controller
             'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
             'search' =>  request()->get('search')
         ]);
-
         return \view('Nodes.View', [
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,
@@ -133,7 +134,11 @@ class NodeController extends Controller
             'search_placeholder' => $searchPlaceholder,
             'page_count' => \ceil($max_amount_of_pages),
             'search' => request()->get('search'),
-            'nodes_count_overall' => $nodes_count_overall
+            'nodes_count_overall' => $nodes_count_overall,
+            "data_interoperability" => $this->data_interoperability,
+            "page_title" => $this->data_interoperability == true
+                ? "Routes, Pages, Links, Layouts, Components & Data Interoperability Management"
+                : "Routes, Pages, Links, Layouts and Components Management"
         ]);
     }
 
@@ -261,17 +266,18 @@ class NodeController extends Controller
             $columns = gettype($data) == "object" ? array_keys($data) : array_keys($data[0]);
         }
         return [
-            "validation_rules" => $this->getValidationRules(),
-            'node' => $node,
+            "validation_rules" => $this->data_interoperability ? $this->getValidationRules() : [],
+            'node'
+            => $this->data_interoperability ? $node : null,
             "tables" => $tables,
-            "data_to_consume" => $data_to_consume,
+            "data_to_consume" => $this->data_interoperability ? $data_to_consume : [],
             "columns" => $columns,
-            'display_aid_columns' => !empty($data_to_consume) ? collect($data_to_consume)->keys() : $columns,
-            "table_items" => $table_items,
-            "orderByTypes" => (new DataBusController())->orderByTypes,
-            "databases" => collect(Cache::get('settings'))
+            'display_aid_columns' => $this->data_interoperability == true ? (!empty($data_to_consume) ? collect($data_to_consume)->keys() : $columns) : [],
+            "table_items" => $this->data_interoperability == true ? $table_items : [],
+            "orderByTypes" => $this->data_interoperability == true ? (new DataBusController())->orderByTypes : [],
+            "databases" => $this->data_interoperability == true ? collect(Cache::get('settings'))
                 ->where('key', 'database_configuration')->first()
-                ->getSettingValue()->keys()
+                ->getSettingValue()->keys() : []
         ];
     }
 
@@ -288,7 +294,10 @@ class NodeController extends Controller
                 DB::connection($database)->getSchemaBuilder()->getColumnListing($selectedTables[$i])
             );
         }
-        return ["tables_with_columns" => $tables_with_columns, 'query_conditions' => $query_conditions];
+        return [
+            "tables_with_columns" => $this->data_interoperability == true ? $tables_with_columns : [],
+            'query_conditions' => $this->data_interoperability == true ? $query_conditions : []
+        ];
     }
 
 

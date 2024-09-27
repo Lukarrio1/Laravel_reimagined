@@ -23,10 +23,15 @@ class Controller extends BaseController
 
     public $cache_ttl = 0;
     public  $search_skip_word;
+    public  $data_interoperability;
+
     public function __construct()
     {
         $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? null;
         $this->search_skip_word = optional(collect(Cache::get('settings'))->where('key', 'search_skip_word')->first())->properties;
+        $this->data_interoperability = (bool)optional(collect(Cache::get('settings'))
+            ->where('key', 'data_interoperability')->first())?->getSettingValue();
+        // \dd(optional(collect(Cache::get('settings'))->where('key', 'data_interoperability')->first())?->getSettingValue());
     }
 
     public function auth_user()
@@ -47,7 +52,8 @@ class Controller extends BaseController
         'node_order_by_field',
         'node_order_by_type',
         'node_table_columns',
-        'node_database'
+        'node_database',
+        'html_value'
     ];
 
 
