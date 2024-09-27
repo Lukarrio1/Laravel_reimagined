@@ -35,11 +35,11 @@ class AuthController extends Controller
             $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
                 ->filter(fn($_, $idx) => 1 + $idx != \count($verification_front_end_link))
                 ->join('/') . '/' . $email_token;
-            $this->sendEmail(
+            \defer(fn() =>   $this->sendEmail(
                 $request->email,
                 "Email Verification",
                 "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
-            );
+            ));
         }
         $role = !empty($setting) ? Role::find($setting) : null;
         $user = User::create($request->except('password') + [
@@ -66,7 +66,7 @@ class AuthController extends Controller
             $token = Str::random(50);
             $user->update(['password_reset_token' => $token]);
             $route = "/per/{$token}";
-            $this->sendEmail($request->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>");
+            \defer(fn() => $this->sendEmail($request->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>"));
         }
         return \response()->json(['message' => "An email was sent to the provided email address"]);
     }
@@ -78,7 +78,7 @@ class AuthController extends Controller
         if (!empty($user)) {
             $token = Str::random(50);
             $user->update(['password' => Hash::make($request->password), 'password_reset_token' => $token]);
-            $this->sendEmail($email, 'Password Update', 'Your password was updated successfully');
+            \defer(fn() =>   $this->sendEmail($email, 'Password Update', 'Your password was updated successfully'));
         }
         return response()->json(['message' => "You've updated your password successfully."]);
     }

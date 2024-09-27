@@ -34,9 +34,14 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
+        //  \optional(Setting::where('key', 'cache_driver')->first())
+        //     ->getSettingValue('last')
+        Config::set('cache.default', "file");
+
         if (!Cache::has('settings')) {
             Cache::add('settings', Setting::all());
         }
+
         if (!Cache::has('redirect_to_options')) {
             $links =  Node::query()->where('node_type', 2)->get()->map(function ($item) {
                 $temp = \collect([]);
@@ -65,8 +70,7 @@ class AppServiceProvider extends ServiceProvider
             Cache::set('roles', Role::all()->pluck('id', 'name'));
         }
 
-        Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-            ->getSettingValue('last') ?? "redis");
+
 
         if (!Cache::has('setting_allowed_login_roles')) {
             $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
