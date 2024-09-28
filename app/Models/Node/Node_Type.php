@@ -2,12 +2,12 @@
 
 namespace App\Models\Node;
 
-use App\Http\Controllers\Api\DataBusController;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Model;
+use App\Http\Controllers\Api\DataBusController;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Node_Type extends Model
 {
@@ -27,9 +27,9 @@ class Node_Type extends Model
                 collect($controller)
                     ->each(function ($method) use ($location, &$options, $filler, $databus_methods) {
                         $method_updated = \in_array($method, $databus_methods) ? $method . "_" . Str::random(10) : $method;
-                        $current_function =!empty($filler) ?\collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))
-                            ->first():$method;
-                        $selected =  $current_function== $location . '::' . $method ? "selected" : '';
+                        $current_function = !empty($filler) ? \collect(\explode('_', optional(\optional($filler)->properties['value'])->route_function))
+                            ->first() : $method;
+                        $selected =  $current_function == $location . '::' . $method ? "selected" : '';
                         $display_location = \collect(\explode('\\', $location))->last();
                         $options .= "<option value='" . $location . '::' . $method_updated . "' $selected>" . $display_location . "::" . $method . "</option>";
                     });
@@ -50,9 +50,9 @@ class Node_Type extends Model
             });
         $multi_tenancy = (int) optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())->getSettingValue('first');
         $setting
-        = (int) optional(collect(Cache::get('settings'))
+            = (int) optional(collect(Cache::get('settings'))
                 ->where('key', 'admin_role')->first())
-            ->getSettingValue();
+                ->getSettingValue();
         $role_for_checking = !empty($setting) ? Role::find((int) $setting) : null;
         $node_route = empty($filler) ? '' : \collect(\explode('/', \optional(\optional($filler)->properties['value'])->node_route))
             ->filter(function ($dt, $key) use ($filler, $multi_tenancy, $role_for_checking) {
@@ -75,7 +75,7 @@ class Node_Type extends Model
         $layout_name = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->layout_name;
         $link_page_node_route = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_route;
         $is_auditing_on = (int) optional(collect(Cache::get('settings'))
-                ->where('key', 'app_auditing')->first())
+            ->where('key', 'app_auditing')->first())
             ->getSettingValue('last') == 1;
         $node_cache_ttl = empty($filler) ? '' : \optional(\optional($filler)->properties['value'])->node_cache_ttl;
         $app_auditing = $is_auditing_on ? "<div class='mb-3'>

@@ -27,10 +27,8 @@ class Controller extends BaseController
 
     public function __construct()
     {
-        $this->cache_ttl = optional(collect(Cache::get('settings'))->where('key', 'cache_ttl')->first())->properties ?? null;
-        $this->search_skip_word = optional(collect(Cache::get('settings'))->where('key', 'search_skip_word')->first())->properties;
-
-        // \dd(optional(collect(Cache::get('settings'))->where('key', 'data_interoperability')->first())?->getSettingValue());
+        $this->cache_ttl = \getSetting('cache_ttl') ?? null;
+        $this->search_skip_word = \getSetting('search_skip_word');
     }
 
     public function auth_user()

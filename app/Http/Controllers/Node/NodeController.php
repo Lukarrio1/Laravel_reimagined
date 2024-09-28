@@ -30,8 +30,7 @@ class NodeController extends Controller
         $this->middleware('can:can crud nodes');
         $this->cache = new CacheController();
         $this->tenancy = new Tenant();
-        $this->data_interoperability = (bool)optional(collect(Cache::get('settings'))
-            ->where('key', 'data_interoperability')->first())?->getSettingValue();
+        $this->data_interoperability = (bool)\getSetting('data_interoperability');
     }
 
 
@@ -275,9 +274,7 @@ class NodeController extends Controller
             'display_aid_columns' => $this->data_interoperability == true ? (!empty($data_to_consume) ? collect($data_to_consume)->keys() : $columns) : [],
             "table_items" => $this->data_interoperability == true ? $table_items : [],
             "orderByTypes" => $this->data_interoperability == true ? (new DataBusController())->orderByTypes : [],
-            "databases" => $this->data_interoperability == true ? collect(Cache::get('settings'))
-                ->where('key', 'database_configuration')->first()
-                ->getSettingValue()->keys() : []
+            "databases" => $this->data_interoperability == true ? \collect(\getSetting('database_configuration'))->keys() : []
         ];
     }
 

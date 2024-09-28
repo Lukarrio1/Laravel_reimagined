@@ -9,20 +9,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 use App\Http\Middleware\AuthMiddleware;
 
-// Ensure routes are cached
-
-
-
-
-
-
-
-
-
+// Ensure routes are cache
 // Retrieve cached routes
 $routes = Cache::get('routes', collect([]));
-
-
 $routes->each(function ($route) {
     $properties = $route->properties['value'];
     if (empty($properties->route_method) || empty($properties->node_route) || empty($properties->route_function)) {

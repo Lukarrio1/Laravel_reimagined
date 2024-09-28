@@ -24,8 +24,7 @@ class DataBusController extends Controller
     public $methods = ["manyRecords", "oneRecord", "checkRecord", "deleteRecord", "saveRecord", "updateRecord", "consumeGetEndPoint"];
     public function __call($method, $parameters)
     {
-        $this->data_interoperability = (bool)optional(collect(Cache::get('settings'))
-            ->where('key', 'data_interoperability')->first())?->getSettingValue();
+        $this->data_interoperability = (bool)\getSetting('data_interoperability');
 
         $method_to_call = \in_array(collect(explode('_', $method))->first(), $this->methods)
             ? collect(explode('_', $method))->first()
