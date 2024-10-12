@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Api\Node;
 
-use PSpell\Config;
 use App\Models\User;
 use App\Models\Node\Node;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Api\DataBusController;
 
 class NodeController extends Controller
 {
@@ -20,7 +17,20 @@ class NodeController extends Controller
         $node = null;
         $cache_name = 'app_node_' . $uuid;
         if (!Cache::has($cache_name)) {
-            $node = Node::where('uuid', $uuid)->first();
+            $node = Node::where('uuid', $uuid)
+                ->get()->map(function ($n) {
+                    $n->hasAccess = $n->authentication_level['value'] == 0 ||
+                        !empty($n->permission) && !$this->auth_user()
+                            ->hasPermissionTo(\optional($n->permission)->name)
+                        ? false : true;
+                    $n = (object)[
+                        ...$n->toArray(),
+                        'properties' => [
+                            'value' => $this->removeKeys($n->properties['value'])
+                        ]
+                    ];
+                    return $n;
+                })->first();
             Cache::set($cache_name, $node, $this->getCurrentMethodCacheTtl());
         } else {
             $node = Cache::get($cache_name);
@@ -115,27 +125,4 @@ class NodeController extends Controller
         }
         return \response()->json(['nodes' => $nodes]);
     }
-
-    // public function unauthNodes(): JsonResponse
-    // {
-    //     $nodes = Node::where('node_type', '>', 1)
-    //         ->whereIn('authentication_level', [0, 2])
-    //         ->where(
-    //             'node_status',
-    //             1
-    //         )
-    //         ->select('name', 'properties', 'node_type', 'authentication_level', 'permission_id', 'id', 'uuid', 'verbiage')
-    //         ->get()->map(function ($node) {
-    //             $node->hasAccess = true;
-    //             $node = (object)[
-    //                 ...$node->toArray(),
-    //                 'properties' => [
-    //                     'value' => $this->removeKeys($node->properties['value'])
-    //                 ]
-    //             ];
-    //             return $node;
-    //         });
-
-    //     return \response()->json(['nodes' => $nodes]);
-    // }
 }

@@ -224,7 +224,7 @@ function App() {
                                     setSelectedDatabases(e.target.value)
                                 }
                             >
-                                <option>Select A Database</option>
+                                <option value="">Select A Database</option>
                                 {databases &&
                                     databases.map((database) => {
                                         return (

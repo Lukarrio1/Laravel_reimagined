@@ -27,7 +27,7 @@ class Controller extends BaseController
 
     public function __construct()
     {
-        $this->cache_ttl = \getSetting('cache_ttl') ?? null;
+        $this->cache_ttl = \getSetting('cache_ttl');
         $this->search_skip_word = \getSetting('search_skip_word');
     }
 
