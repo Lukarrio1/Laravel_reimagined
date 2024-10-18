@@ -128,8 +128,8 @@ class AppServiceProvider extends ServiceProvider
                     });
 
                     // creates the reverse of the owned relationship
-                    $owned_model::resolveRelationUsing($rel_type->first() . "_owner", function ($owner_model) use ($owned_model, $has_many, $ref) {
-                        return $owner_model->$has_many($owned_model, Reference::class, 'owned_id', 'id', 'id', 'owner_id')
+                    $owned_model::resolveRelationUsing($rel_type->first() . "_owner", function ($owned_model) use ($owner_model, $has_many, $ref) {
+                        return $owned_model->hasOneThrough($owner_model, Reference::class, 'owned_id', 'id', 'id', 'owner_id')
                             ->where('references.type', $ref->type);
                     });
                 }

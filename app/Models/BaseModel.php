@@ -26,7 +26,13 @@ class BaseModel extends Model
         if (empty($config)) {
             return null;
         }
-        $Reference = Reference::create([
+        $Reference = Reference::updateOrCreate([
+            "owner_id" => $owner_id,
+            "owner_model" => $config->owner_model,
+            "owned_model" => $config->owned_model,
+            "owned_id" => $owned_id,
+            "type" => $config->type,
+        ], [
             "owner_id" => $owner_id,
             "owner_model" => $config->owner_model,
             "owned_model" => $config->owned_model,
@@ -34,5 +40,25 @@ class BaseModel extends Model
             "type" => $config->type,
         ]);
         return $Reference;
+    }
+
+    public function deleteReference($type, $owner_id = null, $owned_id)
+    {
+        if (empty($type) || empty($owned_id)) {
+            return null;
+        }
+        $config =  ReferenceConfig::where('type', $type)->first();
+
+        if (empty($config)) {
+            return null;
+        }
+        $owner_id_query = $owner_id != null ? ["owner_id" => $owner_id] : [];
+        Reference::where($owner_id_query + [
+            "owner_model" => $config->owner_model,
+            "owned_model" => $config->owned_model,
+            "owned_id" => $owned_id,
+            "type" => $config->type,
+        ])->delete();
+        return true;
     }
 }

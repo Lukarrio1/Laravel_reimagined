@@ -220,7 +220,6 @@ class NodeController extends Controller
         );
 
         if ($validator->fails()) {
-            dd($request->all(), $validator->errors());
             return redirect()->back()->withErrors($validator)->withInput();
         }
 

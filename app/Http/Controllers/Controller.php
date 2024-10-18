@@ -6,6 +6,7 @@ use ReflectionClass;
 use App\SendEmailTrait;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Cache;
@@ -21,14 +22,15 @@ class Controller extends BaseController
     use ValidatesRequests;
     use SendEmailTrait;
 
-    public $cache_ttl = 0;
-    public  $search_skip_word;
-    public  $data_interoperability;
-
+    protected $cache_ttl = 0;
+    protected  $search_skip_word;
+    protected  $data_interoperability;
+    protected  $admin_role;
     public function __construct()
     {
         $this->cache_ttl = \getSetting('cache_ttl');
         $this->search_skip_word = \getSetting('search_skip_word');
+        $this->admin_role = Role::find((int)\getSetting('admin_role'));
     }
 
     public function auth_user()

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Post;
 
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ReferenceConfig extends BaseModel
+class Post extends BaseModel
 {
     use HasFactory;
-    protected $fillable = ['id', 'owned_model', 'owner_model', 'type', 'description'];
+    protected $fillable = ['title', 'body', 'is_active'];
 }
