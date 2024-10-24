@@ -34,9 +34,9 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
-        //  \optional(Setting::where('key', 'cache_driver')->first())
-        //     ->getSettingValue('last')
-        Config::set('cache.default', "file");
+
+        Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
+            ->getSettingValue('last'));
 
         if (!Cache::has('settings')) {
             Cache::add('settings', Setting::all());

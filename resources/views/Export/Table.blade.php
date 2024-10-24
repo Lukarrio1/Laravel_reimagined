@@ -2,7 +2,7 @@
 <div class="col-sm-12">
     <div class="card shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div class="card-header h4 text-left">
-            Current Table: {{strtoupper(request('table'))}}
+            Current Table: {{request('table')}} ({{count($table_data)}})
         </div>
         <div class="card-body scrollable-div">
             <table class="table table-responsive-xxl">

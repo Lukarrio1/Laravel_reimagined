@@ -42,7 +42,7 @@ class BaseModel extends Model
         return $Reference;
     }
 
-    public function deleteReference($type, $owner_id = null, $owned_id)
+    public function deleteReference($type, $owner_id, $owned_id)
     {
         if (empty($type) || empty($owned_id)) {
             return null;

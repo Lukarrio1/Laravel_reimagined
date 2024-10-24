@@ -26,6 +26,7 @@ class Controller extends BaseController
     protected  $search_skip_word;
     protected  $data_interoperability;
     protected  $admin_role;
+
     public function __construct()
     {
         $this->cache_ttl = \getSetting('cache_ttl');

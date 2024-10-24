@@ -13,20 +13,21 @@ class PostController extends Controller
 {
     private function getPosts($filters = [])
     {
-
+        $is_admin_condition = $this->auth_user()->hasRole($this->admin_role);
         $posts = Post::query()
             ->when(
-                !$this->auth_user()->hasRole($this->admin_role),
+                !$is_admin_condition,
                 fn($q) => $q->whereHas(
                     'posts_owner',
                     fn($q) => $q->where('users.id', $this->auth_user()->id)
                 )
             )
             ->when(
-                $this->auth_user()->hasRole($this->admin_role),
+                $is_admin_condition,
                 fn($q) => $q->with('posts_owner')
             )
             ->latest()
+            ->limit(50)
             ->get() ?? [];
         return \collect(['posts' => $posts]);
     }
@@ -48,6 +49,7 @@ class PostController extends Controller
         $admin_role = Role::find((int)\getSetting('admin_role'));
         if (!$this->auth_user()->hasRole($admin_role)) {
             $post->createReference("posts_1", $this->auth_user()->id, $post->id);
+            $post->createReference("assessments_1", $this->auth_user()->id, $post->id);
         }
 
         return \response()->json(['post' => $post]);
@@ -58,6 +60,6 @@ class PostController extends Controller
         $admin_role = Role::find((int)\getSetting('admin_role'));
         $post->deleteReference("posts_1", !$this->auth_user()->hasRole($admin_role) ? $this->auth_user()->id : null, $post->id);
         $post->delete();
-        return \response()->json([], 204);
+        return \response()->json(["message" => "post was deleted successfully"], 204);
     }
 }

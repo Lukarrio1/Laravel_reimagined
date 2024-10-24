@@ -14,7 +14,7 @@ class Reference extends BaseModel
 
     public function items($types = [])
     {
-        $items = collect($types)->map(fn ($type) => $this->item($type));
+        $items = collect($types)->map(fn($type) => $this->item($type));
         return $items->toArray();
     }
 
@@ -33,12 +33,5 @@ class Reference extends BaseModel
         $id = $item->owned_id;
         $class = new $item->owned_model();
         return $class->find($id)->toArray();
-    }
-
-    public function setRelationShips($types=[])
-    {
-        \dd(Cache::get('references')
-            ->where('id', $this->id)
-            ->where('type', "friend"));
     }
 }
