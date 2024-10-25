@@ -22,16 +22,16 @@ class ImportController extends Controller
     public function index()
     {
         return view('Import.View', [
-            'table_names' => empty(\request('database')) ? [] : $this->export->getAllTables(\request('database')),
-            'databases' => collect(Cache::get('settings'))
-                ->where('key', 'database_configuration')->first()
-                ->getSettingValue()->keys()
+         'table_names' => empty(\request('database')) ? [] : $this->export->getAllTables(\request('database')),
+         'databases' => collect(Cache::get('settings'))
+          ?->where('key', 'database_configuration')?->first()
+          ?->getSettingValue()?->keys() ?? [],
         ]);
     }
     public function index_ajax()
     {
         return [
-            'table_names' => empty(\request('database')) ? [] : $this->export->getAllTables(\request('database')),
+         'table_names' => empty(\request('database')) ? [] : $this->export->getAllTables(\request('database')),
         ];
     }
 
@@ -39,13 +39,12 @@ class ImportController extends Controller
     {
 
         $export = new Export();
-
         $first_rules = [
-            'csv_file' => [
-                'required',
-                'file'
-            ],
-            'table_name' => ['required'],
+         'csv_file' => [
+          'required',
+          'file',
+         ],
+         'table_name' => ['required'],
         ];
 
         $validator = Validator::make($request->all(), $first_rules);
@@ -61,13 +60,13 @@ class ImportController extends Controller
 
         $table_columns = $export->getAllTableColumns($request->table_name, $request->database);
 
-        $table_validation = \collect(get_object_vars((object)$file_columns))
-            ->filter(fn ($key) => \in_array($key, \get_object_vars((object)$table_columns)))->count() <=
-            \count(\get_object_vars((object)$table_columns));
+        $table_validation = \collect(get_object_vars((object) $file_columns))
+         ->filter(fn ($key) => \in_array($key, \get_object_vars((object) $table_columns)))->count() <=
+        \count(\get_object_vars((object) $table_columns));
 
         if (!$table_validation) {
             return \redirect()->back()->withInput()->withErrors([
-                'csv_file' => 'The database table columns does not match the fields presented in the csv file.'
+             'csv_file' => 'The database table columns does not match the fields presented in the csv file.',
             ]);
         }
 
@@ -77,7 +76,7 @@ class ImportController extends Controller
 
         $table_data = $csv_data->filter(fn ($_, $index) => $index > 0)->map(function ($data, $key) use ($file_columns) {
             $temp = collect([]);
-            collect(\get_object_vars((object)$file_columns))->each(function ($column, $c_key) use ($temp, $data) {
+            collect(\get_object_vars((object) $file_columns))->each(function ($column, $c_key) use ($temp, $data) {
                 $temp->put($column, $data[$c_key]);
             });
             return $temp->toArray();
@@ -87,10 +86,9 @@ class ImportController extends Controller
             DB::connection($request->database)->table($request->table_name)->insert($table_data);
         } catch (\Throwable $th) {
             return \redirect()->back()->withInput()->withErrors([
-                'csv_file'
-                => isset(\explode(' in ', isset(\explode('(', $th)[0]) ? \explode('(', $th)[0] : [])[0]) ?
-                    \explode(' in ', isset(\explode('(', $th)[0]) ? \explode('(', $th)[0] : [])[0] : ''
-            ]);;
+             'csv_file' => isset(\explode(' in ', isset(\explode('(', $th)[0]) ? \explode('(', $th)[0] : [])[0]) ?
+             \explode(' in ', isset(\explode('(', $th)[0]) ? \explode('(', $th)[0] : [])[0] : ''
+            ]);
         }
         Session::flash('message', 'The data was imported successfully.');
         Session::flash('alert-class', 'alert-success');

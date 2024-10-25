@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-            ->getSettingValue('last'));
+            ->getSettingValue('last') ?? "file");
 
         if (!Cache::has('settings')) {
             Cache::add('settings', Setting::all());
@@ -84,7 +84,7 @@ class AppServiceProvider extends ServiceProvider
             $data_configurations = !empty($data_configurations) ? $data_configurations->getSettingValue() : [];
             collect($data_configurations)
                 ->keys()
-                ->each(fn($db) => $databases->put($db, $db));
+                ->each(fn ($db) => $databases->put($db, $db));
             Cache::add('setting_databases', $databases);
         }
         if (!Cache::has('setting_backup_databases')) {
