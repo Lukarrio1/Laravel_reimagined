@@ -32,10 +32,10 @@ class SettingController extends Controller
             = $setting->query()->latest('updated_at');
         $settings_count = $settings_for_display
             ->count();
-        $settings_for_display = $settings_for_display->when($search, fn($q) => $q->where('key', 'LIKE', '%' . $search . '%'))->get();
+        $settings_for_display = $settings_for_display->when($search, fn ($q) => $q->where('key', 'LIKE', '%' . $search . '%'))->get();
         $keys
             = collect($setting->getAllSettingKeys())
-            ->filter(fn($key, $idx) => \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
+            ->filter(fn ($key, $idx) => \request()->get('setting_key') == $idx || !\in_array($idx, $settings_for_display->pluck('key')->toArray()));
 
         $setting_key = empty(\request()->get('setting_key')) ? $keys->keys()->first() : \request()->get('setting_key');
         $field_value = optional(collect(Cache::get('settings')));
@@ -53,14 +53,13 @@ class SettingController extends Controller
 
     public function save(Request $request)
     {
-
         $validator = Validator::make($request->all(), ['value' => ['required'], 'setting_key' => ['required']]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        // $multi_tenancy_role_id = \optional(Setting::where('key', 'multi_tenancy_role')->first())->getSettingValue();
-        // $role_for_checking = !empty($setting) ? Role::find((int)$multi_tenancy_role_id) : null;
-        $value = \in_array($request->setting_key, ["allowed_login_roles", 'not_exportable_tables', 'database_backup_configuration']) ? \collect($request->value)->map(function ($item) {
+        $value =
+        \in_array($request->setting_key, ["allowed_login_roles", 'not_exportable_tables', 'database_backup_configuration']) ?
+        \collect($request->value)->map(function ($item) {
             return \collect(\explode(' ', $item))->join("--");
         })->join('|') : $request->value;
 
@@ -72,12 +71,7 @@ class SettingController extends Controller
         );
         Cache::forget('settings');
         Cache::forget('setting_allowed_login_roles');
-        Cache::set('settings', Setting::latest()->get());
         Cache::forget('setting_backup_databases');
-        $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
-        $database_backup_configuration = \optional(Setting::where('key', 'database_backup_configuration')->first())->getSettingValue('last') ?? \collect([]);
-        Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
-        Cache::add('database_backup_configuration', $database_backup_configuration->toArray());
         Session::flash('message', 'The setting value was saved successfully.');
         Session::flash('alert-class', 'alert-success');
         return \redirect()->route('viewSettings');
@@ -87,7 +81,7 @@ class SettingController extends Controller
     {
 
         $setting = Setting::where('key', $setting_key)->first();
-        $setting->delete();        // exportable_tables
+        $setting->delete();
         return \redirect()->route('viewSettings');
     }
 }

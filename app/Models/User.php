@@ -154,8 +154,7 @@ class User extends Authenticatable
 
     public function deleteInactiveUsers()
     {
-        $delete_inactive_users_after = (int) optional(collect(Cache::get('settings'))->where('key', 'delete_inactive_users')->first())
-            ->getSettingValue('last');
+        $delete_inactive_users_after = (int) getSetting('delete_inactive_users');
         if ($delete_inactive_users_after == 0) {
             return false;
         }

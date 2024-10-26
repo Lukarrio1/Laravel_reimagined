@@ -26,9 +26,10 @@ class ReferenceController extends Controller
             'reference' => null,
             'owners' => $owners ?? [],
             'owned_model_fields' => $owned_model_fields ?? [],
-            'types' => optional(collect(Cache::get('settings'))->where('key', 'reference_types')->first())->getSettingValue() ?? []
+            'types' => \getSetting('reference_types')
         ]);
     }
+
     public function index2()
     {
         $owner_model = \request()->get('owner_model');
@@ -49,7 +50,7 @@ class ReferenceController extends Controller
             'owners' => $owners ?? [],
             'owned' => $owned,
             'owned_model_fields' => $owned_model_fields ?? [],
-            'types' => optional(collect(Cache::get('settings'))->where('key', 'reference_types')->first())->getSettingValue() ?? []
+            'types' => \getSetting('reference_types')
         ];
     }
 

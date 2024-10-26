@@ -87,19 +87,14 @@ class AuthMiddleware
      */
     protected function handleAuthLevelOne(Request $request, Closure $next, $token, $currentRouteNode)
     {
-        $app_auditing = (int) optional(collect(Cache::get('settings'))
-            ->where('key', 'app_auditing')->first())
-            ->getSettingValue('last');
+        $app_auditing = (int) getSetting('app_auditing');
 
         if (!$token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         $personalAccessToken = PersonalAccessToken::findToken($token);
-
         if ($personalAccessToken && $personalAccessToken->tokenable instanceof \App\Models\User) {
             Auth::setUser($personalAccessToken->tokenable);
-            // Cache::set('tenant_' . \auth()->id(), \request()->get('tenant'));
             $node_audit_message = empty($currentRouteNode) ? '' : \optional(\optional($currentRouteNode)->properties['value'])->node_audit_message;
             if ($app_auditing == 1) {
                 Audit::create(
@@ -111,7 +106,7 @@ class AuthMiddleware
                 );
             }
             // Check admin role
-            $adminRoleId = optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
+            $adminRoleId = \getSetting('admin_role');
             $adminRole = $adminRoleId ? Role::find($adminRoleId) : null;
 
             if ($adminRole && request()->user()->hasRole(optional($adminRole)->name)) {

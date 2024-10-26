@@ -35,34 +35,40 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        Config::set('cache.default', \optional(Setting::where('key', 'cache_driver')->first())
-            ->getSettingValue('last') ?? "file");
+        $cache_driver = Setting::where('key', 'cache_driver')->first() ?? "file";
+        if (!empty($cache_driver)) {
+            $cache_driver = $cache_driver->getSettingValue('last');
+        }
+        Config::set('cache.default', $cache_driver);
 
         if (!Cache::has('settings')) {
             Cache::add('settings', Setting::all());
         }
 
         if (!Cache::has('redirect_to_options')) {
-            $links =  Node::query()->where('node_type', 2)->get()->map(function ($item) {
+            $links =  Node::query()
+            ->where('node_type', 2)
+            ->get()
+            ->map(function ($item) {
                 $temp = \collect([]);
                 $temp->put('name', $item->name);
                 $temp->put('route', $item->properties['value']->node_route);
                 return $temp->toArray();
-            })->pluck('route', 'name');
+            })
+            ->pluck('route', 'name');
             Cache::add('redirect_to_options', $links);
         }
-
         $setting = collect(Cache::get('settings'));
         $mail_config = [
-            \strtolower('MAIL_HOST') =>  \optional($setting->where('key', 'mail_host')->first())->properties,
-            \strtolower('MAIL_PORT') =>  \optional($setting->where('key', 'mail_port')->first())->properties,
-            \strtolower('MAIL_USERNAME') =>  \optional($setting->where('key', 'mail_username')->first())->properties,
-            \strtolower('MAIL_PASSWORD') =>  \optional($setting->where('key', 'mail_password')->first())->properties,
-            \strtolower('MAIL_ENCRYPTION') =>  \optional($setting->where('key', 'mail_encryption')->first())->properties,
-            \strtolower('MAIL_FROM_ADDRESS') => \optional($setting->where('key', 'mail_from_address')->first())->properties,
-            \strtolower('MAIL_FROM_NAME') =>  \optional($setting->where('key', 'mail_from_name')->first())->properties,
-            'mail_url' =>  \optional($setting->where('key', 'mail_url')->first())->properties,
-            'transport' => \optional($setting->where('key', 'mail_mailer')->first())->properties
+            \strtolower('MAIL_HOST') =>  \getSetting('mail_host'),
+            \strtolower('MAIL_PORT') =>  \getSetting('mail_port'),
+            \strtolower('MAIL_USERNAME') => \getSetting('mail_username'),
+            \strtolower('MAIL_PASSWORD') =>  \getSetting('mail_password'),
+            \strtolower('MAIL_ENCRYPTION') => \getSetting('mail_encryption'),
+            \strtolower('MAIL_FROM_ADDRESS') => \getSetting('mail_from_address'),
+            \strtolower('MAIL_FROM_NAME') =>  \getSetting('mail_from_name'),
+            'mail_url' =>  \getSetting('mail_url'),
+            'transport' => \getSetting('mail_mailer')
         ];
         Config::set('mail', $mail_config);
 
@@ -70,30 +76,22 @@ class AppServiceProvider extends ServiceProvider
             Cache::set('roles', Role::all()->pluck('id', 'name'));
         }
 
-
-
         if (!Cache::has('setting_allowed_login_roles')) {
-            $allowed_login_roles = \optional(Setting::where('key', 'allowed_login_roles')->first())->getSettingValue('last') ?? \collect([]);
+            $allowed_login_roles = \getSetting("allowed_login_roles") ?? \collect([]);
             Cache::add('setting_allowed_login_roles', $allowed_login_roles->toArray());
         }
 
         if (!Cache::has('setting_databases')) {
             $databases = collect([]);
-            $data_configurations = Cache::get('settings', collect([]))
-                ->where('key', 'database_configuration')->first();
-            $data_configurations = !empty($data_configurations) ? $data_configurations->getSettingValue() : [];
+            $data_configurations = \getSetting('database_configuration') ?? [];
             collect($data_configurations)
                 ->keys()
                 ->each(fn ($db) => $databases->put($db, $db));
             Cache::add('setting_databases', $databases);
         }
-        if (!Cache::has('setting_backup_databases')) {
-            $item =  collect(Cache::get('settings'))
-                ->where('key', 'database_backup_configuration')->first() ?? [];
-            if (!empty($item)) {
-                $item = gettype($item) == "array" ? [] : $item->getSettingValue()->toArray();
-            }
 
+        if (!Cache::has('setting_backup_databases')) {
+            $item = \getSetting('database_backup_configuration') ?? [];
             Cache::add('setting_backup_databases', $item);
         }
 
@@ -103,16 +101,13 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
             Cache::add('routes', $nodes);
         }
-
         if (!Cache::has('references')) {
             Cache::add('references', ReferenceConfig::query()
-                ->whereIn('type', optional(collect(Cache::get('settings'))
-                    ->where('key', 'reference_types')->first())->getSettingValue() ?? collect([]))
+                ->whereIn('type', \getSetting('reference_types') ?? collect([]))
                 ->distinct('type')
                 ->get());
         }
-        \collect(optional(collect(Cache::get('settings'))
-            ->where('key', 'reference_types')->first())->getSettingValue())
+        \collect(\getSetting('reference_types'))
             ->each(function ($ref) {
                 $rel_type = collect(\explode('_', $ref));
                 $ref = Cache::get('references')->where('type', $ref)->first();
@@ -126,7 +121,6 @@ class AppServiceProvider extends ServiceProvider
                         return $owner_model->$has_many($owned_model, Reference::class, 'owner_id', 'id', 'id', 'owned_id')
                             ->where('references.type', $ref->type);
                     });
-
                     // creates the reverse of the owned relationship
                     $owned_model::resolveRelationUsing($rel_type->first() . "_owner", function ($owned_model) use ($owner_model, $has_many, $ref) {
                         return $owned_model->hasOneThrough($owner_model, Reference::class, 'owned_id', 'id', 'id', 'owner_id')
@@ -136,14 +130,11 @@ class AppServiceProvider extends ServiceProvider
             });
 
         \collect(
-            optional(collect(Cache::get('settings'))
-                ->where('key', 'database_configuration')->first())
-                ->getSettingValue()
-        )
+            \getSetting('database_configuration')
+        )->filter(function ($item) {
+            return !empty($item->get('DB_CONNECTION') ?? '');
+        })
             ->each(function ($item, $key) {
-                if (empty($item) || empty($key)) {
-                    return false;
-                }
                 try {
                     Config::set("database.connections.{$key}", [
                         'driver'    => $item->get('DB_CONNECTION') ?? "mysql",
@@ -161,7 +152,6 @@ class AppServiceProvider extends ServiceProvider
 
                 }
             });
-
 
         (new User())->deleteInactiveUsers();
     }

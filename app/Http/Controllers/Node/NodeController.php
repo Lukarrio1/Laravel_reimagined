@@ -36,8 +36,6 @@ class NodeController extends Controller
 
     public function index($node = null)
     {
-
-
         $translate = [
             'name' => 'name',
             'description' => 'small_description',
@@ -67,7 +65,7 @@ class NodeController extends Controller
 
         // Parse the search parameter from the request and create key-value pairs
         $searchParams = empty(request()->get('search')) ? \collect([]) : collect(explode('|', request()->get('search')))
-            ->filter(fn($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -77,8 +75,8 @@ class NodeController extends Controller
         $nodes_count_overall = $nodes->count();
 
         $searchParams->when(
-            $searchParams->filter(fn($val) => \count($val) > 1)->count() > 0,
-            fn($collection) => $collection->each(function ($section) use ($nodes, $translate) {
+            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
+            fn ($collection) => $collection->each(function ($section) use ($nodes, $translate) {
                 list($key, $value) = $section;
                 // Check if the key is valid in the translation map
                 if (!isset($translate[$key])) {
@@ -99,8 +97,8 @@ class NodeController extends Controller
         $nodes  = $nodes->with(['permission']);
         $node_count = $nodes->get()->when(
             !$this->auth_user()->hasPermissionTo('can crud data bus nodes'),
-            fn($collection) => $collection->filter(
-                fn($item) => !isset($item->properties['value']->node_database)
+            fn ($collection) => $collection->filter(
+                fn ($item) => !isset($item->properties['value']->node_database)
                     &&   !isset($item->properties['value']->node_endpoint_to_consume)
             )
         )->count();
@@ -117,13 +115,13 @@ class NodeController extends Controller
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $node_count,
             'nodes' => $nodes->latest("updated_at")->with('permission')->customPaginate(8, (int)\request()->get('page'))->get()
-                ->when($node, fn($collection) => \collect([
+                ->when($node, fn ($collection) => \collect([
                     $node,
-                    ...$collection->filter(fn($item) => \optional($item)->id != $node->id)
+                    ...$collection->filter(fn ($item) => \optional($item)->id != $node->id)
                 ]))->when(
                     !$this->auth_user()->hasPermissionTo('can crud data bus nodes'),
-                    fn($collection) => $collection->filter(
-                        fn($item) => !isset($item->properties['value']->node_database)
+                    fn ($collection) => $collection->filter(
+                        fn ($item) => !isset($item->properties['value']->node_database)
                             &&   !isset($item->properties['value']->node_endpoint_to_consume)
                     )
                 ),
@@ -236,7 +234,7 @@ class NodeController extends Controller
         ])
             ->updatePageLayoutName()
             ->updatePageLink();
-
+        \defer(fn () => (new CacheController())->clearCache());
 
         return \redirect()->route('viewNodes');
     }
@@ -253,7 +251,7 @@ class NodeController extends Controller
         $display_aid = \request('display_aid');
         // getColumnListing
         $tables = $database != "null" ? collect(DB::connection($database)->select('SHOW TABLES'))
-            ->map(fn($value) => \array_values((array) $value))
+            ->map(fn ($value) => \array_values((array) $value))
             ->flatten() : [];
         $columns = !isset($table) || $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
@@ -307,6 +305,8 @@ class NodeController extends Controller
             'page' => \request('page'),
             'search' =>  request()->get('search')
         ]);
+
+        \defer(fn () => (new CacheController())->clearCache());
         return \redirect()->route('viewNodes');
     }
 }

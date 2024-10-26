@@ -23,9 +23,9 @@ class Controller extends BaseController
     use SendEmailTrait;
 
     protected $cache_ttl = 0;
-    protected  $search_skip_word;
-    protected  $data_interoperability;
-    protected  $admin_role;
+    protected $search_skip_word;
+    protected $data_interoperability;
+    protected $admin_role;
 
     public function __construct()
     {
@@ -68,7 +68,7 @@ class Controller extends BaseController
     {
         $keys = collect($properties)->keys();
         $object = collect([]);
-        $keys->each(fn($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
+        $keys->each(fn ($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
         return $object->toArray();
     }
     /**
@@ -243,7 +243,7 @@ class Controller extends BaseController
                 ->select($rel['columns'])
                 ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
                 ->orderBy($rel['second_value'])
-                ->when($rel['one_or_many'] == 2, fn($q) => $q->limit(1))
+                ->when($rel['one_or_many'] == 2, fn ($q) => $q->limit(1))
                 ->chunk(500, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level, $rel) {
                     $allRelatedItems = $allRelatedItems->merge($relatedItems);
                     if ($rel['one_or_many'] == 3) {
