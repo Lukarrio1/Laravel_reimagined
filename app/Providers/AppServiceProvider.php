@@ -35,10 +35,12 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        $cache_driver = Setting::where('key', 'cache_driver')->first() ?? "file";
+        $cache_driver = Setting::where('key', 'cache_driver')->first();
         if (!empty($cache_driver)) {
             $cache_driver = $cache_driver->getSettingValue('last');
-        }
+        }else{
+            $cache_driver="file";
+            }
         Config::set('cache.default', $cache_driver);
 
         if (!Cache::has('settings')) {
