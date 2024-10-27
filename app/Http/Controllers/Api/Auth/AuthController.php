@@ -18,6 +18,24 @@ use App\Http\Requests\Api\Auth\PasswordUpdateRequest;
 
 class AuthController extends Controller
 {
+    protected function processVerificationEmail($email)
+    {
+        $client_app_url = \getSetting('client_app_url');
+        $verification_front_end_link = \explode('/', \optional(optional(Node::where('uuid', 'yuUkEHFptRPqzkBdOosQPeU5yeKbycDcE2qPvmr8LhIb6OmlYE')->first()->properties)['value'])->node_route);
+        $email_token = Str::random(30);
+        $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
+            ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
+            ->join('/') . '/' . $email_token;
+        \defer(fn () =>   $this->sendEmail(
+            $email,
+            "Email Verification",
+            "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
+        ));
+
+
+
+    }
+
     public function register(RegisterRequest $request)
     {
         $token = Str::random(50);
@@ -26,17 +44,7 @@ class AuthController extends Controller
         $api_email_verification = (int) \getSetting('api_email_verification');
         $email_token = '';
         if ($api_email_verification == 1) {
-            $client_app_url = \getSetting('client_app_url');
-            $verification_front_end_link = \explode('/', \optional(optional(Node::where('uuid', 'yuUkEHFptRPqzkBdOosQPeU5yeKbycDcE2qPvmr8LhIb6OmlYE')->first()->properties)['value'])->node_route);
-            $email_token = Str::random(30);
-            $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
-                ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
-                ->join('/') . '/' . $email_token;
-            \defer(fn () =>   $this->sendEmail(
-                $request->email,
-                "Email Verification",
-                "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
-            ));
+            $this->processVerificationEmail($request->email);
         }
         $role = !empty($setting) ? Role::find($setting) : null;
         $user = User::create($request->except('password') + [
@@ -80,12 +88,10 @@ class AuthController extends Controller
         return response()->json(['message' => "You've updated your password successfully."]);
     }
 
-
-
     public function login(LoginRequest $request)
     {
         $user = User::query()->whereEmail($request->email)->first();
-        $api_email_verification = (bool) \getSetting('api_email_verification');
+        $api_email_verification = (int) \getSetting('api_email_verification');
         // no record found
         if (empty($user)) {
             return response()->json(['message' => 'Invalid Credentials'], 401);
@@ -103,7 +109,8 @@ class AuthController extends Controller
             return  \response()->json(['token' => $token, 'user' => $user]);
         }
         //if empty the user needs to verify email address
-        if (!empty($user->email_verification_token)) {
+        if (empty($user->email_verified_at)) {
+            $this->processVerificationEmail($user->email);
             return response()
                    ->json([
                     'message' => 'Please verify your email address, an email was sent to your email address when registered.'

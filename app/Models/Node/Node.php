@@ -144,7 +144,7 @@ class Node extends BaseModel
     {
         $value = \collect($value);
         if (\in_array($this->node_type['value'], [1])) {
-            $app_url = getSetting('app_url');
+            $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
             $seg = $this->node_type['value'] == 2 ? '/' : '/api/';
             $value = $value->put('node_route', $app_url . $seg . $value->get('node_route'));
         }
