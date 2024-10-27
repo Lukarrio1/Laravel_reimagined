@@ -23,19 +23,16 @@ class AuthController extends Controller
         $token = Str::random(50);
         $setting = \optional(Cache::get('settings', \collect([]))->where('key', 'registration_role')->first())
             ->getSettingValue();
-        $api_email_verification = (int) \optional(Cache::get('settings', \collect([]))
-            ->where('key', 'api_email_verification')->first())
-            ->getSettingValue();
+        $api_email_verification = (int) \getSetting('api_email_verification');
         $email_token = '';
         if ($api_email_verification == 1) {
-            $client_app_url = \optional(Cache::get('settings', \collect([]))->where('key', 'client_app_url')->first())
-                ->getSettingValue();
+            $client_app_url = \getSetting('client_app_url');
             $verification_front_end_link = \explode('/', \optional(optional(Node::where('uuid', 'yuUkEHFptRPqzkBdOosQPeU5yeKbycDcE2qPvmr8LhIb6OmlYE')->first()->properties)['value'])->node_route);
             $email_token = Str::random(30);
             $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
-                ->filter(fn($_, $idx) => 1 + $idx != \count($verification_front_end_link))
+                ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
                 ->join('/') . '/' . $email_token;
-            \defer(fn() =>   $this->sendEmail(
+            \defer(fn () =>   $this->sendEmail(
                 $request->email,
                 "Email Verification",
                 "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
@@ -66,7 +63,7 @@ class AuthController extends Controller
             $token = Str::random(50);
             $user->update(['password_reset_token' => $token]);
             $route = "/per/{$token}";
-            \defer(fn() => $this->sendEmail($request->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>"));
+            \defer(fn () => $this->sendEmail($request->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>"));
         }
         return \response()->json(['message' => "An email was sent to the provided email address"]);
     }
@@ -78,29 +75,42 @@ class AuthController extends Controller
         if (!empty($user)) {
             $token = Str::random(50);
             $user->update(['password' => Hash::make($request->password), 'password_reset_token' => $token]);
-            \defer(fn() =>   $this->sendEmail($email, 'Password Update', 'Your password was updated successfully'));
+            \defer(fn () =>   $this->sendEmail($email, 'Password Update', 'Your password was updated successfully'));
         }
         return response()->json(['message' => "You've updated your password successfully."]);
     }
+
+
 
     public function login(LoginRequest $request)
     {
         $user = User::query()->whereEmail($request->email)->first();
         $api_email_verification = (bool) \getSetting('api_email_verification');
-        if (!empty($user)) {
-            if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
-                User::find($user->id)->update(['last_login_at' => Carbon::now()]);
-                if ($api_email_verification == 1) {
-                    return !empty($user->email_verification_token) ?
-                        \response()->json(['token' => $token, 'user' => $user]) :
-                        response()->json(['message' => 'Please verify your email address,
-                    an email was sent to your email address when registered.'], 401);
-                }
-                return \response()->json(['token' => $token, 'user' => $user]);
-            }
+        // not record found
+        if (empty($user)) {
+            return response()->json(['message' => 'Invalid Credentials'], 401);
         }
-        return response()->json(['message' => 'Invalid Credentials'], 401);
+        // password mismatch
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid Credentials'], 401);
+        }
+
+        User::find($user->id)->update(['last_login_at' => Carbon::now()]);
+
+        $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
+        // email verification check
+        if ($api_email_verification == 0) {
+            return  \response()->json(['token' => $token, 'user' => $user]);
+        }
+        //if empty the user needs to verify email address
+        if (!empty($user->email_verification_token)) {
+            return response()
+                   ->json([
+                    'message' => 'Please verify your email address, an email was sent to your email address when registered.'
+                ], 401);
+        }
+
+        return \response()->json(['token' => $token, 'user' => $user]);
     }
 
     public function verifyEmail($token)
