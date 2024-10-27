@@ -86,7 +86,7 @@ class AuthController extends Controller
     {
         $user = User::query()->whereEmail($request->email)->first();
         $api_email_verification = (bool) \getSetting('api_email_verification');
-        // not record found
+        // no record found
         if (empty($user)) {
             return response()->json(['message' => 'Invalid Credentials'], 401);
         }

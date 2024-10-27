@@ -128,14 +128,13 @@ class Node extends BaseModel
 
     public function getPropertiesAttribute($value)
     {
-        // An item
         return [
             'value' => $this->addAppUrlToNodeRoute(\json_decode($value)),
             'html_value' => "<ul class='list-group list-group-flush'>" . \collect($this->addAppUrlToNodeRoute(json_decode($value)))->map(
                 function ($value, $key) {
                     $value = gettype($value) == 'array' ? \json_encode($value) : (\count(\explode('_object_or_array_or_count', $key)) > 1 ? $this->object_array_count[$value] : $value);
                     return "<li class='list-group-item'>" . collect(\explode('_', $key))
-                        ->map(fn($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
+                        ->map(fn ($word) => \ucfirst($word))->join(' ') . "<strong>:</strong> $value </li>";
                 }
             )->join('') . '</ul>'
         ];
@@ -145,7 +144,7 @@ class Node extends BaseModel
     {
         $value = \collect($value);
         if (\in_array($this->node_type['value'], [1])) {
-            $app_url = \collect(Cache::get('settings'))->where('key', 'app_url')->pluck('properties')->first();
+            $app_url = getSetting('app_url');
             $seg = $this->node_type['value'] == 2 ? '/' : '/api/';
             $value = $value->put('node_route', $app_url . $seg . $value->get('node_route'));
         }
@@ -164,7 +163,7 @@ class Node extends BaseModel
         $verbiage = collect([]);
         collect(\explode('||', $value))->map(function ($item) use ($verbiage) {
             $segments = collect(\explode(':', $item));
-            $verbiage->put($segments->first(), \str_replace('"', '', $segments->filter(fn($_, $idx) => $idx > 0)->join(':')));
+            $verbiage->put($segments->first(), \str_replace('"', '', $segments->filter(fn ($_, $idx) => $idx > 0)->join(':')));
         });
         return ['value' => $value, 'human_value' => $verbiage];
     }
