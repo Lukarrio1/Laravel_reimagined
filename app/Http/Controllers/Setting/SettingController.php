@@ -74,6 +74,8 @@ class SettingController extends Controller
         Cache::forget('setting_backup_databases');
         Session::flash('message', 'The setting value was saved successfully.');
         Session::flash('alert-class', 'alert-success');
+        \defer(fn () => (new CacheController())->clearCache());
+
         return \redirect()->route('viewSettings');
     }
 

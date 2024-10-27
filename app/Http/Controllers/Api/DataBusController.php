@@ -55,7 +55,7 @@ class DataBusController extends Controller
         $node_cache_ttl = $currentRouteNode->properties['value']->node_cache_ttl ?? 0;
         $id = request()->user()->id ?? null;
         $cache_name
-            = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
+            = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn ($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
         if (!Cache::has($cache_name)) {
             if ($database != null && $table != null) {
                 $item =  DB::connection($database)
@@ -64,7 +64,7 @@ class DataBusController extends Controller
                 if (isset($currentRouteNode->properties['value']->node_item)) {
                     $item->where('id', $currentRouteNode->properties['value']->node_item);
                 } else {
-                    $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, "LIKE", "%" . $value . "%")));
+                    $route_parameters->each(fn ($value, $key) => $item->when($value != $this->search_skip_word, fn ($q) => $q->where($key, "LIKE", "%" . $value . "%")));
                 }
                 $relationShips = $this->handleJoins($currentRouteNode);
                 if (count($relationShips) > 0) {
@@ -87,6 +87,55 @@ class DataBusController extends Controller
      *
      * @return JsonResponse
      */
+    public function manyRecords2($method): JsonResponse
+    {
+        $currentRouteNode = $this->getCurrentRoute();
+        $route_parameters = \collect(Route::current()->parameters());
+        if (!$currentRouteNode) {
+            return response()->json([]);
+        }
+        $properties = $currentRouteNode->properties['value'];
+        $database = optional($properties)->node_database;
+        $table = optional($properties)->node_table;
+        $columns = optional($properties)->node_table_columns ?? ['*'];
+        $limit = (int) optional($properties)->node_data_limit;
+        $orderByField = optional($properties)->node_order_by_field;
+        $orderByType = optional($properties)->node_order_by_type;
+        $node_cache_ttl = optional($properties)->node_cache_ttl ?? 0;
+        $id = request()->user()->id ?? null;
+        $cache_name
+            = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn ($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
+        $items = [];
+        if (!Cache::has($cache_name)) {
+            if (!$database || !$table) {
+                return response()->json([]);
+            }
+            $query = DB::connection($database)
+                ->table($table)
+                ->select($columns);
+
+            if ($limit > 0) {
+                $query->limit($limit);
+            }
+            if ($orderByField && $orderByType) {
+                $query->orderBy($orderByField, $orderByType);
+            }
+            if ($route_parameters->count() > 0) {
+                $route_parameters->each(fn ($value, $key) => $query->when($value != $this->search_skip_word, fn ($q) => $q->where($key, "LIKE", "%" . $value . "%")));
+            }
+            $items = $query->get();
+
+            $relationShips = $this->handleJoins($currentRouteNode);
+            if (count($relationShips) > 0) {
+                $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
+            }
+            Cache::add($cache_name, $items, $node_cache_ttl);
+        } else {
+            $items = Cache::get($cache_name);
+        }
+        return \response()->json($items, 200);
+    }
+
     public function manyRecords($method): JsonResponse
     {
         $currentRouteNode = $this->getCurrentRoute();
@@ -104,15 +153,15 @@ class DataBusController extends Controller
         $node_cache_ttl = optional($properties)->node_cache_ttl ?? 0;
         $id = request()->user()->id ?? null;
         $cache_name
-            = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
-        $items = [];
-        if (!Cache::has($cache_name)) {
-            if (!$database || !$table) {
-                return response()->json([]);
-            }
+            = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn ($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
+
+        $items = Cache::flexible($cache_name, [5,$node_cache_ttl], function () use ($database, $table, $columns, $limit, $orderByField, $orderByType, $route_parameters, $currentRouteNode) {
             $query = DB::connection($database)
-                ->table($table)
-                ->select($columns);
+                           ->table($table)
+                           ->select($columns);
+            if (!$database || !$table) {
+                return [];
+            }
 
             if ($limit > 0) {
                 $query->limit($limit);
@@ -121,7 +170,7 @@ class DataBusController extends Controller
                 $query->orderBy($orderByField, $orderByType);
             }
             if ($route_parameters->count() > 0) {
-                $route_parameters->each(fn($value, $key) => $query->when($value != $this->search_skip_word, fn($q) => $q->where($key, "LIKE", "%" . $value . "%")));
+                $route_parameters->each(fn ($value, $key) => $query->when($value != $this->search_skip_word, fn ($q) => $q->where($key, "LIKE", "%" . $value . "%")));
             }
             $items = $query->get();
 
@@ -129,12 +178,13 @@ class DataBusController extends Controller
             if (count($relationShips) > 0) {
                 $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
             }
-            Cache::add($cache_name, $items, $node_cache_ttl);
-        } else {
-            $items = Cache::get($cache_name);
-        }
+            return $items;
+
+        });
+
         return \response()->json($items, 200);
     }
+
 
 
     /**
@@ -158,7 +208,7 @@ class DataBusController extends Controller
             if (isset($currentRouteNode->properties['value']->node_item)) {
                 $item->where('id', $currentRouteNode->properties['value']->node_item);
             } else {
-                $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
+                $route_parameters->each(fn ($value, $key) => $item->when($value != $this->search_skip_word, fn ($q) => $q->where($key, $value)));
             }
             $item = $item->first();
         } else {
@@ -182,7 +232,7 @@ class DataBusController extends Controller
         if ($database != null && $table != null) {
             $item =  DB::connection($database)
                 ->table($table);
-            $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
+            $route_parameters->each(fn ($value, $key) => $item->when($value != $this->search_skip_word, fn ($q) => $q->where($key, $value)));
             $item->delete();
         } else {
             $item = null;
@@ -255,7 +305,7 @@ class DataBusController extends Controller
         if ($database != null && $table != null) {
             $query =  DB::connection($database)
                 ->table($table);
-            $route_parameters->each(fn($value, $key) => $query->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
+            $route_parameters->each(fn ($value, $key) => $query->when($value != $this->search_skip_word, fn ($q) => $q->where($key, $value)));
             $query->update($data);
             $item =
                 DB::connection($database)
@@ -296,7 +346,7 @@ class DataBusController extends Controller
                 return $temp;
             })->filter(function ($item) use ($route_parameters) {
                 return count($route_parameters) > 0 ? $route_parameters
-                    ->filter(fn($rp, $key) => Str::contains(Str::lower($item[$key]), Str::lower($route_parameters->get($key))))
+                    ->filter(fn ($rp, $key) => Str::contains(Str::lower($item[$key]), Str::lower($route_parameters->get($key))))
                     ->count() > 0 : true;
             })
             ->all();
