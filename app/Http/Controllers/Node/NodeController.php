@@ -134,8 +134,8 @@ class NodeController extends Controller
             'nodes_count_overall' => $nodes_count_overall,
             "data_interoperability" => $this->data_interoperability,
             "page_title" => $this->data_interoperability == true
-                ? "Routes, Pages, Links, Layouts, Components & Data Interoperability Management"
-                : "Routes, Pages, Links, Layouts and Components Management"
+                ? "Feature Flag & Data Interoperability Management"
+                : "Feature Flag Management"
         ]);
     }
 
