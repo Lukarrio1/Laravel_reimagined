@@ -30,6 +30,6 @@ return [
     /*
      | The minimum content length that we apply the gZip
      */
-    'minimum_content_length' => 0,
+    'minimum_content_length' => 20,
 
 ];

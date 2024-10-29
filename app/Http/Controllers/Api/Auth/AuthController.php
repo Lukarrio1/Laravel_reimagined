@@ -42,7 +42,7 @@ class AuthController extends Controller
         ]);
 
         if (!empty($role)) {
-            \defer(fn () => $user->assignRole($role));
+            $user->assignRole($role);
         }
 
         $token = $user->createToken($user->name . '_' . Carbon::now(), ['*'], Carbon::now()->addDays(6))->plainTextToken;
@@ -116,7 +116,10 @@ class AuthController extends Controller
     public function logout()
     {
         $user = $this->auth_user();
+        Cache::forget('auth_user_permissions_'.$user->id);
+        Cache::forget('auth_nodes_user_'.$user->id);
         $user->tokens()->delete();
+
         return response()->json(['message' => 'bye bye..'], 200);
 
     }

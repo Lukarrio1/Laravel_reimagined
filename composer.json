@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "erlandmuchasaj/laravel-gzip": "^1.1",
+        "genealabs/laravel-model-caching": "^11.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.0",

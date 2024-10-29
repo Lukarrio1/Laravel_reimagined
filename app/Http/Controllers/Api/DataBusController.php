@@ -87,7 +87,7 @@ class DataBusController extends Controller
      *
      * @return JsonResponse
      */
-    public function manyRecords2($method): JsonResponse
+    public function manyRecords($method): JsonResponse
     {
         $currentRouteNode = $this->getCurrentRoute();
         $route_parameters = \collect(Route::current()->parameters());
@@ -136,54 +136,54 @@ class DataBusController extends Controller
         return \response()->json($items, 200);
     }
 
-    public function manyRecords($method): JsonResponse
-    {
-        $currentRouteNode = $this->getCurrentRoute();
-        $route_parameters = \collect(Route::current()->parameters());
-        if (!$currentRouteNode) {
-            return response()->json([]);
-        }
-        $properties = $currentRouteNode->properties['value'];
-        $database = optional($properties)->node_database;
-        $table = optional($properties)->node_table;
-        $columns = optional($properties)->node_table_columns ?? ['*'];
-        $limit = (int) optional($properties)->node_data_limit;
-        $orderByField = optional($properties)->node_order_by_field;
-        $orderByType = optional($properties)->node_order_by_type;
-        $node_cache_ttl = optional($properties)->node_cache_ttl ?? 0;
-        $id = request()->user()->id ?? null;
-        $cache_name
-            = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn ($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
+    // public function manyRecords($method): JsonResponse
+    // {
+    //     $currentRouteNode = $this->getCurrentRoute();
+    //     $route_parameters = \collect(Route::current()->parameters());
+    //     if (!$currentRouteNode) {
+    //         return response()->json([]);
+    //     }
+    //     $properties = $currentRouteNode->properties['value'];
+    //     $database = optional($properties)->node_database;
+    //     $table = optional($properties)->node_table;
+    //     $columns = optional($properties)->node_table_columns ?? ['*'];
+    //     $limit = (int) optional($properties)->node_data_limit;
+    //     $orderByField = optional($properties)->node_order_by_field;
+    //     $orderByType = optional($properties)->node_order_by_type;
+    //     $node_cache_ttl = optional($properties)->node_cache_ttl ?? 0;
+    //     $id = request()->user()->id ?? null;
+    //     $cache_name
+    //         = $method . '_' . $database . '_' . $table . '_' .  $route_parameters->map(fn ($value, $key) => $key . '_' . Str::lower($value))->join('_') . "_user_" . $id;
 
-        $items = Cache::flexible($cache_name, [5,$node_cache_ttl], function () use ($database, $table, $columns, $limit, $orderByField, $orderByType, $route_parameters, $currentRouteNode) {
-            $query = DB::connection($database)
-                           ->table($table)
-                           ->select($columns);
-            if (!$database || !$table) {
-                return [];
-            }
+    //     $items = Cache::flexible($cache_name, [5,$node_cache_ttl], function () use ($database, $table, $columns, $limit, $orderByField, $orderByType, $route_parameters, $currentRouteNode) {
+    //         $query = DB::connection($database)
+    //                        ->table($table)
+    //                        ->select($columns);
+    //         if (!$database || !$table) {
+    //             return [];
+    //         }
 
-            if ($limit > 0) {
-                $query->limit($limit);
-            }
-            if ($orderByField && $orderByType) {
-                $query->orderBy($orderByField, $orderByType);
-            }
-            if ($route_parameters->count() > 0) {
-                $route_parameters->each(fn ($value, $key) => $query->when($value != $this->search_skip_word, fn ($q) => $q->where($key, "LIKE", "%" . $value . "%")));
-            }
-            $items = $query->get();
+    //         if ($limit > 0) {
+    //             $query->limit($limit);
+    //         }
+    //         if ($orderByField && $orderByType) {
+    //             $query->orderBy($orderByField, $orderByType);
+    //         }
+    //         if ($route_parameters->count() > 0) {
+    //             $route_parameters->each(fn ($value, $key) => $query->when($value != $this->search_skip_word, fn ($q) => $q->where($key, "LIKE", "%" . $value . "%")));
+    //         }
+    //         $items = $query->get();
 
-            $relationShips = $this->handleJoins($currentRouteNode);
-            if (count($relationShips) > 0) {
-                $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
-            }
-            return $items;
+    //         $relationShips = $this->handleJoins($currentRouteNode);
+    //         if (count($relationShips) > 0) {
+    //             $items = $this->addNestedRelationship($items, $currentRouteNode, $database);
+    //         }
+    //         return $items;
 
-        });
+    //     });
 
-        return \response()->json($items, 200);
-    }
+    //     return \response()->json($items, 200);
+    // }
 
 
 
