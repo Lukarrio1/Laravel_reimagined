@@ -18,6 +18,7 @@ $routes->each(function ($route) {
         return;
     }
     $method = strtolower($properties->route_method);
+
     $node_route = \collect(\explode('/', $properties->node_route))
         ->filter(function ($dt, $key) use ($properties) {
             if (array_search('api', \explode('/', $properties->node_route)) < $key) {
@@ -35,5 +36,8 @@ $routes->each(function ($route) {
 
 
     Route::$method($node_route, [$controller, $methodName])
-        ->middleware(AuthMiddleware::class);
+        ->middleware([
+            AuthMiddleware::class,
+            \ErlandMuchasaj\LaravelGzip\Middleware\GzipEncodeResponse::class
+        ]);
 });
