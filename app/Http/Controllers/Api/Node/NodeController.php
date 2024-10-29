@@ -10,15 +10,14 @@ use Illuminate\Support\Facades\Cache;
 
 class NodeController extends Controller
 {
-
-
     public function node($uuid): JsonResponse
     {
         $node = null;
         $cache_name = 'app_node_' . $uuid;
         if (!Cache::has($cache_name)) {
             $node = Node::where('uuid', $uuid)
-                ->get()->map(function ($n) {
+                ->get()
+                ->map(function ($n) {
                     $n->hasAccess = $n->authentication_level['value'] == 0 ||
                         !empty($n->permission) && !$this->auth_user()
                             ->hasPermissionTo(\optional($n->permission)->name)
@@ -83,7 +82,7 @@ class NodeController extends Controller
                         ]
                     ];
                     return $node;
-                })->each(fn($item) => $nodes->push($item));
+                })->each(fn ($item) => $nodes->push($item));
             Cache::set($cache_name, $nodes, $this->getCurrentMethodCacheTtl());
         } else {
             $nodes = Cache::get($cache_name);
@@ -110,7 +109,7 @@ class NodeController extends Controller
                     return true;
                 })
                 ->map(function ($node) {
-                    $node->hasAccess = !empty($node->permission_id) ||  $node->authentication_level['value'] == 1 ? false : true;
+                    $node->hasAccess = $node->authentication_level['value'] == 1 ? false : true;
                     $node = (object)[
                         ...$node->toArray(),
                         'properties' => [
@@ -118,10 +117,10 @@ class NodeController extends Controller
                         ]
                     ];
                     return $node;
-                })->each(fn($item) => $nodes->push($item));
+                })->each(fn ($item) => $nodes->push($item));
             Cache::set('guest_nodes', $nodes, $this->getCurrentMethodCacheTtl());
         } else {
-            Cache::get('guest_nodes')->each(fn($item) => $nodes->push($item));
+            Cache::get('guest_nodes')->each(fn ($item) => $nodes->push($item));
         }
         return \response()->json(['nodes' => $nodes]);
     }

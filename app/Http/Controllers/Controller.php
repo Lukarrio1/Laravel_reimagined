@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use ReflectionClass;
 use App\SendEmailTrait;
+use App\Models\Node\Node;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -257,5 +259,29 @@ class Controller extends BaseController
                 $allRelatedItems->toArray() : ($rel['one_or_many'] == 3 ?
                     $allRelatedItems->count() : $allRelatedItems->first());
         }
+    }
+
+    protected function updateUser($user, $properties = [])
+    {
+        User::find($user->id)->update($properties);
+        return User::find($user->id);
+
+    }
+
+    protected function processVerificationEmail($email)
+    {
+        $client_app_url = \getSetting('client_app_url');
+        $verification_front_end_link = \explode('/', \optional(optional(Node::where('uuid', 'yuUkEHFptRPqzkBdOosQPeU5yeKbycDcE2qPvmr8LhIb6OmlYE')->first()->properties)['value'])->node_route);
+        $email_token = Str::random(30);
+        $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
+            ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
+            ->join('/') . '/' . $email_token;
+
+        \defer(fn () => $this->sendEmail(
+            $email,
+            "Email Verification",
+            "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
+        ));
+        return $email_token;
     }
 }

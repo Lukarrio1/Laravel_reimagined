@@ -49,7 +49,8 @@ class AppServiceProvider extends ServiceProvider
 
         if (!Cache::has('redirect_to_options')) {
             $links =  Node::query()
-            ->where('node_type', 2)
+            ->enabled()
+            ->links()
             ->get()
             ->map(function ($item) {
                 $temp = \collect([]);
@@ -98,17 +99,19 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if (!Cache::has('routes')) {
-            $nodes = Node::where('node_status', 1)
-                ->where('node_type', 1)
+            $nodes = Node::enabled()
+                ->routes()
                 ->get();
             Cache::add('routes', $nodes);
         }
+
         if (!Cache::has('references')) {
             Cache::add('references', ReferenceConfig::query()
                 ->whereIn('type', \getSetting('reference_types') ?? collect([]))
                 ->distinct('type')
                 ->get());
         }
+
         \collect(\getSetting('reference_types'))
             ->each(function ($ref) {
                 $rel_type = collect(\explode('_', $ref));

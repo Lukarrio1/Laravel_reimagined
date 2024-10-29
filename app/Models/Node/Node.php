@@ -201,11 +201,44 @@ class Node extends BaseModel
         }
         return $this;
     }
-
-
-
     public function permission()
     {
         return $this->hasOne(Permission::class, 'id', 'permission_id');
+    }
+
+    public function scopeEnabled($query)
+    {
+        return $query->where('node_status', 1);
+    }
+
+
+    public function scopeNodeType($query, $type)
+    {
+        return $query->where('node_type', $type);
+    }
+
+    public function scopeRoutes($query)
+    {
+        return $query->nodeType(1);
+    }
+
+    public function scopeLinks($query)
+    {
+        return $query->nodeType(2);
+    }
+
+    public function scopePages($query)
+    {
+        return $query->nodeType(3);
+    }
+
+    public function scopeComponents($query)
+    {
+        return $query->nodeType(4);
+    }
+
+    public function scopeLayouts($query)
+    {
+        return $query->nodeType(4);
     }
 }
