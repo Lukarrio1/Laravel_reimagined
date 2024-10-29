@@ -18,7 +18,7 @@ return [
      | 5 is a perfect compromise between size and CPU
      */
 
-    'level' => env('GZIP_LEVEL', 8),
+    'level' => env('GZIP_LEVEL', 7),
 
     /*
      | This setting determines if debugbar is enabled or not

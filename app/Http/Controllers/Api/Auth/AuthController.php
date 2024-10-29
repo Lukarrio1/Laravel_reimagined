@@ -112,6 +112,15 @@ class AuthController extends Controller
         return \response()->json(['token' => $token, 'user' => $user]);
     }
 
+
+    public function logout()
+    {
+        $user = $this->auth_user();
+        $user->tokens()->delete();
+        return response()->json(['message' => 'bye bye..'], 200);
+
+    }
+
     public function verifyEmail($token)
     {
         $user = User::where('email_verification_token', $token)->first();
