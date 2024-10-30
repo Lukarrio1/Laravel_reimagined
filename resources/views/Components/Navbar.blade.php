@@ -10,8 +10,8 @@
          @auth
          @can('can crud nodes',auth()->user())
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewNodes'))? 'red' : 'black' }}" href="{{route('viewNodes')}}" aria-current="page">
-             {{ getSetting('data_interoperability')?"Flags & Interoperability "
-            : "Flags" }}
+             {{ getSetting('data_interoperability')?"Flags & Interoperability"
+            : "Feature Flags" }}
 
 
          </a>

@@ -26,14 +26,13 @@ class AuthController extends Controller
 
         $api_email_verification = (bool) \getSetting('api_email_verification') ?? false;
 
-        $email_token = '';
+
+        $email_token = Str::random(50);
 
         if ($api_email_verification) {
-            $email_token = $this->processVerificationEmail($request->email);
+            $this->processVerificationEmail($request->email);
         }
-
         $role = !empty($setting) ? Role::find($setting) : null;
-
         $user = User::create($request->except('password') + [
             'last_login_at' => Carbon::now(),
             'password' => Hash::make($request->password),
@@ -55,10 +54,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!empty($user)) {
-            $token = Str::random(50);
-            $this->updateUser($user, ['password_reset_token' => $token]);
-            $route = "/per/{$token}";
-            \defer(fn () => $this->sendEmail($request->email, 'Password Email', "Click <a href='$route'> here to reset your password.</a>"));
+            $this->processPasswordEmail($user->email, $user->password_reset_token);
         }
         return \response()->json(['message' => "An email was sent to the provided email address"]);
     }
@@ -66,8 +62,8 @@ class AuthController extends Controller
     public function resetPassword(PasswordUpdateRequest $request, $param)
     {
         $user = User::where('password_reset_token', $param)->first();
-        $email = $user->email;
         if (!empty($user)) {
+            $email = $user->email;
             $token = Str::random(50);
             $this->updateUser($user, ['password' => Hash::make($request->password), 'password_reset_token' => $token]);
             \defer(fn () =>   $this->sendEmail($email, 'Password Update', 'Your password was updated successfully'));
@@ -99,7 +95,9 @@ class AuthController extends Controller
         //if empty the user needs to verify email address
         if (empty($user->email_verified_at)) {
 
-            $email_token = $this->processVerificationEmail($user->email);
+            $email_token = Str::random(30);
+
+            $this->processVerificationEmail($user->email, $email_token);
 
             $this->updateUser($user, ['email_verification_token' => $email_token]);
 

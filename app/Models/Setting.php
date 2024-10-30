@@ -225,6 +225,10 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
+              'redirect_to_after_password_reset' => [
+                'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options', []), $key, $field_value),
+                'handle' => ['action' => 'split', 'value' => 'last'],
+            ],
         ]);
         return $keys->get($key);
     }
@@ -241,17 +245,17 @@ class Setting extends Model
             case 'multi_split':
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
-                    ->map(fn($item) => \collect(\explode('_', $item))
-                        ->filter(fn($item, $idx) =>  $idx == 0)
-                        ->map(fn($item) => \collect(\explode('--', $item))->join(' ')))
-                    ->flatten()->map(fn($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
-                    collect(\explode('|', $this->properties))->map(fn($item) => \collect(\explode('_', $item))
-                        ->filter(fn($item, $idx) =>  $idx > 0))->flatten();
+                    ->map(fn ($item) => \collect(\explode('_', $item))
+                        ->filter(fn ($item, $idx) =>  $idx == 0)
+                        ->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
+                    ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
+                    collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
+                        ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
                 break;
             case "magic_split":
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
-                    ->map(fn($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
+                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
                 break;
             case "config_split":
                 $value = !empty($value) ? $value : $key['value'];
@@ -268,7 +272,7 @@ class Setting extends Model
                         return [$outerKey => $innerArray];
                     });
                 $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode(',', $this->properties))
-                    ->map(fn($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
+                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
                     $else_val;
                 break;
             default:
@@ -280,8 +284,6 @@ class Setting extends Model
 
     public function getAllSettingKeys($key = "")
     {
-
-
         $keys = \collect([
             'admin_role' => "Super Admin Role",
             'registration_role' => 'Api Registration Role',
@@ -317,7 +319,8 @@ class Setting extends Model
             "database_backup" => "Database Backup (Weekly)",
             "cache_ttl"    =>   "Cache Time To Live (seconds)",
             "search_skip_word"    => "Search Skip Word (used to preserve a data interoperability route if the value of a parameter is empty when searching or filtering data)",
-            "data_interoperability" => "Data Interoperability"
+            "data_interoperability" => "Data Interoperability",
+            'redirect_to_after_password_reset' => "React router redirect to after password reset"
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {
