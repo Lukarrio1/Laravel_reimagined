@@ -22,7 +22,7 @@ class PostSeeder extends Seeder
                 'body' => Str::random(40),
                 'is_active' => \floor(\rand(0, 1))
             ]);
-            $post->createReference("posts_1", 36, $post->id);
+            createReference("posts_1", 36, $post->id);
         }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Node\Node;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 
 if (!function_exists('getSetting')) {
@@ -23,4 +25,36 @@ if (!function_exists('getSetting')) {
         ->where('key', $key)->first())
         ->getSettingValue($value) ?? $default_value;
     }
+}
+
+
+if (!function_exists('getNode')) {
+    /**
+    * Method getNode
+    *
+    * @param $uuid $uuid [ node uuid ]
+    * @return Node
+    */
+
+
+
+
+    function getNode($uuid = '', $property = '')
+    {
+        // Fetch the node using the UUID and ensure it's enabled
+        $node = Node::query()->enabled()->where('uuid', $uuid)->first();
+
+        // If no node is found, return an empty collection
+        if (empty($node)) {
+            return collect();
+        }
+
+        // Use Laravel's Arr::get to retrieve nested properties safely
+        $current_value = Arr::get($node, $property, null);
+
+        // Debug output to check the current value (you can remove this after testing)
+
+        return !empty($property) ? $current_value : $node;
+    }
+
 }
