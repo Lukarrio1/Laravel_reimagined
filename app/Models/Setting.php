@@ -173,6 +173,14 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
             ],
+            'brotli_compression_ratio' => [
+                'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
+            'gzip_compression_ratio' => [
+                'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ],
             'site_email_address' => [
                 'field' => $this->SETTING_OPTIONS('input_email', '', $key, $field_value),
                 'handle' => ['action' => '', 'value' => ''],
@@ -320,7 +328,9 @@ class Setting extends Model
             "cache_ttl"    =>   "Cache Time To Live (seconds)",
             "search_skip_word"    => "Search Skip Word (used to preserve a data interoperability route if the value of a parameter is empty when searching or filtering data)",
             "data_interoperability" => "Data Interoperability",
-            'redirect_to_after_password_reset' => "React router redirect to after password reset"
+            'redirect_to_after_password_reset' => "React router redirect to after password reset",
+            'brotli_compression_ratio' => "Brotli compression ration from 1 to 11",
+            'gzip_compression_ratio' => "Gzip compression ration from 1 to 9",
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

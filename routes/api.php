@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\CompressResponse;
 
 // Ensure routes are cache
 // Retrieve cached routes
@@ -38,6 +39,6 @@ $routes->each(function ($route) {
     Route::$method($node_route, [$controller, $methodName])
         ->middleware([
             AuthMiddleware::class,
-            \ErlandMuchasaj\LaravelGzip\Middleware\GzipEncodeResponse::class
+           CompressResponse::class
         ]);
 });
