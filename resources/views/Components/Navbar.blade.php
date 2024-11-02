@@ -35,6 +35,10 @@
          @can('can import', auth()->user())
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('importView'))? 'red' : 'black' }}" href="{{route('importView')}}">Import</a>
          @endcan
+         @can('can crud redirects', auth()->user())
+         <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('roleRedirects'))? 'red' : 'black' }}" href="{{route('roleRedirects')}}">Role Redirects</a>
+         @endcan
+
          @can('can crud tenant', auth()->user())
          @if($multi_tenancy==1)
          <a class="navbar-brand" style="color:{{request()->url()==URL::to(route('viewTenants'))? 'red' : 'black' }}" href="{{route('viewTenants')}}">Multi Tenancy</a>

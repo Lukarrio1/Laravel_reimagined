@@ -21,4 +21,5 @@ class DashboardController extends Controller
             'audit_history' => $audits->take($take)->get()
         ]);
     }
+
 }

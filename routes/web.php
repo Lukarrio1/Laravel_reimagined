@@ -16,6 +16,7 @@ use App\Http\Controllers\Export\ExportController;
 use App\Http\Controllers\Import\ImportController;
 use App\Http\Controllers\Tenant\TenantController;
 use App\Http\Controllers\Setting\SettingController;
+use App\Http\Controllers\Redirect\RedirectController;
 use App\Http\Controllers\Permission\PermissionController;
 
 Auth::routes();
@@ -66,16 +67,21 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::get('/references', [ReferenceController::class, 'index'])->name('viewReferences');
     Route::post('/reference', [ReferenceController::class, 'save'])->name('saveReference');
-    Route::get('/references_ajax',[ReferenceController::class, 'index2']);
+    Route::get('/references_ajax', [ReferenceController::class, 'index2']);
     Route::delete('/reference/{reference}', [ReferenceController::class, 'delete']);
-    $multi_tenancy = (int)optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
-        ->getSettingValue('first');
+    $multi_tenancy = (int) optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
+                    ->getSettingValue('first');
     if ($multi_tenancy == 1) {
         Route::get('/tenants', [TenantController::class, 'index'])->name('viewTenants');
         Route::get('/tenant/{tenant}', [TenantController::class, 'index'])->name('editTenant');
         Route::post('/tenant', [TenantController::class, 'save'])->name('updateOrCreateTenant');
         Route::delete('/tenant/{tenant}/delete', [TenantController::class, 'delete'])->name('deleteTenant');
     }
+
+    Route::get('/redirects', [RedirectController::class, 'index'])->name('roleRedirects');
+
+    Route::post('/redirect/save', [RedirectController::class, 'save'])->name('saveRedirects');
+
 
     Route::get('/', [DashboardController::class, 'index'])->name('home');
 });

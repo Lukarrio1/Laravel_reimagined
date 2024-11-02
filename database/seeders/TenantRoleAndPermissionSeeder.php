@@ -55,10 +55,14 @@ class TenantRoleAndPermissionSeeder extends Seeder
             ['core' => true, 'name' => 'can view last update api route dashboard component',],
             ['core' => true, 'name' => 'can create or update references',],
             ['core' => true, 'name' => 'can view references',],
+            ['core' => true, 'name' => 'can crud redirects',],
+            ['core' => true, 'name' => 'can view redirects',],
+            ['core' => true, 'name' => 'can edit redirects',],
+            ['core' => true, 'name' => 'can delete redirects',],
+            ['core' => true, 'name' => 'can create redirects',],
         ];
 
         // $role = ' api owner';
-
         // $role = Role::create(['name' => $role]);
         $super_admin = Role::create(['name' => "Super Admin", 'core' => true]);
 
@@ -71,10 +75,11 @@ class TenantRoleAndPermissionSeeder extends Seeder
         Setting::updateOrCreate(['key' => 'admin_role'], ['properties' => $super_admin->name . '_' . $super_admin->id]);
 
         $super_admin_user = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@test.com',
-            'password' => Hash::make('admin123')
+                    'name' => 'Admin',
+                    'email' => 'admin@test.com',
+                    'password' => Hash::make('admin123')
         ]);
         $super_admin_user->assignRole($super_admin);
     }
+
 }

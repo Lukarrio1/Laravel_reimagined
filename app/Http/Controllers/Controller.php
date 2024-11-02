@@ -82,6 +82,8 @@ class Controller extends BaseController
     {
         Artisan::call('cache:clear');
         Artisan::call('optimize');
+        Cache::set("is_cache_valid", Str::random(40));
+
     }
 
     /**

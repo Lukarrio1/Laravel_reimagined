@@ -79,7 +79,6 @@ class PermissionController extends Controller
         Permission::updateOrCreate(['id' => $request->id], $request->all() + ['guard' => 'api']);
         Session::flash('message', 'The permission was saved successfully.');
         Session::flash('alert-class', 'alert-success');
-
         return \redirect()->route('viewPermissions');
     }
 
