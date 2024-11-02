@@ -82,7 +82,7 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
 
     Route::post('/redirect/save', [RedirectController::class, 'save'])->name('saveRedirects');
 
-    Route::get('/redirect/{redirect}', [RedirectController::class, 'save'])->name('editRedirect');
+    Route::get('/redirect/{redirect}', [RedirectController::class, 'edit'])->name('editRedirect');
 
     Route::delete('/delete/redirect/{redirect}', [RedirectController::class, 'delete'])->name('deleteRedirect');
 

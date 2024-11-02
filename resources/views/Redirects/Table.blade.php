@@ -49,6 +49,15 @@
 
                         <td class="text-center">
                             <div class="text-bg-light p-3 fw-semibold">
+                                @can('can edit redirects',auth()->user())
+                                <a href="{{route('editRedirect',['redirect'=>$redirect])}}" class="btn btn-sm btn-warning m-2">
+                                    @if(isset($redirect_edit)&&optional($redirect_edit)->role_id ==$redirect->id)
+                                    <i class="fa fa-spinner" aria-hidden="true"></i>
+                                    @else
+                                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                                    @endif
+                                </a>
+                                @endcan
                                 @can('can delete redirects', auth()->user())
                                 <form action="{{route('deleteRedirect',['redirect'=>$redirect])}}" method="post">
                                     @csrf

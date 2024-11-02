@@ -12,7 +12,6 @@
                     @error('name')
                     <div style="color: red;">{{ $message }}</div>
                     @enderror
-
                 </div>
                 <div class="mb-3">
                     <label for="role_priority" class="form-label">Role priority</label>

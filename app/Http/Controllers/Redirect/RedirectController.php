@@ -16,7 +16,7 @@ class RedirectController extends Controller
         $this->middleware('can:can crud redirects');
     }
 
-    public function index($redirect = null)
+    public function index($redirect_edit = null)
     {
         $links =  Cache::get('role_base_redirects', collect([]));
         $roles = Cache::get('roles', []);
@@ -30,7 +30,7 @@ class RedirectController extends Controller
             $item->redirect_to_after_password_reset_name = $links->firstWhere('uuid', $item->redirect_to_after_password_reset)?->get('name');
             return $item;
         });
-        return view('Redirects.View', ['links' => $links,'roles' => $roles,'redirects' => $redirect_configs,'Redirect' => $redirect]);
+        return view('Redirects.View', ['links' => $links,'roles' => $roles,'redirects' => $redirect_configs,'redirect_edit' => $redirect_edit]);
     }
 
     public function save(SaveRequest $request)
@@ -44,7 +44,7 @@ class RedirectController extends Controller
 
     public function edit(Redirect $redirect)
     {
-        $this->index($redirect);
+        return $this->index($redirect);
     }
 
     public function delete(Redirect $redirect)
