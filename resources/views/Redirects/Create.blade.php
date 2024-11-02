@@ -11,6 +11,7 @@
                     <select class="form-select" name="role_id">
                         @foreach ($roles as $role=>$key )
                         <option value="{{$key}}">{{ $role }}</option>
+
                         @endforeach
                     </select>
                 </div>
@@ -50,10 +51,8 @@
                         @endforeach
                     </select>
                 </div>
-                <input type="hidden" value="{{ isset($redirect)?$redirect->id:'' }}" name="id" />
                 <div class="mb-3 text-center">
-                    <button type="submit" class="btn btn-">
-                        <i class="fa fa-wrench" aria-hidden="true"></i>
+                    <button type="submit" class="btn btn-primary">
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                     </button>
                 </div>

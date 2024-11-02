@@ -20,15 +20,17 @@ class RedirectController extends Controller
     {
         $links =  Cache::get('role_base_redirects', collect([]));
         $roles = Cache::get('roles', []);
-        $redirect_configs = Redirect::with('role:name,id')->get()->map(function ($item) use ($links) {
+        $redirect_configs = Redirect::with('role:name,id')
+        ->get()
+        ->map(function ($item) use ($links) {
             $links =  collect($links, []);
-            $item->redirect_to_after_login_name = $links->firstWhere('uuid', $item->redirect_to_after_login)->get('name');
-            $item->redirect_to_after_register_name = $links->firstWhere('uuid', $item->redirect_to_after_register)->get('name');
-            $item->redirect_to_after_logout_name = $links->firstWhere('uuid', $item->redirect_to_after_logout)->get('name');
-            $item->redirect_to_after_password_reset_name = $links->firstWhere('uuid', $item->redirect_to_after_password_reset)->get('name');
+            $item->redirect_to_after_login_name = $links->firstWhere('uuid', $item->redirect_to_after_login)?->get('name');
+            $item->redirect_to_after_register_name = $links->firstWhere('uuid', $item->redirect_to_after_register)?->get('name');
+            $item->redirect_to_after_logout_name = $links->firstWhere('uuid', $item->redirect_to_after_logout)?->get('name');
+            $item->redirect_to_after_password_reset_name = $links->firstWhere('uuid', $item->redirect_to_after_password_reset)?->get('name');
             return $item;
         });
-        return view('Redirects.View', ['links' => $links,'roles' => $roles,'redirects' => $redirect_configs,'redirect' => $redirect]);
+        return view('Redirects.View', ['links' => $links,'roles' => $roles,'redirects' => $redirect_configs,'Redirect' => $redirect]);
     }
 
     public function save(SaveRequest $request)
