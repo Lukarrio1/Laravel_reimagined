@@ -28,7 +28,7 @@ class SaveRequest extends FormRequest
             'redirect_to_after_login' => [ 'required' ],
             'redirect_to_after_register' => [ 'required' ],
             'redirect_to_after_logout' => [ 'required' ],
-            'redirect_to_after_password_reset' => [ 'required' ],
+            // 'redirect_to_after_password_reset' => [ 'required' ],
 
         ];
     }

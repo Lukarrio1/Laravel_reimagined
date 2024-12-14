@@ -29,7 +29,8 @@ class NodeController extends Controller
                         ]
                     ];
                     return $n;
-                })->first();
+                })
+                ->first();
             Cache::set($cache_name, $node, $this->getCurrentMethodCacheTtl());
         } else {
             $node = Cache::get($cache_name);
@@ -63,7 +64,8 @@ class NodeController extends Controller
                 ->get()
                 ->filter(function ($node) {
                     if ($node->node_type['value'] == 1) {
-                        if (isset($node->properties['value']->node_database) || isset($node->properties['value']->node_endpoint_to_consume)) {
+                        if (isset($node->properties['value']->node_database) ||
+                          isset($node->properties['value']->node_endpoint_to_consume)) {
                             return false;
                         }
                         return true;

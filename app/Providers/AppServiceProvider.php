@@ -77,7 +77,6 @@ class AppServiceProvider extends ServiceProvider
             Cache::add('role_base_redirects', $links);
         }
 
-        $setting = collect(Cache::get('settings'));
         $mail_config = [
             \strtolower('MAIL_HOST') => \getSetting('mail_host'),
             \strtolower('MAIL_PORT') => \getSetting('mail_port'),

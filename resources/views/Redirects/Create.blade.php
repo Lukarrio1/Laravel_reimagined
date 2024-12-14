@@ -38,20 +38,20 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <label for="role_name" class="form-label">Redirect to after password reset</label>
                     <select class="form-select" name="redirect_to_after_password_reset">
                         @foreach ($links as $link )
                         <option value="{{ $link->get('uuid') }}" {{ isset($redirect_edit)&&$link->get('uuid') ==$redirect_edit->redirect_to_after_password_reset?"selected":"" }}>{{ $link->get('name')  }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mb-3 text-center">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </button>
-                </div>
-            </form>
+                @endforeach
+                </select>
+        </div> --}}
+        <div class="mb-3 text-center">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+            </button>
         </div>
+        </form>
     </div>
+</div>
 </div>

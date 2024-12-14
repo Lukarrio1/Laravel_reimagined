@@ -14,7 +14,7 @@ if (!function_exists('createReference')) {
     * @return Reference
     */
 
-    function createReference($type, $owner_id, $owned_id)
+    function createReference(string $type, int $owner_id, int $owned_id): Reference|null
     {
         if (empty($type) || empty($owned_id) || empty($owned_id)) {
             return null;
@@ -45,7 +45,7 @@ if (!function_exists('createReference')) {
 
 if (!function_exists('deleteReference')) {
     /**
-    * Method deleteReference
+    * Method createReference
     *
     * @param string $type [Relationship type]
     * @param int $owner_id [owner id]
@@ -54,17 +54,18 @@ if (!function_exists('deleteReference')) {
     * @return bool
     */
 
-    function deleteReference($type, $owner_id, $owned_id)
+    function deleteReference(string $type, int $owner_id, int $owned_id): bool
     {
         if (empty($type) || empty($owned_id)) {
-            return null;
+            return false;
         }
         $config =  ReferenceConfig::where('type', $type)->first();
 
         if (empty($config)) {
-            return null;
+            return false;
         }
         $owner_id_query = $owner_id != null ? ["owner_id" => $owner_id] : [];
+
         Reference::where($owner_id_query + [
             "owner_model" => $config->owner_model,
             "owned_model" => $config->owned_model,
