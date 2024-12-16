@@ -30,7 +30,7 @@ class AuthController extends Controller
         $email_token = Str::random(50);
 
         if ($api_email_verification) {
-            $this->processVerificationEmail($request->email);
+            $this->processVerificationEmail($request->email, $email_token);
         }
         $role = !empty($setting) ? Role::find($setting) : null;
         $user = User::create($request->except('password') + [
