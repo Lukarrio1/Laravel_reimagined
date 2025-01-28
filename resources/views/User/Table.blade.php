@@ -11,7 +11,7 @@ use Carbon\Carbon;
                         <th scope="col" class="h4 fw-bold text-center">Email</th>
                         <th scope="col" class="h4 fw-bold text-center">Created At</th>
                         <th scope="col" class="h4 fw-bold text-center">Last Login At</th>
-                        <th scope="col" class="h4 fw-bold text-center">Role</th>
+                        <th scope="col" class="h4 fw-bold text-center">Roles</th>
                         <th scope="col" class="h4 fw-bold text-center">Action</th>
 
                     </tr>
@@ -33,7 +33,7 @@ use Carbon\Carbon;
                             <div class="text-center text-bg-light p-3 fw-semibold">{{optional($user->last_login_at)->toDateTimeString()}}</div>
                         </td>
                         <td>
-                            <div class="text-center text-bg-light p-3 fw-semibold">{{$user->role_name}}</div>
+                            <div class="text-center text-bg-light p-3 fw-semibold">{{$user->role_names}}</div>
 
                         </td>
                         <td class="text-center">
@@ -70,10 +70,10 @@ use Carbon\Carbon;
                                         @csrf
                                         <div class="mb-3">
                                             <label for="role_name" class="form-label">Role</label>
-                                            <select class="form-select" name="role">
+                                            <select class="form-select" name="roles[]" multiple>
                                                 <option selected value="">Open this select menu</option>
                                                 @foreach ($roles as $role )
-                                                <option value="{{$role->id}}" {{optional($user->role)->id==$role->id?"selected":''}}>
+                                                <option value="{{$role->id}}" {{$user?->role_ids?->contains($role->id)?"selected":''}}>
                                                     {{$role->name}}</option>
                                                 @endforeach
                                             </select>

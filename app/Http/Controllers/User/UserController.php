@@ -38,7 +38,7 @@ class UserController extends Controller
 
         $search = \request()->get('search', '||');
         $searchParams = collect(explode('|', $search))
-            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -55,14 +55,14 @@ class UserController extends Controller
 
         $users = User::query()->with('roles');
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
-        $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
+        $role_for_checking = !empty($setting) ? Role::find((int) $setting) : null;
         $roles = Role::query()
-            ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
+            ->when(!\request()->user()->hasRole($role_for_checking), fn($q) => $q->where('priority', '>', Role::min('priority')))
             ->get();
 
         $searchParams->when(
-            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
-            fn ($collection) => $collection->each(function ($section) use ($users, $translate) {
+            $searchParams->filter(fn($val) => \count($val) > 1)->count() > 0,
+            fn($collection) => $collection->each(function ($section) use ($users, $translate) {
                 list($key, $value) = $section;
                 // Check if the key is valid in the translation map
                 if (!isset($translate[$key])) {
@@ -75,23 +75,23 @@ class UserController extends Controller
                     $convertedValue = $value;
                 }
                 if ($translate[$key] === 'role') {
-                    $users->whereHas('roles', fn ($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
+                    $users->whereHas('roles', fn($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
                 } else {
                     $users->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
-
+    
                 }
             })
         );
         $users_count = $users->count();
         $max_amount_of_pages = $users_count / 8;
-        \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
+        \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int) \request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
         $users = $users->latest('updated_at')->customPaginate(8, \request('page'))->get();
 
         return \view('User.View', [
             'users' => $users->map(function (User $user) {
-                $user->role_name = \optional(\optional($user->roles)->first())->name;
-                $user->role = $user->roles->first();
+                $user->role_names = $user->roles->map->name->join(', ');
                 $user = $user->updateUserHtml();
+                $user->role_ids = $user->roles->pluck('id');
                 return $user;
             }),
             'roles' => $roles,
@@ -106,13 +106,13 @@ class UserController extends Controller
     public function assignRole(Request $request, User $user)
     {
 
-        $role = $request->role ? Role::findById($request->role) : null;
-        if (empty($role)) {
+        $roles = $request->roles ? Role::whereIn('id', $request->roles)->get() : null;
+        if (empty($roles)) {
             $user->syncRoles([]);
         } else {
-            $user->syncRoles([$role]);
+            $user->syncRoles($roles);
         }
-        Session::flash('message', 'The role was assigned successfully.');
+        Session::flash('message', 'The role(s) was assigned successfully.');
         Session::flash('alert-class', 'alert-success');
         return \redirect()->route('viewUsers', ['page' => \request('page')]);
     }

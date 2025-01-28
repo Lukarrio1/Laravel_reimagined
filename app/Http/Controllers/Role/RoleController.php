@@ -31,7 +31,7 @@ class RoleController extends Controller
 
         $search = \request()->get('search', '||');
         $searchParams = collect(explode('|', $search))
-            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -50,8 +50,8 @@ class RoleController extends Controller
         $roles = Role::query()->with('permissions');
         $roles_count_overall = $roles->count();
         $searchParams->when(
-            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
-            fn ($collection) => $collection->each(function ($section) use ($roles, $translate) {
+            $searchParams->filter(fn($val) => \count($val) > 1)->count() > 0,
+            fn($collection) => $collection->each(function ($section) use ($roles, $translate) {
                 list($key, $value) = $section;
                 // Check if the key is valid in the translation map
                 if (!isset($translate[$key])) {
@@ -64,28 +64,28 @@ class RoleController extends Controller
                     $convertedValue = $value;
                 }
                 if ($translate[$key] === 'name') {
-                    $roles->whereHas('permissions', fn ($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
+                    $roles->whereHas('permissions', fn($q) => $q->where($translate[$key], 'LIKE', '%' . $convertedValue . '%')); // Apply the condition to the query)
                 } else {
                     $roles->where($translate[$key], 'LIKE', '%' . $convertedValue . '%'); // Apply the condition to the query
-
+    
                 }
             })
         );
         $roles_count = $roles->count();
         $max_amount_of_pages = $roles_count / 5;
-        \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
+        \request()->merge(['page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int) \request('page') > $max_amount_of_pages ? \ceil($max_amount_of_pages) : \request('page'))]);
         $setting = \optional(Setting::where('key', 'admin_role')->first())->getSettingValue();
-        $role_for_checking = !empty($setting) ? Role::find((int)$setting) : null;
+        $role_for_checking = !empty($setting) ? Role::find((int) $setting) : null;
         $permissions = Permission::all();
         $roles = $roles
-            ->when(!\request()->user()->hasRole($role_for_checking), fn ($q) => $q->where('priority', '>', Role::min('priority')))
+            ->when(!\request()->user()->hasRole($role_for_checking), fn($q) => $q->where('priority', '>', Role::min('priority')))
             ->skip((int) 5 * (int) \request('page') - (int) 5)
             ->take((int) 5)
             ->orderBy('priority', 'asc')
             ->get()
-            ->map(fn ($role) => [
+            ->map(fn($role) => [
                 ...$role->toArray(),
-                'permission_name' => collect($role->permissions)->map(fn ($permission) => $permission->name)
+                'permission_name' => collect($role->permissions)->map(fn($permission) => $permission->name)
             ]);
         return view('Role.View', [
             'role' => optional($role)->load('permissions'),

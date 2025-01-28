@@ -22,7 +22,7 @@ class NodeController extends Controller
                         !empty($n->permission) && !$this->auth_user()
                             ->hasPermissionTo(\optional($n->permission)->name)
                         ? false : true;
-                    $n = (object)[
+                    $n = (object) [
                         ...$n->toArray(),
                         'properties' => [
                             'value' => $this->removeKeys($n->properties['value'])
@@ -41,7 +41,7 @@ class NodeController extends Controller
     public function nodes(): JsonResponse
     {
         $id = request()->user()->id ?? null;
-        $permission_ids  = \collect([]);
+        $permission_ids = \collect([]);
         $user = User::with('roles.permissions')->find($id);
         if (Cache::has('auth_user_permissions_' . $id)) {
             $permission_ids = Cache::get('auth_user_permissions_' . $id);
@@ -64,8 +64,10 @@ class NodeController extends Controller
                 ->get()
                 ->filter(function ($node) {
                     if ($node->node_type['value'] == 1) {
-                        if (isset($node->properties['value']->node_database) ||
-                          isset($node->properties['value']->node_endpoint_to_consume)) {
+                        if (
+                            isset($node->properties['value']->node_database) ||
+                            isset($node->properties['value']->node_endpoint_to_consume)
+                        ) {
                             return false;
                         }
                         return true;
@@ -77,14 +79,15 @@ class NodeController extends Controller
                         !empty($node->permission) && !$this->auth_user()
                             ->hasPermissionTo(\optional($node->permission)->name)
                         ? false : true;
-                    $node = (object)[
+
+                    $node = (object) [
                         ...$node->toArray(),
                         'properties' => [
                             'value' => $this->removeKeys($node->properties['value'])
                         ]
                     ];
                     return $node;
-                })->each(fn ($item) => $nodes->push($item));
+                })->each(fn($item) => $nodes->push($item));
             Cache::set($cache_name, $nodes, $this->getCurrentMethodCacheTtl());
         } else {
             $nodes = Cache::get($cache_name);
@@ -112,17 +115,17 @@ class NodeController extends Controller
                 })
                 ->map(function ($node) {
                     $node->hasAccess = $node->authentication_level['value'] == 1 ? false : true;
-                    $node = (object)[
+                    $node = (object) [
                         ...$node->toArray(),
                         'properties' => [
                             'value' => $this->removeKeys($node->properties['value'])
                         ]
                     ];
                     return $node;
-                })->each(fn ($item) => $nodes->push($item));
+                })->each(fn($item) => $nodes->push($item));
             Cache::set('guest_nodes', $nodes, $this->getCurrentMethodCacheTtl());
         } else {
-            Cache::get('guest_nodes')->each(fn ($item) => $nodes->push($item));
+            Cache::get('guest_nodes')->each(fn($item) => $nodes->push($item));
         }
         return \response()->json(['nodes' => $nodes]);
     }
