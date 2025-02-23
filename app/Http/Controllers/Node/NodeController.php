@@ -30,7 +30,7 @@ class NodeController extends Controller
         $this->middleware('can:can crud nodes');
         $this->cache = new CacheController();
         $this->tenancy = new Tenant();
-        $this->data_interoperability = (bool)\getSetting('data_interoperability');
+        $this->data_interoperability = (bool) \getSetting('data_interoperability');
     }
 
 
@@ -65,7 +65,7 @@ class NodeController extends Controller
 
         // Parse the search parameter from the request and create key-value pairs
         $searchParams = empty(request()->get('search')) ? \collect([]) : collect(explode('|', request()->get('search')))
-            ->filter(fn ($section) => !empty($section)) // Filter out empty sections
+            ->filter(fn($section) => !empty($section)) // Filter out empty sections
             ->map(function ($section) {
                 return explode(':', $section);
             });
@@ -75,8 +75,8 @@ class NodeController extends Controller
         $nodes_count_overall = $nodes->count();
 
         $searchParams->when(
-            $searchParams->filter(fn ($val) => \count($val) > 1)->count() > 0,
-            fn ($collection) => $collection->each(function ($section) use ($nodes, $translate) {
+            $searchParams->filter(fn($val) => \count($val) > 1)->count() > 0,
+            fn($collection) => $collection->each(function ($section) use ($nodes, $translate) {
                 list($key, $value) = $section;
                 // Check if the key is valid in the translation map
                 if (!isset($translate[$key])) {
@@ -94,35 +94,35 @@ class NodeController extends Controller
         );
 
 
-        $nodes  = $nodes->with(['permission']);
+        $nodes = $nodes->with(['permission']);
         $node_count = $nodes->get()->when(
             !$this->auth_user()->hasPermissionTo('can crud data bus nodes'),
-            fn ($collection) => $collection->filter(
-                fn ($item) => !isset($item->properties['value']->node_database)
-                    &&   !isset($item->properties['value']->node_endpoint_to_consume)
+            fn($collection) => $collection->filter(
+                fn($item) => !isset($item->properties['value']->node_database)
+                && !isset($item->properties['value']->node_endpoint_to_consume)
             )
         )->count();
         $max_amount_of_pages
             = $node_count / 8;
 
         \request()->merge([
-            'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int)\request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
-            'search' =>  request()->get('search')
+            'page' => \request('page') == null || (int) \request('page') < 1 ? 1 : ((int) \request('page') > \floor($max_amount_of_pages) ? \floor($max_amount_of_pages + 1) : \request('page')),
+            'search' => request()->get('search')
         ]);
         return \view('Nodes.View', [
             'types' => (new Node_Type())->NODE_TYPES($node),
             'authentication_levels' => Node::Authentication_Levels,
             'node_statuses' => Node::NODE_STATUS,
             'nodes_count' => $node_count,
-            'nodes' => $nodes->latest("updated_at")->with('permission')->customPaginate(8, (int)\request()->get('page'))->get()
-                ->when($node, fn ($collection) => \collect([
+            'nodes' => $nodes->latest("updated_at")->with('permission')->customPaginate(8, (int) \request()->get('page'))->get()
+                ->when($node, fn($collection) => \collect([
                     $node,
-                    ...$collection->filter(fn ($item) => \optional($item)->id != $node->id)
+                    ...$collection->filter(fn($item) => \optional($item)->id != $node->id)
                 ]))->when(
                     !$this->auth_user()->hasPermissionTo('can crud data bus nodes'),
-                    fn ($collection) => $collection->filter(
-                        fn ($item) => !isset($item->properties['value']->node_database)
-                            &&   !isset($item->properties['value']->node_endpoint_to_consume)
+                    fn($collection) => $collection->filter(
+                        fn($item) => !isset($item->properties['value']->node_database)
+                        && !isset($item->properties['value']->node_endpoint_to_consume)
                     )
                 ),
             'node' => $node,
@@ -146,7 +146,7 @@ class NodeController extends Controller
         $node_join_tables = !empty($request->get('node_join_tables')) ?
             json_decode($request->get('node_join_tables')) : [];
 
-        $node_endpoint_length = (int)$request->node_endpoint_length;
+        $node_endpoint_length = (int) $request->node_endpoint_length;
         if (count($node_join_tables) > 0) {
             for ($i = 0; $i < count($node_join_tables); $i++) {
                 $current_table = $node_join_tables[$i];
@@ -214,7 +214,7 @@ class NodeController extends Controller
         $validator = Validator::make(
             $request->all(),
             isset($current_node_type['rules']) ? $current_node_type['rules'] + $main_rules :
-                $main_rules
+            $main_rules
         );
 
         if ($validator->fails()) {
@@ -234,7 +234,7 @@ class NodeController extends Controller
         ])
             ->updatePageLayoutName()
             ->updatePageLink();
-        \defer(fn () => (new CacheController())->clearCache());
+        \defer(fn() => (new CacheController())->clearCache());
 
         return \redirect()->route('viewNodes');
     }
@@ -251,24 +251,43 @@ class NodeController extends Controller
         $display_aid = \request('display_aid');
         // getColumnListing
         $tables = $database != "null" ? collect(DB::connection($database)->select('SHOW TABLES'))
-            ->map(fn ($value) => \array_values((array) $value))
+            ->map(fn($value) => \array_values((array) $value))
             ->flatten() : [];
-        $columns = !isset($table) || $table != "null" ? DB::connection($database)->getSchemaBuilder()->getColumnListing($table) : [];
+        $columns = !isset($table) || $table != "null" ? DB::connection($database)
+            ->getSchemaBuilder()->getColumnListing($table) : [];
         $node = Node::find(\request('node_id'));
-        $table_items = $database != "null" && $table != "null" ? DB::connection($database)->table($table)->get() : [];
-        $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "null" ? null : $this->getHttpData(request('node_url_to_consume'));
+        $table_items = $database != "null" && $table != "null" ? DB::connection($database)
+            ->table($table)
+            ->get() : [];
+
+        $data_to_consume = empty(request('node_url_to_consume')) || request('node_url_to_consume') == "null"
+            ? null :
+            $this->getHttpData(request('node_url_to_consume'));
+
+
+        // handles column selection for the consume api endpoint routes
         if (!empty($data_to_consume) && $display_aid != "null") {
-            $data = isset($data_to_consume[$display_aid]) && gettype($data_to_consume[$display_aid]) != "int" ? collect($data_to_consume[$display_aid])->toArray() : [];
-            $columns = gettype($data) == "object" ? array_keys($data) : array_keys($data[0]);
+            $data = null;
+            if (gettype($data_to_consume) == "array" && gettype(array_keys($data_to_consume)[0]) != "string") {
+                $data = collect($data_to_consume)->toArray();
+            } else if (gettype(array_keys($data_to_consume)[0]) == "string") {
+                if (isset($data_to_consume[$display_aid])) {
+                    $data = $data_to_consume[$display_aid];
+                }
+            }
+            $columns = gettype($data) == "array" ? array_keys($data[0]) : array_keys($data);
         }
+
+
         return [
             "validation_rules" => $this->data_interoperability ? $this->getValidationRules() : [],
-            'node'
-            => $this->data_interoperability ? $node : null,
+            'node' => $this->data_interoperability ? $node : null,
             "tables" => $tables,
             "data_to_consume" => $this->data_interoperability ? $data_to_consume : [],
             "columns" => $columns,
-            'display_aid_columns' => $this->data_interoperability == true ? (!empty($data_to_consume) ? collect($data_to_consume)->keys() : $columns) : [],
+            'display_aid_columns' => $this->data_interoperability == true ? (!empty($data_to_consume) ?
+                collect($data_to_consume)->keys() : $columns)
+                : [],
             "table_items" => $this->data_interoperability == true ? $table_items : [],
             "orderByTypes" => $this->data_interoperability == true ? (new DataBusController())->orderByTypes : [],
             "databases" => $this->data_interoperability == true ? \collect(\getSetting('database_configuration'))->keys() : []
@@ -303,10 +322,10 @@ class NodeController extends Controller
         Session::flash('alert-class', 'alert-success');
         \request()->merge([
             'page' => \request('page'),
-            'search' =>  request()->get('search')
+            'search' => request()->get('search')
         ]);
 
-        \defer(fn () => (new CacheController())->clearCache());
+        \defer(fn() => (new CacheController())->clearCache());
         return \redirect()->route('viewNodes');
     }
 }

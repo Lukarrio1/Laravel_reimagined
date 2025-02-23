@@ -70,7 +70,7 @@ Route::middleware(['auth', CheckSuperAdmin::class])->group(function () {
     Route::get('/references_ajax', [ReferenceController::class, 'index2']);
     Route::delete('/reference/{reference}', [ReferenceController::class, 'delete']);
     $multi_tenancy = (int) optional(collect(Cache::get('settings'))->where('key', 'multi_tenancy')->first())
-                    ->getSettingValue('first');
+        ->getSettingValue('first');
     if ($multi_tenancy == 1) {
         Route::get('/tenants', [TenantController::class, 'index'])->name('viewTenants');
         Route::get('/tenant/{tenant}', [TenantController::class, 'index'])->name('editTenant');

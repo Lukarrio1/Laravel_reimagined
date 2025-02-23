@@ -6,10 +6,8 @@ use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Post extends BaseModel
+class Comment extends BaseModel
 {
     use HasFactory;
-
-    protected $fillable = ['title', 'body', 'is_active'];
-    protected $table = "posts";
+    protected $fillable = ['comment', 'post_id', 'user_id'];
 }

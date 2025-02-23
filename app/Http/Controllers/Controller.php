@@ -33,7 +33,7 @@ class Controller extends BaseController
     {
         $this->cache_ttl = \getSetting('cache_ttl');
         $this->search_skip_word = \getSetting('search_skip_word');
-        $this->admin_role = Role::find((int)\getSetting('admin_role'));
+        $this->admin_role = Role::find((int) \getSetting('admin_role'));
     }
 
     public function auth_user()
@@ -70,7 +70,7 @@ class Controller extends BaseController
     {
         $keys = collect($properties)->keys();
         $object = collect([]);
-        $keys->each(fn ($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
+        $keys->each(fn($key) => !\in_array($key, $this->exception_property_value_keys) ? $object->put($key, $properties->$key) : null);
         return $object->toArray();
     }
     /**
@@ -101,7 +101,7 @@ class Controller extends BaseController
 
     public function getCurrentMethodCacheTtl()
     {
-        return  \optional(\optional($this->getCurrentRoute())->properties['value'])->node_cache_ttl ?? $this->cache_ttl;
+        return \optional(\optional($this->getCurrentRoute())->properties['value'])->node_cache_ttl ?? $this->cache_ttl;
     }
 
     /**
@@ -141,7 +141,7 @@ class Controller extends BaseController
             escapeshellarg($databaseUser),
             escapeshellarg($databasePassword),
             escapeshellarg($databaseHost),
-            (int)$databasePort,
+            (int) $databasePort,
             escapeshellarg($databaseName),
             escapeshellarg($backupFilePath)
         );
@@ -164,7 +164,7 @@ class Controller extends BaseController
      */
     public function getHttpData($url)
     {
-        return !empty($url) ? Http::get($url)->json() : [];
+        return !empty($url) ? Http::timeout(180)->get($url)->json() : [];
     }
 
     /**
@@ -189,11 +189,11 @@ class Controller extends BaseController
                     ? $properties->node_join_column
                     : $properties->{'node_previous_' . $item . '_join_column'},
                 'condition' => $properties->{'node_' . $item . '_join_by_condition'},
-                'second_value' =>  $properties->{'node_' . $item . '_join_by_column'},
+                'second_value' => $properties->{'node_' . $item . '_join_by_column'},
                 'second_table' => $item,
                 'one_or_many' => $properties->{"node_" . $item . "_object_or_array_or_count"} ?? 2,
                 'columns' => collect($properties->{'node_' . $item . '_join_columns'})->map(function ($c) use ($item) {
-                    return  $c;
+                    return $c;
                 })->toArray(),
             ];
         });
@@ -247,7 +247,7 @@ class Controller extends BaseController
                 ->select($rel['columns'])
                 ->where($rel['second_value'], $rel['condition'], $item->{$rel['first_value']})
                 ->orderBy($rel['second_value'])
-                ->when($rel['one_or_many'] == 2, fn ($q) => $q->limit(1))
+                ->when($rel['one_or_many'] == 2, fn($q) => $q->limit(1))
                 ->chunk(500, function ($relatedItems) use (&$allRelatedItems, $relationShips, $database, $level, $rel) {
                     $allRelatedItems = $allRelatedItems->merge($relatedItems);
                     if ($rel['one_or_many'] == 3) {
@@ -275,10 +275,10 @@ class Controller extends BaseController
         $client_app_url = \getSetting('client_app_url');
         $verification_front_end_link = \explode('/', \optional(optional(Node::where('uuid', 'yuUkEHFptRPqzkBdOosQPeU5yeKbycDcE2qPvmr8LhIb6OmlYE')->first()->properties)['value'])->node_route);
         $verification_front_end_link = $client_app_url . collect($verification_front_end_link)
-            ->filter(fn ($_, $idx) => 1 + $idx != \count($verification_front_end_link))
+            ->filter(fn($_, $idx) => 1 + $idx != \count($verification_front_end_link))
             ->join('/') . '/' . $email_token;
 
-        \defer(fn () => $this->sendEmail(
+        \defer(fn() => $this->sendEmail(
             $email,
             "Email Verification",
             "Click <a href='$verification_front_end_link'>here</a> to verify your email address."
@@ -291,9 +291,9 @@ class Controller extends BaseController
     {
         $password_reset_email_frontend_link = \explode('/', \optional(optional(Node::where('uuid', 'q9LGEnzL3R7m7NXdffIlVUoIy7rUU07PS0Z7C8AjqXKn5cp6Gb')->first()->properties)['value'])->node_route);
         $password_reset_email_frontend_link = getSetting('client_app_url') . collect($password_reset_email_frontend_link)
-            ->filter(fn ($_, $idx) => 1 + $idx != \count($password_reset_email_frontend_link))
+            ->filter(fn($_, $idx) => 1 + $idx != \count($password_reset_email_frontend_link))
             ->join('/') . '/' . $token;
-        \defer(fn () => $this->sendEmail($email, 'Password Email', "Click <a href='$password_reset_email_frontend_link'> here to reset your password.</a>"));
+        \defer(fn() => $this->sendEmail($email, 'Password Email', "Click <a href='$password_reset_email_frontend_link'> here to reset your password.</a>"));
         return true;
 
     }
