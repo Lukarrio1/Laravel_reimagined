@@ -77,18 +77,18 @@ class AppServiceProvider extends ServiceProvider
             Cache::add('role_base_redirects', $links);
         }
 
-        $mail_config = [
-            \strtolower('MAIL_HOST') => \getSetting('mail_host'),
-            \strtolower('MAIL_PORT') => \getSetting('mail_port'),
-            \strtolower('MAIL_USERNAME') => \getSetting('mail_username'),
-            \strtolower('MAIL_PASSWORD') => \getSetting('mail_password'),
-            \strtolower('MAIL_ENCRYPTION') => \getSetting('mail_encryption'),
-            \strtolower('MAIL_FROM_ADDRESS') => \getSetting('mail_from_address'),
-            \strtolower('MAIL_FROM_NAME') => \getSetting('mail_from_name'),
-            'mail_url' => \getSetting('mail_url'),
-            'transport' => \getSetting('mail_mailer')
-        ];
-        Config::set('mail', $mail_config);
+        // $mail_config = [
+        //     \strtolower('MAIL_HOST') => \getSetting('mail_host'),
+        //     \strtolower('MAIL_PORT') => \getSetting('mail_port'),
+        //     \strtolower('MAIL_USERNAME') => \getSetting('mail_username'),
+        //     \strtolower('MAIL_PASSWORD') => \getSetting('mail_password'),
+        //     \strtolower('MAIL_ENCRYPTION') => \getSetting('mail_encryption'),
+        //     \strtolower('MAIL_FROM_ADDRESS') => \getSetting('mail_from_address'),
+        //     \strtolower('MAIL_FROM_NAME') => \getSetting('mail_from_name'),
+        //     'mail_url' => \getSetting('mail_url'),
+        //     'transport' => \getSetting('mail_mailer')
+        // ];
+        // Config::set('mail', $mail_config);
 
         if (!Cache::has('roles')) {
             Cache::set('roles', Role::all()->pluck('id', 'name'));
