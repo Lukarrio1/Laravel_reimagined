@@ -66,7 +66,7 @@ class AuthController extends Controller
             $email = $user->email;
             $token = Str::random(50);
             $this->updateUser($user, ['password' => Hash::make($request->password), 'password_reset_token' => $token]);
-            \defer(fn () =>   $this->sendEmail($email, 'Password Update', 'Your password was updated successfully'));
+            \defer(fn() => $this->sendEmail($email, 'Password Update', 'Your password was updated successfully'));
         }
         return response()->json(['message' => "You've updated your password successfully."]);
     }
@@ -90,7 +90,7 @@ class AuthController extends Controller
 
         // email verification check
         if ($api_email_verification == false) {
-            return  \response()->json(['token' => $token, 'user' => $user]);
+            return \response()->json(['token' => $token, 'user' => $user]);
         }
         //if empty the user needs to verify email address
         if (empty($user->email_verified_at)) {
@@ -102,7 +102,7 @@ class AuthController extends Controller
             $this->updateUser($user, ['email_verification_token' => $email_token]);
 
             return response()
-                   ->json([
+                ->json([
                     'message' => 'Please verify your email address, an email was sent to your email address when registered.'
                 ], 401);
         }
@@ -114,8 +114,8 @@ class AuthController extends Controller
     public function logout()
     {
         $user = $this->auth_user();
-        Cache::forget('auth_user_permissions_'.$user->id);
-        Cache::forget('auth_nodes_user_'.$user->id);
+        Cache::forget('auth_user_permissions_' . $user->id);
+        Cache::forget('auth_nodes_user_' . $user->id);
         $user->tokens()->delete();
 
         return response()->json(['message' => 'bye bye..'], 200);

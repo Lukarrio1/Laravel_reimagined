@@ -99,7 +99,8 @@ export default function JoinTablesForm({
             </div>
             <div class="mb-3">
                 <label for="node_table" class="form-label">
-                    Node Tables To Join To {JSON.stringify(selectedTables)}
+                    Node Tables To Join To{" "}
+                    {JSON.stringify(selectedTables?.filter((t) => t))}
                     {/* {[
                         "App\\Http\\Controllers\\Api\\DataBusController::saveRecord",
                         "App\\Http\\Controllers\\Api\\DataBusController::updateRecord",
@@ -112,6 +113,8 @@ export default function JoinTablesForm({
                     class="form-select"
                     // name="node_join_tables"
                     onChange={(e) => {
+                        e.persist();
+                        if (!e.target.value) return;
                         setSelectedTables([
                             ...selectedTables?.filter(
                                 (c, idx) => c != e.target.value
@@ -122,9 +125,11 @@ export default function JoinTablesForm({
                 >
                     <option value="">Select table</option>
                     {mainTables &&
-                        mainTables.map((table) => {
-                            return <option value={table}>{table}</option>;
-                        })}
+                        mainTables
+                            ?.filter((t) => t)
+                            .map((table) => {
+                                return <option value={table}>{table}</option>;
+                            })}
                 </select>
             </div>
             <input

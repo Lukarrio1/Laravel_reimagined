@@ -182,7 +182,7 @@ class Controller extends BaseController
         $joinTables = collect(json_decode($currentRouteNode->properties['value']->node_join_tables));
         $properties = $currentRouteNode->properties['value'];
 
-        $joinTableQueries = $joinTables->map(function ($item, $idx) use ($properties, $joinTables) {
+        $joinTableQueries = $joinTables->filter(fn($item) => !empty($item))->map(function ($item, $idx) use ($properties, $joinTables) {
             return [
                 'first_table' => $idx == 0 ? $properties->{'node_table'} : $joinTables[$idx - 1],
                 'first_value' => $idx == 0

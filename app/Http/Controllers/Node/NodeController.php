@@ -265,10 +265,11 @@ class NodeController extends Controller
             $this->getHttpData(request('node_url_to_consume'));
 
 
+
         // handles column selection for the consume api endpoint routes
         if (!empty($data_to_consume) && $display_aid != "null") {
             $data = null;
-            if (gettype($data_to_consume) == "array" && gettype(array_keys($data_to_consume)[0]) != "string") {
+            if (gettype($data_to_consume) == "array" && gettype(value: array_keys($data_to_consume)[0]) != "string") {
                 $data = collect($data_to_consume)->toArray();
             } else if (gettype(array_keys($data_to_consume)[0]) == "string") {
                 if (isset($data_to_consume[$display_aid])) {

@@ -25,7 +25,7 @@ class Setting extends Model
         'w3-animate-right' => 'w3-animate-right',
         'w3-animate-left' => 'w3-animate-left',
         'w3-animate-bottom' => 'w3-animate-bottom',
-        'w3-animate-top' =>  'w3-animate-top'
+        'w3-animate-top' => 'w3-animate-top'
     ];
 
     public function SETTING_OPTIONS($key, $value, $setting_key, $field_value)
@@ -72,7 +72,7 @@ class Setting extends Model
                              DB_PASSWORD=root_user,
                         <textarea class='form-control' name='value'>$field_value</textarea>
                   ";
-                // no break
+            // no break
             default:
                 # code...
                 break;
@@ -233,10 +233,14 @@ class Setting extends Model
                 'field' => $this->SETTING_OPTIONS('drop_down', ['Enabled' => true, 'Disabled' => false], $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
-              'redirect_to_after_password_reset' => [
+            'redirect_to_after_password_reset' => [
                 'field' => $this->SETTING_OPTIONS('drop_down', Cache::get('redirect_to_options', []), $key, $field_value),
                 'handle' => ['action' => 'split', 'value' => 'last'],
             ],
+            'network_request_elapsed_time' => [
+                'field' => $this->SETTING_OPTIONS('input_number', '', $key, $field_value),
+                'handle' => ['action' => '', 'value' => ''],
+            ]
         ]);
         return $keys->get($key);
     }
@@ -253,34 +257,34 @@ class Setting extends Model
             case 'multi_split':
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == 'first' ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
-                    ->map(fn ($item) => \collect(\explode('_', $item))
-                        ->filter(fn ($item, $idx) =>  $idx == 0)
-                        ->map(fn ($item) => \collect(\explode('--', $item))->join(' ')))
-                    ->flatten()->map(fn ($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
-                    collect(\explode('|', $this->properties))->map(fn ($item) => \collect(\explode('_', $item))
-                        ->filter(fn ($item, $idx) =>  $idx > 0))->flatten();
+                    ->map(fn($item) => \collect(\explode('_', $item))
+                        ->filter(fn($item, $idx) => $idx == 0)
+                        ->map(fn($item) => \collect(\explode('--', $item))->join(' ')))
+                    ->flatten()->map(fn($item) => "<li class='list-group-item'>" . $item . "</li>")->join('') . "</ul>" :
+                    collect(\explode('|', $this->properties))->map(fn($item) => \collect(\explode('_', $item))
+                        ->filter(fn($item, $idx) => $idx > 0))->flatten();
                 break;
             case "magic_split":
                 $value = !empty($value) ? $value : $key['value'];
                 $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode('|', $this->properties))
-                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
+                    ->map(fn($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" : \explode('|', $this->properties);
                 break;
             case "config_split":
                 $value = !empty($value) ? $value : $key['value'];
                 $else_val
                     = collect(explode(',', $this->properties))
-                    ->mapWithKeys(function ($item) {
-                        $itemParts = explode(':', $item);
-                        $outerKey = str_replace(["\r", "\n"], '', trim($itemParts[0]));
-                        $innerParts = isset($itemParts[1]) ? $itemParts[1] : '';
-                        $innerArray = collect(explode('|', $innerParts))->mapWithKeys(function ($val) {
-                            $keyValue = explode('=', $val);
-                            return [trim($keyValue[0]) => isset($keyValue[1]) ? $keyValue[1] : ''];
+                        ->mapWithKeys(function ($item) {
+                            $itemParts = explode(':', $item);
+                            $outerKey = str_replace(["\r", "\n"], '', trim($itemParts[0]));
+                            $innerParts = isset($itemParts[1]) ? $itemParts[1] : '';
+                            $innerArray = collect(explode('|', $innerParts))->mapWithKeys(function ($val) {
+                                $keyValue = explode('=', $val);
+                                return [trim($keyValue[0]) => isset($keyValue[1]) ? $keyValue[1] : ''];
+                            });
+                            return [$outerKey => $innerArray];
                         });
-                        return [$outerKey => $innerArray];
-                    });
                 $value = $value == "first" ? "<ul class='list-group list-group-flush'>" . collect(\explode(',', $this->properties))
-                    ->map(fn ($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
+                    ->map(fn($val) => "<li class='list-group-item'>" . $val . "</li>")->join('') . "</ul>" :
                     $else_val;
                 break;
             default:
@@ -325,12 +329,14 @@ class Setting extends Model
             'database_configuration' => "Database Configurations",
             "database_backup_configuration" => "Database Backup Configurations",
             "database_backup" => "Database Backup (Weekly)",
-            "cache_ttl"    =>   "Cache Time To Live (seconds)",
-            "search_skip_word"    => "Search Skip Word (used to preserve a data interoperability route if the value of a parameter is empty when searching or filtering data)",
+            "cache_ttl" => "Cache Time To Live (seconds)",
+            "search_skip_word" => "Search Skip Word (used to preserve a data interoperability route if the value of a parameter is empty when searching or filtering data)",
             "data_interoperability" => "Data Interoperability",
             'redirect_to_after_password_reset' => "React router redirect to after password reset",
             'brotli_compression_ratio' => "Brotli compression ration from 1 to 11",
             'gzip_compression_ratio' => "Gzip compression ration from 1 to 9",
+            'network_request_elapsed_time' => "Shows the network request time of each request"
+
         ]);
         // ->when($multi_tenancy == 0, function ($collection) {
         //     return $collection->filter((function ($item, $key) {

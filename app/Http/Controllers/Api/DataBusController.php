@@ -266,17 +266,16 @@ class DataBusController extends Controller
         $route_parameters = \collect(Route::current()->parameters());
         $database = $currentRouteNode->properties['value']->node_database;
         $table = $currentRouteNode->properties['value']->node_table;
-        $node_table_columns =
-            $currentRouteNode->properties['value']->node_table_columns;
+
         if ($database != null && $table != null) {
             $item = DB::connection($database)
-                ->table($table)
-                ->select($node_table_columns);
-            if (isset($currentRouteNode->properties['value']->node_item)) {
-                $item->where('id', $currentRouteNode->properties['value']->node_item);
-            } else {
-                $route_parameters->each(fn($value, $key) => $item->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
-            }
+                ->table($table);
+            $route_parameters->each(
+                fn($value, $key) => $item->when(
+                    $value != $this->search_skip_word,
+                    fn($q) => $q->where($key, $value)
+                )
+            );
             $item = $item->first();
         } else {
             $item = [];
@@ -323,7 +322,7 @@ class DataBusController extends Controller
         $rules = [];
         for ($i = 0; $i < \count($node_table_columns); $i++) {
             $rules[$node_table_columns[$i]] = collect($currentRouteNode->properties['value']->{'node_endpoint_field_' . $node_table_columns[$i]})
-                ->join(',');
+                ->join('|');
         }
         $data = \request()->all();
         $validator = Validator::make($data, $rules);
@@ -362,7 +361,7 @@ class DataBusController extends Controller
         $rules = [];
         for ($i = 0; $i < \count($node_table_columns); $i++) {
             $rules[$node_table_columns[$i]] = collect($currentRouteNode->properties['value']->{'node_endpoint_field_' . $node_table_columns[$i]})
-                ->join(',');
+                ->join('|');
         }
         $data = \request()->all();
         $validator = Validator::make($data, $rules);
@@ -372,7 +371,15 @@ class DataBusController extends Controller
         if ($database != null && $table != null) {
             $query = DB::connection($database)
                 ->table($table);
-            $route_parameters->each(fn($value, $key) => $query->when($value != $this->search_skip_word, fn($q) => $q->where($key, $value)));
+            $route_parameters->each(
+                fn($value, $key) => $query->when(
+                    $value != $this->search_skip_word,
+                    fn($q) => $q->where(
+                        $key,
+                        $value
+                    )
+                )
+            );
             $query->update($data);
             $item =
                 DB::connection($database)
